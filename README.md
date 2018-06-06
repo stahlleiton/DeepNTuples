@@ -99,9 +99,9 @@ Production
 ==========
 
 Before doing a batch submission you can test the ntuplizer locally in the production directory with:
-
+```
 cmsRun DeepNtuplizer.py inputFiles=/path/to/file.root
-
+```
 The jobs can be submitted using the following syntax
 ```
 jobSub.py --file <sample file> DeepNtuplizer.py <batch directory> --outpath /path/to/output/directory/
