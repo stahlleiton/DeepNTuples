@@ -49,8 +49,8 @@ Installation (CMSSW 8_4_X and 9_0_X)
 ============
 
 ```
-cmsrel CMSSW_8_0_25
-cd CMSSW_8_0_25/src/
+cmsrel CMSSW_8_4_0
+cd CMSSW_8_4_0/src/
 cmsenv
 git cms-init
 git clone https://github.com/CMSDeepFlavour/DeepNTuples
@@ -74,12 +74,11 @@ cd CMSSW_10_0_1/src/
 cmsenv
 git cms-init
 git clone https://github.com/CMSDeepFlavour/DeepNTuples
-git checkout 94X
 # Add JetToolBox
 cd DeepNTuples
+git checkout 94X
 git submodule init
 git submodule update
-sed -i 's|deepFlavourJetTags|pfDeepCSVJetTags|g' DeepNtuplizer/production/DeepNtuplizer.py
 #compile
 scram b -j 4
 ```
@@ -99,16 +98,16 @@ Production
 ==========
 
 Before doing a batch submission you can test the ntuplizer locally in the production directory with:
-
+```
 cmsRun DeepNtuplizer.py inputFiles=/path/to/file.root
-
+```
 The jobs can be submitted using the following syntax
 ```
 jobSub.py --file <sample file> DeepNtuplizer.py <batch directory> --outpath /path/to/output/directory/
 ```
-For an example of sample files, please refer to the .cfg files already in the production directory. You first specify the number of jobs to be submitted, then the input dataset name, and followed by the name of the output. Other arguments such as gluonReduction can then be specified if needed. Each argument need to be separted by at least two whitespaces.
+For an example of sample files, please refer to the .cfg files already in the production directory. You first specify the number of jobs to be submitted, then the input dataset name, which should then be followed by the name of the output. Other arguments such as gluonReduction can then be specified if needed. Each argument need to be separted by at least two whitespaces.
  
-The large job output (root files) will NOT be stored in the batch directory. The storage directory is specified by the --outpath argument. The batch directory will contain a symlink to this directory. By default the ntuples are stored in the deepjet directory, where you need write permission.
+The large job output (root files) will NOT be stored in the batch directory. The storage directory is specified by the --outpath argument. The batch directory will contain a symlink to this directory. If the outpath is not specified the ntuples are stored in the deepjet directory, where you need write permission.
 
 The status of the jobs can be checked with
 ```
