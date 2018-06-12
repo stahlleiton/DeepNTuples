@@ -74,9 +74,10 @@ cd CMSSW_10_0_1/src/
 cmsenv
 git cms-init
 git clone https://github.com/CMSDeepFlavour/DeepNTuples
-# Add JetToolBox
 cd DeepNTuples
 git checkout 94X
+git revert -m 1 578ae33227bcfcb67d034e38a26485efd180ea92 #Temporary solution 
+# Add JetToolBox
 git submodule init
 git submodule update
 #compile
@@ -139,5 +140,3 @@ This will take a significant amount of time - likely more than the ntuple produc
 ```
 mergeSamples.py 400000 /path/to/dir/merged ntuple_*/train_val_samples.txt --batch
 ```
-
-
