@@ -24,7 +24,7 @@ class neighbourTrackVars {
     
     int index, seed_index; //indexing
     
-    void set_PtEtaPhiMassDzDxy(double, double, double, double, double);
+    void set_PtEtaPhiMassDzDxy(double, double, double, double, double, double);
     void set_IPs(double, double, double, double);
     
     void set_PCAdistance ( double, double );
