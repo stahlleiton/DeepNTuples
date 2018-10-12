@@ -9,8 +9,12 @@
 #define DEEPNTUPLES_DEEPNTUPLIZER_INTERFACE_NTUPLE_DEEPVERTEX_H_
 
 #include "ntuple_content.h"
-#include "trackVars2.h"
+#include "neighbourTrackVars.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "RecoBTag/TrackProbability/interface/HistogramProbabilityEstimator.h"
+
+class HistogramProbabilityEstimator;
+#include <typeinfo>
 
 class ntuple_DeepVertex: public ntuple_content{
 public:
@@ -22,6 +26,7 @@ public:
     void initBranches(TTree* );
     void readEvent(const edm::Event& iEvent);
     void readSetup(const edm::EventSetup& iSetup);
+    void checkEventSetup(const edm::EventSetup & iSetup);
 
     //use either of these functions
 
@@ -55,7 +60,8 @@ private:
     float seed_3D_signedSip[max_seeds];
     float seed_2D_signedIp[max_seeds];
     float seed_2D_signedSip[max_seeds];
-    //int seed_JetMatch[max_seeds];
+    float seed_3D_TrackProbability[max_seeds];
+    float seed_2D_TrackProbability[max_seeds];
  
     float seed_chi2reduced[max_seeds];
     float seed_nPixelHits[max_seeds];
@@ -64,15 +70,12 @@ private:
     float seed_jetAxisDlength[max_seeds];
     
     unsigned int seed_n_NearTracks[max_seeds];
-    float seed_nNearTracks[max_seeds];
-    
-    
+        
     //nearest track candidates
     static constexpr size_t max_nearestTrk=200; // 20 per seed
     
     unsigned int n_NearTracksTotal=0;
-    float nNearTracksTotal=0;
-    
+        
     float nearTracks_pt[max_nearestTrk];
     float nearTracks_eta[max_nearestTrk];
     float nearTracks_phi[max_nearestTrk];
@@ -126,11 +129,16 @@ private:
     
     // builder    
     edm::ESHandle<TransientTrackBuilder> builder;
-    
+        
+    std::auto_ptr<HistogramProbabilityEstimator> m_probabilityEstimator;
+    bool m_computeProbabilities=1;
+    unsigned long long  m_calibrationCacheId2D; 
+    unsigned long long m_calibrationCacheId3D;
+        
     // temporary containers
-    trackVars2 myTrack;
-    std::vector<trackVars2> nearTracks; 
-    std::multimap<double,std::pair<const reco::TransientTrack*,const std::vector<trackVars2> > > SortedSeedsMap;
+    neighbourTrackVars myTrack;
+    std::vector<neighbourTrackVars> nearTracks; 
+    std::multimap<double,std::pair<const reco::TransientTrack*,const std::vector<neighbourTrackVars> > > SortedSeedsMap;
 
 
 };
