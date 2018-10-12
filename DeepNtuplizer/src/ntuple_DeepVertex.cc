@@ -14,6 +14,13 @@
 #include "TrackingTools/IPTools/interface/IPTools.h"
 #include "TrackingTools/PatternTools/interface/TwoTrackMinimumDistance.h"
 
+#include "CondFormats/BTauObjects/interface/TrackProbabilityCalibration.h"
+#include "CondFormats/DataRecord/interface/BTagTrackProbability2DRcd.h"
+#include "CondFormats/DataRecord/interface/BTagTrackProbability3DRcd.h"
+#include "FWCore/Framework/interface/EventSetupRecord.h"
+#include "FWCore/Framework/interface/EventSetupRecordImplementation.h"
+#include "FWCore/Framework/interface/EventSetupRecordKey.h"
+
 ntuple_DeepVertex::ntuple_DeepVertex(double jetR):ntuple_content(jetR){}
 
 ntuple_DeepVertex::~ntuple_DeepVertex(){}
@@ -41,8 +48,8 @@ void ntuple_DeepVertex::initBranches(TTree* tree){
     addBranch(tree,"seed_3D_signedSip", &seed_3D_signedSip, "seed_3D_signedSip[n_seeds]/f");
     addBranch(tree,"seed_2D_signedIp", &seed_2D_signedIp, "seed_2D_signedIp[n_seeds]/f");
     addBranch(tree,"seed_2D_signedSip", &seed_2D_signedSip, "seed_2D_signedSip[n_seeds]/f");
-    addBranch(tree,"seed_3D_TrackProbability" &seed_3D_TrackProbability, "seed_3D_TrackProbability[n_seeds]/f");
-    addBranch(tree,"seed_2D_TrackProbability" &seed_2D_TrackProbability, "seed_2D_TrackProbability[n_seeds]/f");
+    addBranch(tree,"seed_3D_TrackProbability", &seed_3D_TrackProbability, "seed_3D_TrackProbability[n_seeds]/f");
+    addBranch(tree,"seed_2D_TrackProbability", &seed_2D_TrackProbability, "seed_2D_TrackProbability[n_seeds]/f");
     
     addBranch(tree,"seed_chi2reduced",&seed_chi2reduced, "seed_chi2reduced[n_seeds]/f");
     addBranch(tree,"seed_nPixelHits",&seed_nPixelHits, "seed_nPixelHits[n_seeds]/f");
@@ -272,7 +279,7 @@ bool ntuple_DeepVertex::fillBranches(const pat::Jet & jet, const size_t& jetidx,
                 
                 myTrack.set_PCAdistance (distance,  m.significance());
                 myTrack.set_PCAonSeedXYZ(seedPosition.x(), seedPosition.y(), seedPosition.z(), seedPositionErr.cxx(), seedPositionErr.cyy(), seedPositionErr.czz());
-                myTrack.set_PCAonTrackXYZ(ttPoint.x(),  ttPoint.y(),  ttPoint.z(),  ttPointErr.cxx(),  ttPointErr.cyy());
+                myTrack.set_PCAonTrackXYZ(ttPoint.x(),  ttPoint.y(),  ttPoint.z(),  ttPointErr.cxx(),  ttPointErr.cyy(), ttPointErr.czz());
                 
                 myTrack.set_dotProds(dotprodTrack, dotprodSeed, dotprodTrackSeed2D, dotprodTrackSeed3D, dotprodTrackSeed2DV, dotprodTrackSeed3DV);
                 myTrack.set_PVdistance(PCAseedFromPV, PCAtrackFromPV);
@@ -294,7 +301,7 @@ bool ntuple_DeepVertex::fillBranches(const pat::Jet & jet, const size_t& jetidx,
             }
         }            
          
-        std::sort (nearTracks.begin(), nearTracks.end(), sortfunction2());
+        std::sort (nearTracks.begin(), nearTracks.end(), sortfunctionNTracks());
         if (nearTracks.size() > 20){nearTracks.resize(20);}
         SortedSeedsMap.insert(std::make_pair(-ipSigned.second.significance(), std::make_pair(&(*it), nearTracks)));
             
@@ -304,7 +311,7 @@ bool ntuple_DeepVertex::fillBranches(const pat::Jet & jet, const size_t& jetidx,
     unsigned int seeds_max_counter=0;
     unsigned int neartracks_max_counter=0;
  
-    for(std::multimap<double,std::pair<const reco::TransientTrack*,const std::vector<trackVars2> > >::const_iterator im = SortedSeedsMap.begin(); im != SortedSeedsMap.end(); im++){
+    for(std::multimap<double,std::pair<const reco::TransientTrack*,const std::vector<neighbourTrackVars> > >::const_iterator im = SortedSeedsMap.begin(); im != SortedSeedsMap.end(); im++){
         
         if(seeds_max_counter>=max_seeds) break;
         
@@ -337,11 +344,11 @@ bool ntuple_DeepVertex::fillBranches(const pat::Jet & jet, const size_t& jetidx,
             std::pair<bool,double> probability;
     
             //probability with 3D ip
-            probability = m_probabilityEstimator->probability(0, 0,ip.second.significance(),im->second.first->track(),*iter,pv);
+            probability = m_probabilityEstimator->probability(0, 0,ip.second.significance(),im->second.first->track(),jet,pv);
             double prob3D=(probability.first ? probability.second : -1.);
 
             //probability with 2D ip
-            probability = m_probabilityEstimator->probability(0, 1,ip2d.second.significance(),im->second.first->track(),*iter,pv);
+            probability = m_probabilityEstimator->probability(0, 1,ip2d.second.significance(),im->second.first->track(),jet,pv);
             double prob2D=(probability.first ? probability.second : -1.);
                         
             seed_3D_TrackProbability[seeds_max_counter]=prob3D;
