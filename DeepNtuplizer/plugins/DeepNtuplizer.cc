@@ -124,6 +124,7 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
     // read configuration parameters
     const double jetR = iConfig.getParameter<double>("jetR");
     const bool  runFatJets_ = iConfig.getParameter<bool>("runFatJet");
+    const bool  runDeepVertex_ = iConfig.getParameter<bool>("runDeepVertex");
 
     //not implemented yet
     const bool useHerwigCompatibleMatching=iConfig.getParameter<bool>("useHerwigCompatible");
@@ -145,9 +146,13 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
     //addModule(svmodule_LooseIVF);
 
     // DeepVertex info
-    // ntuple_DeepVertex* deepvertexmodule=new ntuple_DeepVertex(jetR);
-    // deepvertexmodule->setCandidatesToken(consumes<edm::View<pat::PackedCandidate> >(iConfig.getParameter<edm::InputTag>("candidates")));
-    // addModule(deepvertexmodule);
+    if (runDeepVertex_)	{
+        
+        ntuple_DeepVertex* deepvertexmodule=new ntuple_DeepVertex(jetR);
+    	deepvertexmodule->setCandidatesToken(consumes<edm::View<pat::PackedCandidate> >(iConfig.getParameter<edm::InputTag>("candidates")));
+    	addModule(deepvertexmodule);
+        
+    }
 
     ntuple_JetInfo* jetinfo=new ntuple_JetInfo();
     jetinfo->setQglToken(consumes<edm::ValueMap<float>>(edm::InputTag(t_qgtagger, "qgLikelihood")));
