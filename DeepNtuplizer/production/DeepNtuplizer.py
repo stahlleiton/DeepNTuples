@@ -115,11 +115,11 @@ else :
          'pfJetBProbabilityBJetTags',
          'pfJetProbabilityBJetTags',
      'pfCombinedInclusiveSecondaryVertexV2BJetTags',
-         'deepFlavourJetTags:probudsg', #to be fixed with new names
-         'deepFlavourJetTags:probb',
-         'deepFlavourJetTags:probc',
-         'deepFlavourJetTags:probbb',
-         'deepFlavourJetTags:probcc',
+         'pfDeepCSVJetTags:probudsg', #to be fixed with new names
+         'pfDeepCSVJetTags:probb',
+         'pfDeepCSVJetTags:probc',
+         'pfDeepCSVJetTags:probbb',
+         'pfDeepCSVJetTags:probcc',
  ]
 
 jetCorrectionsAK4 = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
