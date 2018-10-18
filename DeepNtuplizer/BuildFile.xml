@@ -4,7 +4,7 @@
 <use name="DataFormats/PatCandidates"/>
 <use name="TrackingTools/IPTools"/>
 <use name="DeepNTuples/JetAnalysis"/>
-<use name="RecoBTag/DeepFlavour"/>
+<use name="RecoBTag/TensorFlow"/>
 <use name="RecoBTag/TrackProbability"/>
 <use name="CondFormats/DataRecord"/>
 <use name="CondFormats/BTauObjects"/>
