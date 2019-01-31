@@ -184,6 +184,12 @@ public:
     float  jet_energy_;
 
     float jet_looseId_;
+    int jet_jetId_;
+    int jet_puId_;
+    
+    int jet_hflav_;
+    int jet_pflav_;
+    int jet_phflav_;
 
     // quark/gluon
     float jet_qgl_;

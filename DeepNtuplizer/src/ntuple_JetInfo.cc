@@ -25,6 +25,8 @@ void ntuple_JetInfo::getInput(const edm::ParameterSet& iConfig){
     jetAbsEtaMin_=(iConfig.getParameter<double>("jetAbsEtaMin"));
     jetAbsEtaMax_=(iConfig.getParameter<double>("jetAbsEtaMax"));
 
+    std::cout << "jetPtMin_" << jetPtMin_ << "jetPtMax_" << jetPtMax_ << "jetAbsEtaMin_" << jetAbsEtaMin_ << "jetAbsEtaMax_" << jetAbsEtaMax_ << std::endl;
+    
     vector<string> disc_names = iConfig.getParameter<vector<string> >("bDiscriminators");
     for(auto& name : disc_names) {
         discriminators_[name] = 0.;
@@ -57,6 +59,10 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"isG",&isG_, "isG_/i");
     addBranch(tree,"isUndefined",&isUndefined_, "isUndefined_/i");
     addBranch(tree,"genDecay",&genDecay_, "genDecay_/f"); //dxy corresponds to the distance the Bhadron traveled
+    
+    addBranch(tree,"jet_hflav", &jet_hflav_);
+    addBranch(tree,"jet_pflav", &jet_pflav_);
+    addBranch(tree,"jet_phflav", &jet_phflav_);
 
     //truth labeling with fallback to physics definition for light/gluon/undefined of standard flavor definition
     addBranch(tree,"isPhysB",&isPhysB_, "isPhysB_/i");
@@ -85,6 +91,8 @@ void ntuple_JetInfo::initBranches(TTree* tree){
 
     //jet id
     addBranch(tree,"jet_looseId", &jet_looseId_);
+    addBranch(tree,"jet_jetId", &jet_jetId_);
+    addBranch(tree,"jet_puId", &jet_puId_); 
 
     // quark gluon
     addBranch(tree,"jet_qgl",   &jet_qgl_);  // qg tagger from jmar
@@ -163,6 +171,27 @@ void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
     alltaus_.clear();
     Bhadron_.clear();
     Bhadron_daughter_.clear();
+    
+ // just printout
+    
+    
+    for (const reco::Candidate &genC : *genParticlesHandle)
+   {
+     const reco::GenParticle &gen = static_cast< const reco::GenParticle &>(genC);
+     
+     if((abs(gen.pdgId())>500&&abs(gen.pdgId())<600)||(abs(gen.pdgId())>5000&&abs(gen.pdgId())<6000)) {
+        std::cout<< "gen B hadrons" << gen.pdgId() << "pt -eta " << gen.pt() << " " << gen.eta() << " " << gen.phi() <<std::endl;
+         
+    }
+    
+    if((abs(gen.pdgId())>400&&abs(gen.pdgId())<500)||(abs(gen.pdgId())>4000&&abs(gen.pdgId())<5000)) {
+        std::cout<< "gen C hadrons" << gen.pdgId() << "pt -eta " << gen.pt() << " " << gen.eta() << " " << gen.phi() <<std::endl;
+         
+    }
+           
+    }
+    
+    
 
     //std::cout << " start search for a b in this event "<<std::endl;
  for (const reco::Candidate &genC : *genParticlesHandle)
@@ -257,6 +286,8 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 
     /// cuts ///
     bool returnval=true;
+    
+    std::cout <<  jet.correctedJet("Uncorrected").pt() << " " << jet.eta() << " " << jet.phi() << std::endl;
 
     // some cuts to contrin training region
     if ( jet.pt() < jetPtMin_ ||  jet.pt() > jetPtMax_ ) returnval=false;                  // apply jet pT cut
@@ -435,7 +466,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
         float NHF  = jet.neutralHadronEnergyFraction();
         float NEMF = jet.neutralEmEnergyFraction();
         float CHF  = jet.chargedHadronEnergyFraction();
-        //float MUF  = jet.muonEnergyFraction();
+        float MUF  = jet.muonEnergyFraction();
         float CEMF = jet.chargedEmEnergyFraction();
         float NumConst = jet.chargedMultiplicity()+jet.neutralMultiplicity();
         float NumNeutralParticles =jet.neutralMultiplicity();
@@ -444,9 +475,21 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
         jet_looseId_ = ((NHF<0.99 && NEMF<0.99 && NumConst>1) && ((abs(jet_eta_)<=2.4 && CHF>0 && CHM>0 && CEMF<0.99) || abs(jet_eta_)>2.4) && abs(jet_eta_)<=2.7) ||
                 (NHF<0.98 && NEMF>0.01 && NumNeutralParticles>2 && abs(jet_eta_)>2.7 && abs(jet_eta_)<=3.0 ) ||
                 (NEMF<0.90 && NumNeutralParticles>10 && abs(jet_eta_)>3.0 );
+        //I do it only for eta that I use
+        bool tightJetID = (NHF<0.90 && NEMF<0.90 && NumConst>1) && ((abs(jet_eta_)<=2.4 && CHF>0 && CHM>0 && CEMF<0.99) || abs(jet_eta_)>2.4) && abs(jet_eta_)<=2.7;
+        bool tightLepVetoJetID = (NHF<0.90 && NEMF<0.90 && NumConst>1 && MUF<0.8) && ((abs(jet_eta_)<=2.4 && CHF>0 && CHM>0 && CEMF<0.90) || abs(jet_eta_)>2.4) && abs(jet_eta_)<=2.7;
+        jet_jetId_=tightJetID*2+4*tightLepVetoJetID;
+        
     }catch(const cms::Exception &e){
-        jet_looseId_ = 1;
+        jet_looseId_ = -1;
+        jet_jetId_=-1;
     }
+    
+    jet_puId_=jet.userInt("pileupJetId:fullId");
+    jet_hflav_=abs(jet.hadronFlavour());
+    jet_pflav_=abs(jet.partonFlavour());
+    jet_phflav_=0;
+    if(jet.genParton()) jet_phflav_=abs(jet.genParton()->pdgId());
 
 
     gen_pt_ =  0;
