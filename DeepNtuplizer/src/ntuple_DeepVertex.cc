@@ -201,12 +201,12 @@ bool ntuple_DeepVertex::fillBranches(const pat::Jet & jet, const size_t& jetidx,
     
     double jet_radius = jetR();
     GlobalVector direction(jet.px(), jet.py(), jet.pz());
-    
+       
     for(std::vector<reco::TransientTrack>::const_iterator it = selectedTracks.begin(); it != selectedTracks.end(); it++){
 
         //is the track in the jet cone?
         float angular_distance=reco::deltaR(jet,it->track());//std::sqrt(std::pow(jet.eta()-it->track().eta(),2) + std::pow(jet.phi()-it->track().phi(),2) );
-        if (angular_distance>jet_radius) { continue; }
+	if (angular_distance>jet_radius) { continue; }
 
         // is it a seed track?
         std::pair<bool,Measurement1D> ip = IPTools::absoluteImpactParameter3D(*it, pv);        
@@ -225,7 +225,7 @@ bool ntuple_DeepVertex::fillBranches(const pat::Jet & jet, const size_t& jetidx,
             it->track().normalizedChi2()<5. && std::fabs(it->track().dxy(pv.position())) < 2 &&
             std::fabs(it->track().dz(pv.position())) < 17  && jet_dist.second.value()<0.07 && length<5. );
         
-        if (!is_seed_candidate){continue;}
+        //if (!is_seed_candidate){continue;}
         
         std::pair<bool,Measurement1D> ipSigned = IPTools::signedImpactParameter3D(*it,direction, pv); 
         //n_seeds++;
@@ -233,7 +233,11 @@ bool ntuple_DeepVertex::fillBranches(const pat::Jet & jet, const size_t& jetidx,
         nearTracks.clear();
         //now that we found a seed, loop over all other tracks and look for neighbours
         for(std::vector<reco::TransientTrack>::const_iterator tt = selectedTracks.begin();tt!=selectedTracks.end(); ++tt ) {
-            
+	  float near_angular_distance=reco::deltaR(jet,tt->track());
+	  if(near_angular_distance<jet_radius){
+	    continue;
+	  }
+        
             if(*tt==*it) continue;
             if(std::fabs(pvp.z()-tt->track().vz())>0.1) continue;
             
@@ -241,7 +245,6 @@ bool ntuple_DeepVertex::fillBranches(const pat::Jet & jet, const size_t& jetidx,
             TwoTrackMinimumDistance dist;
             
             if(dist.calculate(tt->impactPointState(),it->impactPointState())) {
-                
                 GlobalPoint ttPoint          = dist.points().first;
                 GlobalError ttPointErr       = tt->impactPointState().cartesianError().position();
                 GlobalPoint seedPosition     = dist.points().second;
@@ -297,17 +300,23 @@ bool ntuple_DeepVertex::fillBranches(const pat::Jet & jet, const size_t& jetidx,
                 myTrack.setSeedMass(masses[it-selectedTracks.begin()]);                    
                 myTrack.set_JetAxisVars(PCA_JetAxis_dist,dotprodMomenta,dEta,dPhi);
                 nearTracks.push_back(myTrack);
-            
+		
             }
         }            
          
         std::sort (nearTracks.begin(), nearTracks.end(), sortfunctionNTracks());
         if (nearTracks.size() > 20){nearTracks.resize(20);}
+	//for(int n = 0; n<20; n++){
+	  //std::cout << "n = " << n << std::endl;
+	  //std::cout << "dR = " << reco::deltaR( jet.eta(), jet.phi(), nearTracks.at(n).eta, nearTracks.at(n).phi) << std::endl;
+	  //std::cout << "dist = " << nearTracks.at(n).dist << std::endl;
+  
+	//}
         SortedSeedsMap.insert(std::make_pair(-ipSigned.second.significance(), std::make_pair(&(*it), nearTracks)));
             
     }
-    
-       
+    // std::cout << "jet tracks = " << counter << std::endl;
+    //std::cout << "ang dist 4 = " << big_counter << std::endl;
     unsigned int seeds_max_counter=0;
     unsigned int neartracks_max_counter=0;
  

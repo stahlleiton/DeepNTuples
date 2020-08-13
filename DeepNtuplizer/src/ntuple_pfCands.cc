@@ -231,7 +231,7 @@ void ntuple_pfCands::initBranches(TTree* tree){
     addBranch(tree,"Cpfcan_quality",&Cpfcan_quality_,"Cpfcan_quality_[n_Cpfcand_]/f");
 
     // did not give integers !!
-    //  addBranch(tree,"Cpfcan_charge",&Cpfcan_charge_,"Cpfcan_charge_[n_Cpfcand_]/i");
+    addBranch(tree,"Cpfcan_charge",&Cpfcan_charge_,"Cpfcan_charge_[n_Cpfcand_]/f");
 
     //Neutral Pf candidates
     addBranch(tree,"n_Npfcand", &n_Npfcand_,"n_Npfcand_/i");
@@ -408,8 +408,8 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
                 Cpfcan_isEl_[fillntupleentry] = 1;
 
             }
-
-            Cpfcan_charge_[fillntupleentry] = PackedCandidate_->charge();
+	    float cand_charge_ = PackedCandidate_->charge();
+            Cpfcan_charge_[fillntupleentry] = cand_charge_;
             Cpfcan_lostInnerHits_[fillntupleentry] = catchInfs(PackedCandidate_->lostInnerHits(),2);
 	    Cpfcan_numberOfPixelHits_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfPixelHits(),-1);
 

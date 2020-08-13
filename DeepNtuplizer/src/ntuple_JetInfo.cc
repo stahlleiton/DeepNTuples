@@ -24,8 +24,6 @@ void ntuple_JetInfo::getInput(const edm::ParameterSet& iConfig){
     jetPtMax_=(iConfig.getParameter<double>("jetPtMax"));
     jetAbsEtaMin_=(iConfig.getParameter<double>("jetAbsEtaMin"));
     jetAbsEtaMax_=(iConfig.getParameter<double>("jetAbsEtaMax"));
-
-    std::cout << "jetPtMin_" << jetPtMin_ << "jetPtMax_" << jetPtMax_ << "jetAbsEtaMin_" << jetAbsEtaMin_ << "jetAbsEtaMax_" << jetAbsEtaMax_ << std::endl;
     
     vector<string> disc_names = iConfig.getParameter<vector<string> >("bDiscriminators");
     for(auto& name : disc_names) {
@@ -57,6 +55,7 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"isUD",&isUD_, "isUD_/i");
     addBranch(tree,"isS",&isS_, "isS_/i");
     addBranch(tree,"isG",&isG_, "isG_/i");
+    addBranch(tree,"isPU",&isPU_, "isPU_/i");
     addBranch(tree,"isUndefined",&isUndefined_, "isUndefined_/i");
     addBranch(tree,"genDecay",&genDecay_, "genDecay_/f"); //dxy corresponds to the distance the Bhadron traveled
     
@@ -65,6 +64,7 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"jet_phflav", &jet_phflav_);
 
     //truth labeling with fallback to physics definition for light/gluon/undefined of standard flavor definition
+    /*
     addBranch(tree,"isPhysB",&isPhysB_, "isPhysB_/i");
     addBranch(tree,"isPhysGBB",&isPhysGBB_, "isPhysGBB_/i");
     addBranch(tree,"isPhysBB",&isPhysBB_, "isPhysBB_/i");
@@ -78,7 +78,8 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"isPhysS",&isPhysS_, "isPhysS_/i");
     addBranch(tree,"isPhysG",&isPhysG_, "isPhysG_/i");
     addBranch(tree,"isPhysUndefined",&isPhysUndefined_, "isPhysUndefined_/i");
-
+    addBranch(tree,"isPhysPU",&isPhysPU_, "isPhysPU_/i");
+    */
     // jet variables
     //b=tree->Branch("jet_pt", &jet_pt_);
     addBranch(tree,"jet_pt", &jet_pt_);
@@ -101,6 +102,7 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"QG_mult",  &QG_mult_);  // multiplicity i.e. total num of PFcands reconstructed
 
     // yutas quark-gluon info
+    /*
     addBranch(tree,"y_multiplicity"    ,&y_multiplicity_,"y_multiplicity_/f"    );
     addBranch(tree,"y_charged_multiplicity"    ,&y_charged_multiplicity_,"y_charged_multiplicity_/f"    );
     addBranch(tree,"y_neutral_multiplicity"    ,&y_neutral_multiplicity_,"y_neutral_multiplicity_/f"    );
@@ -108,10 +110,10 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"y_axis1"    ,&y_axis1_,"y_axis1_/f"    );
     addBranch(tree,"y_axis2"    ,&y_axis2_,"y_axis2_/f"    );
     addBranch(tree,"y_pt_dr_log"    ,&y_pt_dr_log_,"y_pt_dr_log_/f"    );
-
+    */
 
     // in the jet
-
+    /*
     addBranch(tree,"muons_number", &muons_number_, "muons_number_/i");
     addBranch(tree,"electrons_number", &electrons_number_, "electrons_number_/i");
 
@@ -127,7 +129,7 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"electrons_relEta", &electrons_relEta_, "electrons_relEta_[electrons_number_]/f");
     addBranch(tree,"electrons_relPhi", &electrons_relPhi_, "electrons_relPhi_[electrons_number_]/f");
     addBranch(tree,"electrons_energy", &electrons_energy_, "electrons_energy_[electrons_number_]/f");
-
+    */
 
     addBranch(tree,"gen_pt_Recluster"    ,&gen_pt_Recluster_    ,"gen_pt_Recluster_/f"    );
     addBranch(tree,"gen_pt_WithNu"    ,&gen_pt_WithNu_    ,"gen_pt_WithNu_/f"    );
@@ -152,6 +154,9 @@ void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
 
     iEvent.getByToken(genJetMatchReclusterToken_, genJetMatchRecluster);
     iEvent.getByToken(genJetMatchWithNuToken_, genJetMatchWithNu);
+    iEvent.getByToken(genJetMatchAllowDuplicatesToken_, genJetMatchAllowDuplicates);
+
+
 
     iEvent.getByToken(genParticlesToken_, genParticlesHandle);
 
@@ -173,23 +178,6 @@ void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
     Bhadron_daughter_.clear();
     
  // just printout
-    
-    
-    for (const reco::Candidate &genC : *genParticlesHandle)
-   {
-     const reco::GenParticle &gen = static_cast< const reco::GenParticle &>(genC);
-     
-     if((abs(gen.pdgId())>500&&abs(gen.pdgId())<600)||(abs(gen.pdgId())>5000&&abs(gen.pdgId())<6000)) {
-        std::cout<< "gen B hadrons" << gen.pdgId() << "pt -eta " << gen.pt() << " " << gen.eta() << " " << gen.phi() <<std::endl;
-         
-    }
-    
-    if((abs(gen.pdgId())>400&&abs(gen.pdgId())<500)||(abs(gen.pdgId())>4000&&abs(gen.pdgId())<5000)) {
-        std::cout<< "gen C hadrons" << gen.pdgId() << "pt -eta " << gen.pt() << " " << gen.eta() << " " << gen.phi() <<std::endl;
-         
-    }
-           
-    }
     
     
 
@@ -287,8 +275,6 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     /// cuts ///
     bool returnval=true;
     
-    std::cout <<  jet.correctedJet("Uncorrected").pt() << " " << jet.eta() << " " << jet.phi() << std::endl;
-
     // some cuts to contrin training region
     if ( jet.pt() < jetPtMin_ ||  jet.pt() > jetPtMax_ ) returnval=false;                  // apply jet pT cut
     if ( fabs(jet.eta()) < jetAbsEtaMin_ || fabs(jet.eta()) > jetAbsEtaMax_ ) returnval=false; // apply jet eta cut
@@ -298,8 +284,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     if (gluonReduction_>0 && jet.partonFlavour()==21)
         if(TRandom_.Uniform()>gluonReduction_) returnval=false;
 
-    if(jet.genJet()==NULL)returnval=false;
-
+    //if(jet.genJet()==NULL)returnval=false;
 
     //branch fills
     for(auto& entry : discriminators_) {
@@ -330,7 +315,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     //std::vector<Ptr<pat::Jet> > p= coll->ptrs();
 
     isB_=0; isGBB_=0; isBB_=0; isC_=0; isGCC_=0; isCC_=0; isUD_=0;isTau_=0;
-    isS_=0; isG_=0, isLeptonicB_=0, isLeptonicB_C_=0, isUndefined_=0;
+    isS_=0; isG_=0, isPU_=0, isLeptonicB_=0, isLeptonicB_C_=0, isUndefined_=0;
     auto muIds = deep_ntuples::jet_muonsIds(jet,*muonsHandle);
     auto elecIds = deep_ntuples::jet_electronsIds(jet,*electronsHandle);
 
@@ -362,7 +347,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     }
 
     //// Note that jets with gluon->bb (cc) and x->bb (cc) are in the same categories
-    if(jet.genJet()!=NULL){
+    if(true){
         switch(deep_ntuples::jet_flavour(jet, gToBB, gToCC, neutrinosLepB, neutrinosLepB_C, alltaus_)) {
         case deep_ntuples::JetFlavor::B:  isB_=1; break;
         case deep_ntuples::JetFlavor::LeptonicB: isLeptonicB_=1; break;
@@ -374,6 +359,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
         case deep_ntuples::JetFlavor::CC: isCC_=1; break;
         case deep_ntuples::JetFlavor::TAU: isTau_=1;break;
         case deep_ntuples::JetFlavor::G:  isG_=1; break;
+        case deep_ntuples::JetFlavor::PU:  isPU_=1; break;
         case deep_ntuples::JetFlavor::UD: isUD_=1; break;
         case deep_ntuples::JetFlavor::S:  isS_=1; break;
         default : isUndefined_=1; break;
@@ -384,8 +370,8 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     //// Note that jets with gluon->bb (cc) and x->bb (cc) are in the same categories
     isPhysB_=0; isPhysBB_=0; isPhysGBB_=0; isPhysC_=0; isPhysCC_=0;
     isPhysGCC_=0; isPhysUD_=0; isPhysS_=0; isPhysG_=0, isPhysLeptonicB_=0, isPhysLeptonicB_C_=0, isPhysUndefined_=0;
-    isPhysTau_=0;
-    if(jet.genJet()!=NULL){
+    isPhysTau_=0, isPhysPU_=0;
+    if(true){
         switch(deep_ntuples::jet_flavour(jet, gToBB, gToCC, neutrinosLepB, neutrinosLepB_C, alltaus_,true)) {
         case deep_ntuples::JetFlavor::UD: isPhysUD_=1; break;
         case deep_ntuples::JetFlavor::S:  isPhysS_=1; break;
@@ -399,16 +385,17 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
         case deep_ntuples::JetFlavor::G:  isPhysG_=1; break;
         case deep_ntuples::JetFlavor::LeptonicB: isPhysLeptonicB_=1; break;
         case deep_ntuples::JetFlavor::LeptonicB_C: isPhysLeptonicB_C_=1; break;
+	case deep_ntuples::JetFlavor::PU: isPhysPU_=1; break;
         default : isPhysUndefined_=1; break;
         }
     }
 
-    if(!jet.genJet()){//for data
-        isUndefined_=1;isPhysUndefined_=1;
-    }
+    //    if(!jet.genJet()){//for data
+    //    isUndefined_=1;isPhysUndefined_=1;
+    // }
 
-    if(isUndefined_ && isPhysUndefined_) returnval=false; //skip event, if neither standard flavor definition nor physics definition fallback define a "proper flavor"
-
+    //if(isUndefined_ && isPhysUndefined_) returnval=false; //skip event, if neither standard flavor definition nor physics definition fallback define a "proper flavor"
+    if(isUndefined_) returnval=false;
     pat::JetCollection h;
 
     jet_pt_ = jet.correctedJet("Uncorrected").pt();
@@ -485,7 +472,8 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
         jet_jetId_=-1;
     }
     
-    jet_puId_=jet.userInt("pileupJetId:fullId");
+    //jet_puId_=jet.userInt("pileupJetId:fullId");
+    jet_puId_= 0;
     jet_hflav_=abs(jet.hadronFlavour());
     jet_pflav_=abs(jet.partonFlavour());
     jet_phflav_=0;
@@ -498,12 +486,27 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     gen_pt_WithNu_=0;
     Delta_gen_pt_Recluster_=0;
     Delta_gen_pt_WithNu_=0;
+    if(!jet.genJet()){
+        const edm::RefToBase<pat::Jet> patJetRef = coll->refAt(jetidx);
+	reco::GenJetRef genjetDuplication = (*genJetMatchAllowDuplicates)[patJetRef];
+        if (genjetDuplication.isNonnull() && genjetDuplication.isAvailable()) {
+	  returnval=false;
+        }
+
+    }
 
     if(jet.genJet()){
         gen_pt_ =  jet.genJet()->pt();
         Delta_gen_pt_ =  jet.genJet()->pt()- jet_pt_;
 
+	float deltaR_match = reco::deltaR(jet, *jet.genJet());
+	if( deltaR_match > 0.2){
+	  returnval = false;
+	}
+
         const edm::RefToBase<pat::Jet> patJetRef = coll->refAt(jetidx);
+
+
         reco::GenJetRef genjetRecluster = (*genJetMatchRecluster)[patJetRef];
 
         gen_pt_Recluster_ = 0.;
@@ -532,10 +535,6 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     y_axis1_  =  std::get<4>(qgtuple);
     y_axis2_  =  std::get<5>(qgtuple);
     y_pt_dr_log_=std::get<6>(qgtuple);
-
-   
-
-
 
     return returnval;
 }

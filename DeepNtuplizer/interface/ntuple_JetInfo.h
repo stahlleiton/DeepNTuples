@@ -58,6 +58,12 @@ public:
         genJetMatchWithNuToken_ = genJetMatchWithNuToken;
     }
 
+    void setGenJetMatchAllowDuplicatesToken(
+            edm::EDGetTokenT<edm::Association<reco::GenJetCollection> > genJetMatchAllowDuplicatesToken) {
+        genJetMatchAllowDuplicatesToken_ = genJetMatchAllowDuplicatesToken;
+    }
+
+
     void setGenParticlesToken(edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken) {
         genParticlesToken_ = genParticlesToken;
     }
@@ -98,6 +104,7 @@ public:
 
     edm::EDGetTokenT<edm::Association<reco::GenJetCollection> > genJetMatchReclusterToken_;
     edm::EDGetTokenT<edm::Association<reco::GenJetCollection> > genJetMatchWithNuToken_;
+    edm::EDGetTokenT<edm::Association<reco::GenJetCollection> > genJetMatchAllowDuplicatesToken_;
 
     edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken_;
 
@@ -106,6 +113,7 @@ public:
 
     edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatchRecluster;
     edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatchWithNu;
+    edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatchAllowDuplicates;
 
     edm::Handle<reco::GenParticleCollection> genParticlesHandle;
 
@@ -136,6 +144,7 @@ public:
     // labels (MC truth)
     // regressions pt, Deta, Dphi
     float gen_pt_;
+   
     float Delta_gen_pt_;
     //classification
     int isB_;
@@ -147,6 +156,7 @@ public:
     int isUD_;
     int isS_;
     int isG_;
+    int isPU_;
     int isUndefined_;
     float genDecay_;
     int isLeptonicB_;
@@ -167,7 +177,8 @@ public:
     int isPhysLeptonicB_;
     int isPhysLeptonicB_C_;
     int isPhysTau_;
-
+    int isPhysPU_;
+ 
     // global variables
     float npv_;
     float ntrueInt_;

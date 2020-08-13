@@ -9,7 +9,7 @@
 #include "DataFormats/PatCandidates/interface/Electron.h"
 
 namespace deep_ntuples {
-    enum JetFlavor {UNDEFINED, G, UD, S, C, GCC, CC, B, GBB, BB, LeptonicB, LeptonicB_C, TAU};
+  enum JetFlavor {UNDEFINED, G, UD, S, C, GCC, CC, B, GBB, BB, LeptonicB, LeptonicB_C, TAU, PU};
     JetFlavor jet_flavour(const pat::Jet& jet,
             const std::vector<reco::GenParticle>& gToBB,
             const std::vector<reco::GenParticle>& gToCC,

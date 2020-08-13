@@ -17,6 +17,9 @@ options.register('reportEvery', 100, VarParsing.VarParsing.multiplicity.singleto
 options.register('gluonReduction', 0.0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.float, "gluon reduction")
 options.register('selectJets', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "select jets with good gen match")
 options.register('phase2', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "apply jet selection for phase 2. Currently sets JetEtaMax to 3.0 and picks slimmedJetsPuppi as jet collection.")
+options.register('puppi', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use puppi jets")
+options.register('eta', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use eta up to 5.0")
+
 
 import os
 release=os.environ['CMSSW_VERSION'][6:]
@@ -35,7 +38,10 @@ if hasattr(sys, "argv"):
 
 
 
-
+if options.puppi:
+    usePuppi = True
+else:
+    usePuppi = False
 process = cms.Process("DNNFiller")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -125,7 +131,10 @@ else :
 jetCorrectionsAK4 = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 
 from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
-if options.phase2 :
+if options.phase2:
+    usePuppi = True
+
+if usePuppi:
     jet_collection = 'slimmedJetsPuppi'
 else:
     jet_collection = 'slimmedJets'
@@ -168,6 +177,18 @@ process.ak4GenJetsWithNu = ak4GenJets.clone(src = 'packedGenParticles')
 process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedGenParticles"), cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16"))
  ## Define GenJets
 process.ak4GenJetsRecluster = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
+
+process.patGenJetMatchAllowDuplicates = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
+    src         = cms.InputTag("selectedUpdatedPatJetsDeepFlavour"),      # RECO jets (any View<Jet> is ok) 
+    matched     = cms.InputTag("ak4GenJetsWithNu"),        # GEN jets  (must be GenJetCollection)              
+    mcPdgId     = cms.vint32(),                      # n/a   
+    mcStatus    = cms.vint32(),                      # n/a   
+    checkCharge = cms.bool(False),                   # n/a   
+    maxDeltaR   = cms.double(0.4),                   # Minimum deltaR for the match   
+    #maxDPtRel   = cms.double(3.0),                  # Minimum deltaPt/Pt for the match (not used in GenJetMatcher)                     
+    resolveAmbiguities    = cms.bool(False),          # Forbid two RECO objects to match to the same GEN object 
+    resolveByMatchQuality = cms.bool(False),         # False = just match input in order; True = pick lowest deltaR pair first          
+)
  
  
 process.patGenJetMatchWithNu = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
@@ -194,7 +215,7 @@ process.patGenJetMatchRecluster = cms.EDProducer("GenJetMatcher",  # cut on delt
     resolveByMatchQuality = cms.bool(False),         # False = just match input in order; True = pick lowest deltaR pair first          
 )
 
-process.genJetSequence = cms.Sequence(process.packedGenParticlesForJetsNoNu*process.ak4GenJetsWithNu*process.ak4GenJetsRecluster*process.patGenJetMatchWithNu*process.patGenJetMatchRecluster)
+process.genJetSequence = cms.Sequence(process.packedGenParticlesForJetsNoNu*process.ak4GenJetsWithNu*process.ak4GenJetsRecluster*process.patGenJetMatchAllowDuplicates*process.patGenJetMatchWithNu*process.patGenJetMatchRecluster)
 
 
 # Very Loose IVF SV collection
@@ -232,6 +253,10 @@ if ( int(releases[0]) > 8 ) or ( (int(releases[0])==8) and (int(releases[1]) >= 
 
 if options.phase2 :
     process.deepntuplizer.jetAbsEtaMax = cms.double(3.0)
+if options.eta :
+    process.deepntuplizer.jetAbsEtaMax = cms.double(5.0)
+    process.deepntuplizer.jetPtMin = cms.double(10.0)
+
 
 process.deepntuplizer.gluonReduction  = cms.double(options.gluonReduction)
 

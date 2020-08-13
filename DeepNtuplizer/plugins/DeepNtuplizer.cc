@@ -13,7 +13,7 @@
 #include "../interface/ntuple_bTagVars.h"
 #include "../interface/ntuple_FatJetInfo.h"
 #include "../interface/ntuple_DeepVertex.h"
-
+#include "../interface/ntuple_GraphB.h"
 //ROOT includes
 #include "TTree.h"
 #include <TFile.h>
@@ -94,6 +94,7 @@ private:
     size_t njetstotal_;
     size_t njetswithgenjet_;
     size_t njetsselected_;
+    size_t njetsselected_nogen_;
 
 	ntuple_content * addModule(ntuple_content *m, std::string name = ""){
         modules_.push_back(m);
@@ -146,6 +147,7 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
     //addModule(svmodule_LooseIVF);
 
     // DeepVertex info
+    /*
     if (runDeepVertex_)	{
         
         ntuple_DeepVertex* deepvertexmodule=new ntuple_DeepVertex(jetR);
@@ -153,6 +155,11 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
     	addModule(deepvertexmodule);
         
     }
+    */  
+    //ntuple_GraphB* deepvertexmodule=new ntuple_GraphB(jetR);
+    //deepvertexmodule->setCandidatesToken(consumes<edm::View<pat::PackedCandidate> >(iConfig.getParameter<edm::InputTag>("candidates")));
+    //addModule(deepvertexmodule);
+     
 
     ntuple_JetInfo* jetinfo=new ntuple_JetInfo();
     jetinfo->setQglToken(consumes<edm::ValueMap<float>>(edm::InputTag(t_qgtagger, "qgLikelihood")));
@@ -169,6 +176,11 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
     jetinfo->setGenJetMatchWithNuToken(
             consumes<edm::Association<reco::GenJetCollection> >(
                     iConfig.getParameter<edm::InputTag>( "genJetMatchWithNu" )));
+
+    jetinfo->setGenJetMatchAllowDuplicatesToken(
+            consumes<edm::Association<reco::GenJetCollection> >(
+                    iConfig.getParameter<edm::InputTag>( "genJetMatchAllowDuplicates" )));
+
 
     jetinfo->setGenParticlesToken(
             consumes<reco::GenParticleCollection>(
@@ -282,6 +294,9 @@ DeepNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         if( (writejet&&applySelection_) || !applySelection_ ){
             tree_->Fill();
             njetsselected_++;
+	    if(!jet.genJet())
+	      njetsselected_nogen_++;
+
         }
     } // end of looping over the jets
 }
@@ -303,6 +318,7 @@ DeepNtuplizer::beginJob()
     njetstotal_=0;
     njetswithgenjet_=0;
     njetsselected_=0;
+    njetsselected_nogen_=0;
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
@@ -315,6 +331,7 @@ DeepNtuplizer::endJob()
     std::cout << "total number of selected jets:  "<< njetsselected_<<std::endl;
     std::cout << "fraction of selected jets:      "<< (float)njetsselected_/(float)njetstotal_<<std::endl;
     std::cout << "fraction of selected jets with gen: "<< (float)njetsselected_/(float)njetswithgenjet_<<std::endl;
+    std::cout << "fraction of selected jetsout with gen: "<< (float)njetsselected_nogen_/(float)njetsselected_<<std::endl;
 
 }
 
