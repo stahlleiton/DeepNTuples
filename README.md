@@ -66,7 +66,7 @@ When the file lists are created, the part used for training of the ttbar and QCD
 ```
 mergeSamples.py <no of jets per file> <output dir> <file lists 1> <file lists 2> <file lists 3> ...
 ```
-For example:
+Here the output directory cannot already exist. For example:
 ```
 mergeSamples.py 400000 /path/to/dir/merged ntuple_*/train_val_samples.txt
 ```
