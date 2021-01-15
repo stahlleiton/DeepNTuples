@@ -14,7 +14,6 @@ git clone https://github.com/emilbols/DeepNTuples
 cd DeepNTuples
 git checkout 106X
 # Add JetToolBox
-cd DeepNTuples
 git submodule init
 git submodule update
 
