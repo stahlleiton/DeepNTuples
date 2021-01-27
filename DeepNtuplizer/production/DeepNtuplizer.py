@@ -257,7 +257,9 @@ if options.phase2 :
 if options.eta :
     process.deepntuplizer.jetAbsEtaMax = cms.double(5.0)
     process.deepntuplizer.jetPtMin = cms.double(10.0)
-
+else :
+    process.deepntuplizer.jetAbsEtaMax = cms.double(2.5)
+    process.deepntuplizer.jetPtMin = cms.double(10.0)
 
 process.deepntuplizer.gluonReduction  = cms.double(options.gluonReduction)
 
