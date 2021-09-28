@@ -40,16 +40,45 @@ public:
 private:
 
     // seed candidates
+    float jetradius_;
+    float min_candidate_pt_ = -1;
+
+    unsigned int n_Cpfcand_;
+    float nCpfcand_;
+    unsigned int n_Npfcand_;
+    float nNpfcand_;
+
     static constexpr size_t max_gtracks=100;
     
     unsigned int n_gtracks=0;
+    unsigned int n_match10=0;
+    unsigned int n_match20=0;
+    unsigned int n_match30=0;
+    unsigned int n_match40=0;
+    unsigned int n_match50=0;
+
+    unsigned int n_gen_match10=0;
+    unsigned int n_gen_match20=0;
+    unsigned int n_gen_match30=0;
+    unsigned int n_gen_match40=0;
+    unsigned int n_gen_match50=0;
+
     float nGtracks=0;
+    float n_daughters=0;
+    float n_gen_daughters=0;
+    float n_gen_constit=0;
     
+    float gtrack_isMatched10[max_gtracks];
+    float gtrack_isMatched20[max_gtracks];
+    float gtrack_isMatched30[max_gtracks];
+    float gtrack_isMatched40[max_gtracks];
+    float gtrack_isMatched50[max_gtracks];
     float gtrack_pt[max_gtracks];
     float gtrack_eta[max_gtracks];
     float gtrack_phi[max_gtracks];
     float gtrack_mass[max_gtracks];
     float gtrack_dR[max_gtracks];
+    float gtrack_dist_neigh[max_gtracks];
     float gtrack_dz[max_gtracks];
     float gtrack_dxy[max_gtracks];
     float gtrack_3D_ip[max_gtracks];
@@ -88,6 +117,7 @@ private:
     bool m_computeProbabilities=1;
     unsigned long long  m_calibrationCacheId2D; 
     unsigned long long m_calibrationCacheId3D;
+    float mindrsvpfcand(const pat::PackedCandidate* pfcand);
 
 };
 

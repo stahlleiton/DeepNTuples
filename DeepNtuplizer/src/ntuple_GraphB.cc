@@ -10,7 +10,8 @@
 #include "../interface/ntuple_GraphB.h"
 
 #include "DataFormats/GeometrySurface/interface/Line.h"
-
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+#include "DataFormats/Candidate/interface/VertexCompositePtrCandidate.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "TrackingTools/IPTools/interface/IPTools.h"
 #include "TrackingTools/PatternTools/interface/TwoTrackMinimumDistance.h"
@@ -21,18 +22,166 @@
 #include "FWCore/Framework/interface/EventSetupRecord.h"
 #include "FWCore/Framework/interface/EventSetupRecordImplementation.h"
 #include "FWCore/Framework/interface/EventSetupRecordKey.h"
+#include "RecoVertex/VertexTools/interface/VertexDistance3D.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "TVector3.h"
+
+class TrackInfoBuilder{
+public:
+    TrackInfoBuilder(edm::ESHandle<TransientTrackBuilder> & build):
+        builder(build),
+        trackMomentum_(0),
+        trackEta_(0),
+        trackEtaRel_(0),
+        trackPtRel_(0),
+        trackPPar_(0),
+        trackDeltaR_(0),
+        trackPtRatio_(0),
+        trackPParRatio_(0),
+        trackSip2dVal_(0),
+        trackSip2dSig_(0),
+        trackSip3dVal_(0),
+        trackSip3dSig_(0),
+        trackJetDistVal_(0),
+        trackJetDistSig_(0),
+	trackImpactPointState_(0)
+{
+
+
+}
+
+    void buildTrackInfo(const pat::PackedCandidate* PackedCandidate_ ,const math::XYZVector&  jetDir, GlobalVector refjetdirection, const reco::Vertex & pv){
+			TVector3 jetDir3(jetDir.x(),jetDir.y(),jetDir.z());
+			if(!PackedCandidate_->hasTrackDetails()) {
+				TVector3 trackMom3(
+					PackedCandidate_->momentum().x(),
+					PackedCandidate_->momentum().y(),
+					PackedCandidate_->momentum().z()
+					);
+				trackMomentum_=PackedCandidate_->p();
+				trackEta_= PackedCandidate_->eta();
+				trackEtaRel_=reco::btau::etaRel(jetDir, PackedCandidate_->momentum());
+				trackPtRel_=trackMom3.Perp(jetDir3);
+				trackPPar_=jetDir.Dot(PackedCandidate_->momentum());
+				trackDeltaR_=reco::deltaR(PackedCandidate_->momentum(), jetDir);
+				trackPtRatio_=trackMom3.Perp(jetDir3) / PackedCandidate_->p();
+				trackPParRatio_=jetDir.Dot(PackedCandidate_->momentum()) / PackedCandidate_->p();
+				trackSip2dVal_=0.;
+				trackSip2dSig_=0.;
+				trackSip3dVal_=0.;
+				trackSip3dSig_=0.;
+				trackJetDistVal_=0.;
+				trackJetDistSig_=0.;
+				//trackImpactPointState_=PackedCandidate_->impactPointState();
+				return;
+			}
+
+        const reco::Track & PseudoTrack =  PackedCandidate_->pseudoTrack();
+
+        reco::TransientTrack transientTrack;
+        transientTrack=builder->build(PseudoTrack);
+        Measurement1D meas_ip2d=IPTools::signedTransverseImpactParameter(transientTrack, refjetdirection, pv).second;
+        Measurement1D meas_ip3d=IPTools::signedImpactParameter3D(transientTrack, refjetdirection, pv).second;
+        Measurement1D jetdist=IPTools::jetTrackDistance(transientTrack, refjetdirection, pv).second;
+        math::XYZVector trackMom = PseudoTrack.momentum();
+        double trackMag = std::sqrt(trackMom.Mag2());
+        TVector3 trackMom3(trackMom.x(),trackMom.y(),trackMom.z());
+
+
+        trackMomentum_=std::sqrt(trackMom.Mag2());
+        trackEta_= trackMom.Eta();
+        trackEtaRel_=reco::btau::etaRel(jetDir, trackMom);
+        trackPtRel_=trackMom3.Perp(jetDir3);
+        trackPPar_=jetDir.Dot(trackMom);
+        trackDeltaR_=reco::deltaR(trackMom, jetDir);
+        trackPtRatio_=trackMom3.Perp(jetDir3) / trackMag;
+        trackPParRatio_=jetDir.Dot(trackMom) / trackMag;
+        trackSip2dVal_=(meas_ip2d.value());
+
+        trackSip2dSig_=(meas_ip2d.significance());
+        trackSip3dVal_=(meas_ip3d.value());
+
+
+        trackSip3dSig_=meas_ip3d.significance();
+        trackJetDistVal_= jetdist.value();
+        trackJetDistSig_= jetdist.significance();
+	trackImpactPointState_=transientTrack.impactPointState();
+
+    }
+
+    const float& getTrackDeltaR() const {return trackDeltaR_;}
+    const float& getTrackEta() const {return trackEta_;}
+    const float& getTrackEtaRel() const {return trackEtaRel_;}
+    const float& getTrackJetDistSig() const {return trackJetDistSig_;}
+    const float& getTrackJetDistVal() const {return trackJetDistVal_;}
+    const float& getTrackMomentum() const {return trackMomentum_;}
+    const float& getTrackPPar() const {return trackPPar_;}
+    const float& getTrackPParRatio() const {return trackPParRatio_;}
+    const float& getTrackPtRatio() const {return trackPtRatio_;}
+    const float& getTrackPtRel() const {return trackPtRel_;}
+    const float& getTrackSip2dSig() const {return trackSip2dSig_;}
+    const float& getTrackSip2dVal() const {return trackSip2dVal_;}
+    const float& getTrackSip3dSig() const {return trackSip3dSig_;}
+    const float& getTrackSip3dVal() const {return trackSip3dVal_;}
+    const TrajectoryStateOnSurface& getImpactPointState() const {return trackImpactPointState_;}
+
+private:
+
+    edm::ESHandle<TransientTrackBuilder>& builder;
+
+    float trackMomentum_;
+    float trackEta_;
+    float trackEtaRel_;
+    float trackPtRel_;
+    float trackPPar_;
+    float trackDeltaR_;
+    float trackPtRatio_;
+    float trackPParRatio_;
+    float trackSip2dVal_;
+    float trackSip2dSig_;
+    float trackSip3dVal_;
+    float trackSip3dSig_;
+
+    float trackJetDistVal_;
+    float trackJetDistSig_;
+    TrajectoryStateOnSurface trackImpactPointState_;
+
+};
 
 ntuple_GraphB::ntuple_GraphB(double jetR):ntuple_content(jetR){}
 
 ntuple_GraphB::~ntuple_GraphB(){}
 
-void ntuple_GraphB::getInput(const edm::ParameterSet& iConfig){}
+void ntuple_GraphB::getInput(const edm::ParameterSet& iConfig){
+  min_candidate_pt_ = (iConfig.getParameter<double>("minCandidatePt"));
+}
 
 void ntuple_GraphB::initBranches(TTree* tree){
     
     addBranch(tree,"n_gtracks",&n_gtracks, "n_gtracks/i");
+    addBranch(tree,"n_match10",&n_match10, "n_match10/i");
+    addBranch(tree,"n_match20",&n_match20, "n_match20/i");
+    addBranch(tree,"n_match30",&n_match30, "n_match30/i");
+    addBranch(tree,"n_match40",&n_match40, "n_match40/i");
+    addBranch(tree,"n_match50",&n_match50, "n_match50/i");
+
+    addBranch(tree,"n_gen_match10",&n_gen_match10, "n_gen_match10/i");
+    addBranch(tree,"n_gen_match20",&n_gen_match20, "n_gen_match20/i");
+    addBranch(tree,"n_gen_match30",&n_gen_match30, "n_gen_match30/i");
+    addBranch(tree,"n_gen_match40",&n_gen_match40, "n_gen_match40/i");
+    addBranch(tree,"n_gen_match50",&n_gen_match50, "n_gen_match50/i");
+
     addBranch(tree,"nGtracks",&nGtracks, "nGtracks/f");
 
+    addBranch(tree,"n_daughters",&n_daughters, "n_daughters/f");
+    addBranch(tree,"n_gen_daughters",&n_gen_daughters, "n_gen_daughters/f");
+    addBranch(tree,"n_gen_constit",&n_gen_constit, "n_gen_constit/f");
+
+    addBranch(tree,"gtrack_isMatched10",&gtrack_isMatched10, "gtrack_isMatched10[n_gtracks]/f");
+    addBranch(tree,"gtrack_isMatched20",&gtrack_isMatched20, "gtrack_isMatched20[n_gtracks]/f");
+    addBranch(tree,"gtrack_isMatched30",&gtrack_isMatched30, "gtrack_isMatched30[n_gtracks]/f");
+    addBranch(tree,"gtrack_isMatched40",&gtrack_isMatched40, "gtrack_isMatched40[n_gtracks]/f");
+    addBranch(tree,"gtrack_isMatched50",&gtrack_isMatched50, "gtrack_isMatched50[n_gtracks]/f");
     addBranch(tree,"gtrack_pt",&gtrack_pt, "gtrack_pt[n_gtracks]/f");
     addBranch(tree,"gtrack_eta",&gtrack_eta, "gtrack_eta[n_gtracks]/f");
     addBranch(tree,"gtrack_phi",&gtrack_phi, "gtrack_phi[n_gtracks]/f");
@@ -45,6 +194,7 @@ void ntuple_GraphB::initBranches(TTree* tree){
     addBranch(tree,"gtrack_2D_ip", &gtrack_2D_ip, "gtrack_2D_ip[n_gtracks]/f");
     addBranch(tree,"gtrack_2D_sip", &gtrack_2D_sip, "gtrack_2D_sip[n_gtracks]/f");
     addBranch(tree,"gtrack_dR", &gtrack_dR, "gtrack_dR[n_gtracks]/f");
+    addBranch(tree,"gtrack_dist_neigh", &gtrack_dist_neigh, "gtrack_dist_neigh[n_gtracks]/f");
     
     addBranch(tree,"gtrack_3D_TrackProbability", &gtrack_3D_TrackProbability, "gtrack_3D_TrackProbability[n_gtracks]/f");
     addBranch(tree,"gtrack_2D_TrackProbability", &gtrack_2D_TrackProbability, "gtrack_2D_TrackProbability[n_gtracks]/f");
@@ -62,9 +212,10 @@ void ntuple_GraphB::initBranches(TTree* tree){
 }
 
 
-void ntuple_GraphB::readEvent(const edm::Event& iEvent)
-{
+void ntuple_GraphB::readEvent(const edm::Event& iEvent){
     iEvent.getByToken(CandidateToken, tracks);
+    n_Npfcand_=0;
+    n_Cpfcand_=0;
 }
 
 
@@ -86,6 +237,7 @@ void ntuple_GraphB::readSetup(const edm::EventSetup& iSetup){
         iSetup.get<BTagTrackProbability2DRcd>().get(calib2DHandle);
         ESHandle<TrackProbabilityCalibration> calib3DHandle;
         iSetup.get<BTagTrackProbability3DRcd>().get(calib3DHandle);
+	iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", builder);	
 
         const TrackProbabilityCalibration *  ca2D= calib2DHandle.product();
         const TrackProbabilityCalibration *  ca3D= calib3DHandle.product();
@@ -139,20 +291,44 @@ bool ntuple_GraphB::fillBranches(const pat::Jet & jet, const size_t& jetidx, con
     const reco::Vertex &pv = vertices()->at(0);
     GlobalPoint pvp(pv.x(),pv.y(),pv.z());
 
-    
     std::vector<reco::TransientTrack> selectedTracks;
     std::vector<float> masses;
-    
+    std::vector<const reco::Candidate*> raw_gen_constituents;
+    std::vector<const reco::Candidate*> raw_cpf_constituents;
+    std::vector<const reco::Candidate*> raw_part_constituents;
+    float number_of_daughters = -1.0;
+    float number_of_gen_daughters = -1.0;
+    //float number_of_cpf_gen = -1.0;
+    float number_of_part_gen = -1.0;
+    size_t num_match10 = 0.0;
+    size_t num_match20 = 0.0;
+    size_t num_match30 = 0.0;
+    size_t num_match40 = 0.0;
+    size_t num_match50 = 0.0;
 
-   for(size_t k = 0; k<tracks->size(); ++k) {
-        if((*tracks)[k].bestTrack() != 0 &&  (*tracks)[k].pt()>0.5 && std::fabs(pvp.z()-builder->build(tracks->ptrAt(k)).track().vz())<0.5) {
-            selectedTracks.push_back(builder->build(tracks->ptrAt(k)));
-            masses.push_back(tracks->ptrAt(k)->mass());
+    size_t num_gen_match10 = 0.0;
+    size_t num_gen_match20 = 0.0;
+    size_t num_gen_match30 = 0.0;
+    size_t num_gen_match40 = 0.0;
+    size_t num_gen_match50 = 0.0;
+
+    double jet_radius = jetR();
+
+    math::XYZVector jetDir = jet.momentum().Unit();
+    GlobalVector direction(jet.px(), jet.py(), jet.pz());
+    std::vector<sorting::sortingClass<size_t> > sortedcharged;
+    std::vector<size_t> sortedchargedindices;
+
+    const float jet_uncorr_pt=jet.correctedJet("Uncorrected").pt();
+    //const float jet_uncorr_e=jet.correctedJet("Uncorrected").energy();
+
+    for(size_t k = 0; k<tracks->size(); ++k) {
+      if((*tracks)[k].bestTrack() != 0 &&  (*tracks)[k].pt()>0.5 && std::fabs(pvp.z()-builder->build(tracks->ptrAt(k)).track().vz())<0.5) {
+	selectedTracks.push_back(builder->build(tracks->ptrAt(k)));
+	masses.push_back(tracks->ptrAt(k)->mass());
         }
     }
-    
-    double jet_radius = jetR();
-    GlobalVector direction(jet.px(), jet.py(), jet.pz());
+        
     std::vector<sorting::sortingClass<size_t> > sorted_tracks;
     for(std::vector<reco::TransientTrack>::const_iterator it = selectedTracks.begin(); it != selectedTracks.end(); it++){  
       float angular_distance=reco::deltaR(jet,it->track());
@@ -165,55 +341,289 @@ bool ntuple_GraphB::fillBranches(const pat::Jet & jet, const size_t& jetidx, con
     sorted_track_indices=sorting::invertSortingVector(sorted_tracks);
     //n_gtracks = std::min(sorted_tracks.size(),max_gtracks);
     //nGtracks = n_gtracks;
+
+
+    TrackInfoBuilder trackinfo(builder);
+    //create collection of cpf/npf for the seeding
+    for (unsigned int i = 0; i <  jet.numberOfDaughters(); i++){
+        const pat::PackedCandidate* PackedCandidate = dynamic_cast<const pat::PackedCandidate*>(jet.daughter(i));
+        if(PackedCandidate){
+	  if(PackedCandidate->pt() < min_candidate_pt_) continue; 
+            if(PackedCandidate->charge()!=0){
+                trackinfo.buildTrackInfo(PackedCandidate,jetDir,direction,pv);
+                sortedcharged.push_back(sorting::sortingClass<size_t>
+                (i, trackinfo.getTrackSip2dSig(),
+                        -mindrsvpfcand(PackedCandidate), PackedCandidate->pt()/jet_uncorr_pt));
+            }
+        }
+    }
+    std::sort(sortedcharged.begin(),sortedcharged.end(),sorting::sortingClass<size_t>::compareByABCInv);
+    long unsigned int max_cpf = 30;
+    n_Cpfcand_ = std::min(sortedcharged.size(),max_cpf);
+    sortedchargedindices = sorting::invertSortingVector(sortedcharged);
+
+    //Count the number of gen_daughters and fill the raw_constituent
+    if (jet.genJet()){
+      number_of_gen_daughters = jet.genJet()->numberOfDaughters();
+      number_of_daughters = jet.numberOfDaughters();
+      for (size_t i = 0; i < number_of_gen_daughters; ++i){
+	const reco::Candidate* constit = jet.daughter(i);
+	raw_gen_constituents.push_back(constit);
+      }
+    }
+
+    for (size_t j = 0; j < jet.numberOfDaughters(); j++){
+      const reco::Candidate* constit = jet.daughter(j);
+      if(constit->charge() != 0){
+	raw_cpf_constituents.push_back(constit);
+	  }
+    }
+    //number_of_cpf_gen = raw_cpf_constituents.size();
+
+    /*if(jet.genJet()){
+      for(size_t m = 0; m < jet.numberOfDaughters(); m++){
+	bool gen_10 = false;
+	bool gen_20 = false;
+	bool gen_30 = false;
+	bool gen_40 = false;
+	bool gen_50 = false;
+	const pat::PackedCandidate* PackedCandidate = dynamic_cast<const pat::PackedCandidate*>(jet.daughter(m));
+	for(size_t n = 0; n < jet.genJet()->numberOfDaughters(); n++){
+	  if((jet.genJet()->daughter(n)->charge() != 0) && (jet.daughter(m)->charge() != 0) && (PackedCandidate->hasTrackDetails())){
+	    if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - jet.daughter(m)->eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - jet.daughter(m)->phi(), 2)) < 0.10){
+	      gen_10 = true;
+	    }
+	    if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - jet.daughter(m)->eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - jet.daughter(m)->phi(), 2)) < 0.20){
+	      gen_20 = true;
+	    }
+	    if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - jet.daughter(m)->eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - jet.daughter(m)->phi(), 2)) < 0.30){
+	      gen_30 = true;
+	    }
+	    if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - jet.daughter(m)->eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - jet.daughter(m)->phi(), 2)) < 0.40){
+	      gen_40 = true;
+	    }
+	    if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - jet.daughter(m)->eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - jet.daughter(m)->phi(), 2)) < 0.50){
+	      gen_50 = true;
+	    }
+	  }
+	}
+	if(gen_10){
+	  num_gen_match10++;
+	}
+	if(gen_20){
+	  num_gen_match20++;
+	}
+	if(gen_30){
+	  num_gen_match30++;
+	}
+	if(gen_40){
+	  num_gen_match40++;
+	}
+	if(gen_50){
+	  num_gen_match50++;
+	}
+      }
+    }*/
+
+
+    //Count the number of parton_daughters and fill the raw_constituent
+    if(jet.genParton()){
+      //Prep jet-parton daughters
+      int keep = 1;
+      std::vector<const reco::Candidate*> part_constituents;
+      std::vector<const reco::Candidate*> daughters_constituents;
+      //int number_of_part_daughters = jet.genParton()->numberOfDaughters();
+      for (size_t j = 0; j < jet.genParton()->numberOfDaughters(); ++j){
+	const reco::Candidate* constit = jet.genParton()->daughter(j);
+	part_constituents.push_back(constit);
+      }
+      //Loop until we process all the constituents
+      while (keep != 0){
+	keep = 0;
+	for (size_t k = 0; k < part_constituents.size(); ++k){
+	  if (part_constituents[k]->numberOfDaughters() != 0){
+	    keep = 1;
+	    for (size_t m = 0; m < part_constituents[k]->numberOfDaughters(); ++m){
+	      daughters_constituents.push_back(part_constituents[k]->daughter(m));
+	    }
+	  }
+	  else{
+	    raw_part_constituents.push_back(part_constituents[k]);
+	  }
+	}
+	part_constituents = daughters_constituents;
+	daughters_constituents.clear();
+      }
+      number_of_part_gen = raw_part_constituents.size();
+    }
  
     size_t counter= 0;
+
     for(std::vector<reco::TransientTrack>::const_iterator it = selectedTracks.begin(); it != selectedTracks.end(); it++){  
       //is the track in the jet cone?
       float angular_distance=reco::deltaR(jet,it->track());
       //std::sqrt(std::pow(jet.eta()-it->track().eta(),2) + std::pow(jet.phi()-it->track().phi(),2) );
       bool hasNeighbour = false;
       bool include = false;
-      if (angular_distance>jet_radius) {
-	if(std::fabs(pvp.z()-it->track().vz())>0.1) continue;
-	for(std::vector<reco::TransientTrack>::const_iterator tt = selectedTracks.begin();tt!=selectedTracks.end(); ++tt ) {
-	  TwoTrackMinimumDistance dist;
-	  float near_angular_distance=reco::deltaR(jet,tt->track());
-	  if(*tt==*it) continue;
-	  if(near_angular_distance<jet_radius){
-	    std::pair<bool,Measurement1D> ip = IPTools::absoluteImpactParameter3D(*tt, pv);
-	    if(ip.second.significance() < 1.0) continue;
-	    if(dist.calculate(tt->impactPointState(),it->impactPointState())) {
-	      float distance = dist.distance();
-	      if(distance < 0.02){
-		hasNeighbour = true;
+      float dist_part = -0.01;
+      float is_matched10 = -1.0;
+      float is_matched20 = -1.0;
+      float is_matched30 = -1.0;
+      float is_matched40 = -1.0;
+      float is_matched50 = -1.0;
+      //matching the track with the jet radius
+      if(/*(angular_distance < 1.50*jet_radius) &&*/ (angular_distance > jet_radius)){
+	if((std::fabs(pvp.z() - it->track().vz()) > 0.1)) {continue;}  	
+	   //matching the track with a cpf_seed of not
+
+	  for (unsigned int i = 0; i <  jet.numberOfDaughters(); i++){
+	    const pat::PackedCandidate* PackedCandidate = dynamic_cast<const pat::PackedCandidate*>(jet.daughter(i));
+	    if(PackedCandidate->hasTrackDetails()){
+	      if(PackedCandidate->pt() < min_candidate_pt_) {continue;} 
+	      if(PackedCandidate->charge()!=0){
+		const reco::Track & PseudoTrack =  PackedCandidate->pseudoTrack();
+		reco::TransientTrack transientTrack;
+		transientTrack=builder->build(PseudoTrack);
+	      
+		TwoTrackMinimumDistance dist;
+		std::pair<bool, Measurement1D> ip=IPTools::absoluteImpactParameter3D(transientTrack, pv);
+		float near_angular_dist = reco::deltaR(jet,transientTrack.track());
+		//std::pair<double, Measurement1D> jet_dist =IPTools::jetTrackDistance(transientTrack, direction, pv);
+		//float length = 999;
+		//TrajectoryStateOnSurface closest = IPTools::closestApproachToJet(transientTrack.impactPointState(), pv, direction, transientTrack.field());
+		//if(closest.isValid()){
+		// length = (closest.globalPosition() - pvp).mag();
+		//}
+		if (transientTrack == *it) {continue;}
+		if (near_angular_dist < jet_radius){
+		  /*if (!(ip.first && ip.second.value() >= 0.0 && ip.second.significance() >= 1.0 && ip.second.value() <= 9999. 
+			&& ip.second.significance() <= 9999. && transientTrack.track().normalizedChi2() < 5. && std::fabs(transientTrack.track().dxy(pv.position())) < 2 
+			&& std::fabs(transientTrack.track().dz(pv.position())) < 17 && jet_dist.second.value() < 0.07 && length < 5.)){continue;}*/
+		  if(ip.second.significance() < 1.0) {continue;}
+		  if(dist.calculate(transientTrack.impactPointState(),it->impactPointState())){
+		    float distance = dist.distance();
+		    if(distance < 0.02){
+		      hasNeighbour = true;
+		      dist_part = distance;
+		    }
+		  }
+		}
 	      }
 	    }
 	  }
-	}
-	if(hasNeighbour){
-	  int matched_jets = 0;
-	  for (std::size_t jet_n = 0; jet_n < coll->size(); jet_n++) {
-	    const auto& test_jet = coll->at(jet_n);
-	    if(test_jet.pt() < 5.0){continue;}
-	    float new_angular_distance=reco::deltaR(test_jet,it->track());
-	    if(new_angular_distance < jet_radius){
-	      matched_jets = matched_jets + 1;
+	  if(hasNeighbour){
+	    int matched_jets = 0;
+	    for (std::size_t jet_n = 0; jet_n < coll->size(); jet_n++) {
+	      const auto& test_jet = coll->at(jet_n);
+	      if(test_jet.pt() < 5.0){continue;}
+	      float new_angular_distance=reco::deltaR(test_jet,it->track());
+	      if(new_angular_distance < jet_radius){
+		matched_jets = matched_jets + 1;
+	      }
 	    }
+	    if(matched_jets != 0){continue;}
+	    include = true;
 	  }
-	  if(matched_jets != 0){continue;}
-	  include = true;
-	}
       }
-      if(angular_distance<jet_radius){
+      if(angular_distance<=jet_radius){
 	include = true;
-      }
+	}
+      
       if(include){
+
+	if(jet.genJet()){
+	    bool is_gmatched10 = false;
+	    bool is_gmatched20 = false;
+	    bool is_gmatched30 = false;
+	    bool is_gmatched40 = false;
+	    bool is_gmatched50 = false;
+
+	    for(size_t n = 0; n < jet.genJet()->numberOfDaughters(); n++){	
+	      if(jet.genJet()->daughter(n)->charge() != 0){
+		if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - it->track().eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - it->track().phi(), 2)) < 0.10){
+		  is_gmatched10 = true;
+		}
+		if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - it->track().eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - it->track().phi(), 2)) < 0.20){
+		  is_gmatched20 = true;
+		}
+		if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - it->track().eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - it->track().phi(), 2)) < 0.30){
+		  is_gmatched30 = true;
+		}
+		if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - it->track().eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - it->track().phi(), 2)) < 0.40){
+		  is_gmatched40 = true;
+		}
+		if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - it->track().eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - it->track().phi(), 2)) < 0.50){
+		  is_gmatched50 = true;
+		}
+	      }
+	    }
+	  if(is_gmatched10){
+	    num_gen_match10++;
+	  }
+	  if(is_gmatched20){
+	    num_gen_match20++;
+	  }
+	  if(is_gmatched30){
+	    num_gen_match30++;
+	  }
+	  if(is_gmatched40){
+	    num_gen_match40++;
+	  }
+	  if(is_gmatched50){
+	    num_gen_match50++;
+	  }
+	}
+
+	if(jet.genParton()){
+	    is_matched10 = 0;
+	    is_matched20 = 0;
+	    is_matched30 = 0;
+	    is_matched40 = 0;
+	    is_matched50 = 0;
+
+	    for(size_t n = 0; n < raw_part_constituents.size();  n++){	
+	      if(raw_part_constituents.at(n)->charge() != 0){
+		if(std::sqrt(std::pow(raw_part_constituents.at(n)->eta() - it->track().eta(), 2) + std::pow(raw_part_constituents.at(n)->phi() - it->track().phi(), 2)) < 0.10){
+		  is_matched10 = 1.0;
+		}
+		if(std::sqrt(std::pow(raw_part_constituents.at(n)->eta() - it->track().eta(), 2) + std::pow(raw_part_constituents.at(n)->phi() - it->track().phi(), 2)) < 0.20){
+		  is_matched20 = 1.0;
+		}
+		if(std::sqrt(std::pow(raw_part_constituents.at(n)->eta() - it->track().eta(), 2) + std::pow(raw_part_constituents.at(n)->phi() - it->track().phi(), 2)) < 0.30){
+		  is_matched30 = 1.0;
+		}
+		if(std::sqrt(std::pow(raw_part_constituents.at(n)->eta() - it->track().eta(), 2) + std::pow(raw_part_constituents.at(n)->phi() - it->track().phi(), 2)) < 0.40){
+		  is_matched40 = 1.0;
+		}
+		if(std::sqrt(std::pow(raw_part_constituents.at(n)->eta() - it->track().eta(), 2) + std::pow(raw_part_constituents.at(n)->phi() - it->track().phi(), 2)) < 0.50){
+		  is_matched50 = 1.0;
+		}
+	      }
+	    }
+	  if(is_matched10 == 1.0){
+	    num_match10++;
+	  }
+	  if(is_matched20 == 1.0){
+	    num_match20++;
+	  }
+	  if(is_matched30 == 1.0){
+	    num_match30++;
+	  }
+	  if(is_matched40 == 1.0){
+	    num_match40++;
+	  }
+	  if(is_matched50 == 1.0){
+	    num_match50++;
+	  }
+	}
+
 	std::pair<bool,Measurement1D> ip = IPTools::signedImpactParameter3D(*it, direction, pv);        
         std::pair<bool,Measurement1D> ip2d = IPTools::signedTransverseImpactParameter(*it, direction, pv);
         std::pair<double, Measurement1D> jet_dist =IPTools::jetTrackDistance(*it, direction, pv);                   
         TrajectoryStateOnSurface closest = IPTools::closestApproachToJet(it->impactPointState(),pv, direction,it->field());
 	if(counter >= max_gtracks){continue;}	
-	gtrack_dR[counter] = catchInfsAndBound( reco::deltaR(jet,it->track()), -1.0,0.0,10.0);
+	gtrack_dR[counter] = catchInfsAndBound(reco::deltaR(jet,it->track()), -1.0,0.0,10.0);
+	gtrack_dist_neigh[counter] = catchInfsAndBound(dist_part, -10.0,-5.0,100.0);
 	float length=999;
         if (closest.isValid()) length=(closest.globalPosition() - pvp).mag();
 	gtrack_jetAxisDlength[counter] = catchInfsAndBound(length,-1.0,-100.0,100.0);
@@ -246,15 +656,46 @@ bool ntuple_GraphB::fillBranches(const pat::Jet & jet, const size_t& jetidx, con
 	gtrack_2D_TrackProbability[counter] = catchInfsAndBound(prob2D,-2.0,-100.0,100.0);
 
         gtrack_nPixelHits[counter] = catchInfsAndBound(it->hitPattern().numberOfValidPixelHits(),-1.0,0.0,100.0);
-        gtrack_nHits[counter] = catchInfsAndBound(it->hitPattern().numberOfValidHits(),-1.0,0.0,100.0);
+        gtrack_nHits[counter] = catchInfsAndBound(it->hitPattern().numberOfValidHits(),-1.0,0.0,100.0);	
+	gtrack_isMatched10[counter] = is_matched10;
+	gtrack_isMatched20[counter] = is_matched20;
+	gtrack_isMatched30[counter] = is_matched30;
+	gtrack_isMatched40[counter] = is_matched40;
+	gtrack_isMatched50[counter] = is_matched50;
 	counter++;
       }
     }
     n_gtracks = counter;
     nGtracks = n_gtracks;
- 
+    n_daughters = number_of_daughters;
+    n_gen_daughters = number_of_gen_daughters;
+    n_gen_constit = number_of_part_gen;
+    n_match10 = num_match10;
+    n_match20 = num_match20;
+    n_match30 = num_match30;
+    n_match40 = num_match40;
+    n_match50 = num_match50;
+
+    n_gen_match10 = num_gen_match10;
+    n_gen_match20 = num_gen_match20;
+    n_gen_match30 = num_gen_match30;
+    n_gen_match40 = num_gen_match40;
+    n_gen_match50 = num_gen_match50;
+
     masses.clear();
 
     return true;
 }
 
+float ntuple_GraphB::mindrsvpfcand(const pat::PackedCandidate* pfcand) {
+
+  float mindr_ = jetradius_;
+  for (unsigned int i=0; i<secVertices()->size(); ++i) {
+    if(!pfcand) continue;
+    //if(!svs.at(i)) continue;
+    float tempdr_ = reco::deltaR(secVertices()->at(i),*pfcand);
+    if (tempdr_<mindr_) { mindr_ = tempdr_; }
+
+  }
+  return mindr_;
+}

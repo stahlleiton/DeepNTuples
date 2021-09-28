@@ -38,7 +38,9 @@ def doSub():
     maxSize=args.maxsize
     
     #eosGlobalOutDir='/eos/user/'+os.environ['USER'][0]+'/'+os.environ['USER']+'/DeepNtuples'
-    eosGlobalOutDir='/eos/cms/store/cmst3/group/dehep/DeepJet/NTuples/'
+    #eosGlobalOutDir='/eos/cms/store/cmst3/group/dehep/DeepJet/NTuples/'
+    eosGlobalOutDir='/afs/cern.ch/work/a/ademoor/NTuples_DV/'
+
     if len(args.outpath):
         eosGlobalOutDir=args.outpath
         if not os.path.isdir(eosGlobalOutDir):
