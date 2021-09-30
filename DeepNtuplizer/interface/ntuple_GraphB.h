@@ -49,30 +49,9 @@ private:
     float nNpfcand_;
 
     static constexpr size_t max_gtracks=100;
-    
-    unsigned int n_gtracks=0;
-    unsigned int n_match10=0;
-    unsigned int n_match20=0;
-    unsigned int n_match30=0;
-    unsigned int n_match40=0;
-    unsigned int n_match50=0;
-
-    unsigned int n_gen_match10=0;
-    unsigned int n_gen_match20=0;
-    unsigned int n_gen_match30=0;
-    unsigned int n_gen_match40=0;
-    unsigned int n_gen_match50=0;
 
     float nGtracks=0;
-    float n_daughters=0;
-    float n_gen_daughters=0;
-    float n_gen_constit=0;
     
-    float gtrack_isMatched10[max_gtracks];
-    float gtrack_isMatched20[max_gtracks];
-    float gtrack_isMatched30[max_gtracks];
-    float gtrack_isMatched40[max_gtracks];
-    float gtrack_isMatched50[max_gtracks];
     float gtrack_pt[max_gtracks];
     float gtrack_eta[max_gtracks];
     float gtrack_phi[max_gtracks];
@@ -96,14 +75,12 @@ private:
     float gtrack_dotProdTrack2D[max_gtracks];
     float gtrack_PCAtrackFromPV[max_gtracks];
 
-    
     // IVF cut parameters (HARDCODED?? OR CONFIGURABLE IN PYTHON CONFIG)
     float min3DIPValue=0.005;
     float min3DIPSignificance=1.2;
     int max3DIPValue=9999.;
     int max3DIPSignificance=9999.;
     
-
     //tokens to be defined from main analyzer
     edm::EDGetTokenT<edm::View<pat::PackedCandidate> > CandidateToken;
 
@@ -120,7 +97,5 @@ private:
     float mindrsvpfcand(const pat::PackedCandidate* pfcand);
 
 };
-
-
 
 #endif /* DEEPNTUPLES_DEEPNTUPLIZER_INTERFACE_NTUPLE_GRAPHB_H_ */

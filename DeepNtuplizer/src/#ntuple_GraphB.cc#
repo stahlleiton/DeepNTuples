@@ -160,6 +160,7 @@ void ntuple_GraphB::initBranches(TTree* tree){
     
     addBranch(tree,"n_gtracks",&n_gtracks, "n_gtracks/i");
     addBranch(tree,"nGtracks",&nGtracks, "nGtracks/f");
+
     addBranch(tree,"gtrack_pt",&gtrack_pt, "gtrack_pt[n_gtracks]/f");
     addBranch(tree,"gtrack_eta",&gtrack_eta, "gtrack_eta[n_gtracks]/f");
     addBranch(tree,"gtrack_phi",&gtrack_phi, "gtrack_phi[n_gtracks]/f");
@@ -186,7 +187,6 @@ void ntuple_GraphB::initBranches(TTree* tree){
     addBranch(tree,"gtrack_dotProdTrack",&gtrack_dotProdTrack, "gtrack_dotProdTrack[n_gtracks]/f");
     addBranch(tree,"gtrack_dotProdTrack2D",&gtrack_dotProdTrack2D, "gtrack_dotProdTrack2D[n_gtracks]/f");
     
-
 }
 
 
@@ -272,14 +272,6 @@ bool ntuple_GraphB::fillBranches(const pat::Jet & jet, const size_t& jetidx, con
     std::vector<reco::TransientTrack> selectedTracks;
     std::vector<float> masses;
 
-    std::vector<const reco::Candidate*> raw_gen_constituents;
-    std::vector<const reco::Candidate*> raw_cpf_constituents;
-    std::vector<const reco::Candidate*> raw_part_constituents;
-    float number_of_daughters = -1.0;
-    float number_of_gen_daughters = -1.0;
-    //float number_of_cpf_gen = -1.0;
-    float number_of_part_gen = -1.0;
-
     double jet_radius = jetR();
 
     math::XYZVector jetDir = jet.momentum().Unit();
@@ -329,6 +321,101 @@ bool ntuple_GraphB::fillBranches(const pat::Jet & jet, const size_t& jetidx, con
     long unsigned int max_cpf = 30;
     n_Cpfcand_ = std::min(sortedcharged.size(),max_cpf);
     sortedchargedindices = sorting::invertSortingVector(sortedcharged);
+
+    //Count the number of gen_daughters and fill the raw_constituent
+    if (jet.genJet()){
+      number_of_gen_daughters = jet.genJet()->numberOfDaughters();
+      number_of_daughters = jet.numberOfDaughters();
+      for (size_t i = 0; i < number_of_gen_daughters; ++i){
+	const reco::Candidate* constit = jet.daughter(i);
+	raw_gen_constituents.push_back(constit);
+      }
+    }
+
+    for (size_t j = 0; j < jet.numberOfDaughters(); j++){
+      const reco::Candidate* constit = jet.daughter(j);
+      if(constit->charge() != 0){
+	raw_cpf_constituents.push_back(constit);
+	  }
+    }
+    //number_of_cpf_gen = raw_cpf_constituents.size();
+
+    /*if(jet.genJet()){
+      for(size_t m = 0; m < jet.numberOfDaughters(); m++){
+	bool gen_10 = false;
+	bool gen_20 = false;
+	bool gen_30 = false;
+	bool gen_40 = false;
+	bool gen_50 = false;
+	const pat::PackedCandidate* PackedCandidate = dynamic_cast<const pat::PackedCandidate*>(jet.daughter(m));
+	for(size_t n = 0; n < jet.genJet()->numberOfDaughters(); n++){
+	  if((jet.genJet()->daughter(n)->charge() != 0) && (jet.daughter(m)->charge() != 0) && (PackedCandidate->hasTrackDetails())){
+	    if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - jet.daughter(m)->eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - jet.daughter(m)->phi(), 2)) < 0.10){
+	      gen_10 = true;
+	    }
+	    if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - jet.daughter(m)->eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - jet.daughter(m)->phi(), 2)) < 0.20){
+	      gen_20 = true;
+	    }
+	    if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - jet.daughter(m)->eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - jet.daughter(m)->phi(), 2)) < 0.30){
+	      gen_30 = true;
+	    }
+	    if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - jet.daughter(m)->eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - jet.daughter(m)->phi(), 2)) < 0.40){
+	      gen_40 = true;
+	    }
+	    if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - jet.daughter(m)->eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - jet.daughter(m)->phi(), 2)) < 0.50){
+	      gen_50 = true;
+	    }
+	  }
+	}
+	if(gen_10){
+	  num_gen_match10++;
+	}
+	if(gen_20){
+	  num_gen_match20++;
+	}
+	if(gen_30){
+	  num_gen_match30++;
+	}
+	if(gen_40){
+	  num_gen_match40++;
+	}
+	if(gen_50){
+	  num_gen_match50++;
+	}
+      }
+    }*/
+
+
+    //Count the number of parton_daughters and fill the raw_constituent
+    if(jet.genParton()){
+      //Prep jet-parton daughters
+      int keep = 1;
+      std::vector<const reco::Candidate*> part_constituents;
+      std::vector<const reco::Candidate*> daughters_constituents;
+      //int number_of_part_daughters = jet.genParton()->numberOfDaughters();
+      for (size_t j = 0; j < jet.genParton()->numberOfDaughters(); ++j){
+	const reco::Candidate* constit = jet.genParton()->daughter(j);
+	part_constituents.push_back(constit);
+      }
+      //Loop until we process all the constituents
+      while (keep != 0){
+	keep = 0;
+	for (size_t k = 0; k < part_constituents.size(); ++k){
+	  if (part_constituents[k]->numberOfDaughters() != 0){
+	    keep = 1;
+	    for (size_t m = 0; m < part_constituents[k]->numberOfDaughters(); ++m){
+	      daughters_constituents.push_back(part_constituents[k]->daughter(m));
+	    }
+	  }
+	  else{
+	    raw_part_constituents.push_back(part_constituents[k]);
+	  }
+	}
+	part_constituents = daughters_constituents;
+	daughters_constituents.clear();
+      }
+      number_of_part_gen = raw_part_constituents.size();
+    }
  
     size_t counter= 0;
 
@@ -339,13 +426,11 @@ bool ntuple_GraphB::fillBranches(const pat::Jet & jet, const size_t& jetidx, con
       bool hasNeighbour = false;
       bool include = false;
       float dist_part = -0.01;
-
       float is_matched10 = -1.0;
       float is_matched20 = -1.0;
       float is_matched30 = -1.0;
       float is_matched40 = -1.0;
       float is_matched50 = -1.0;
-
       //matching the track with the jet radius
       if(/*(angular_distance < 1.50*jet_radius) &&*/ (angular_distance > jet_radius)){
 	if((std::fabs(pvp.z() - it->track().vz()) > 0.1)) {continue;}  	

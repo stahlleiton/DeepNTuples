@@ -186,16 +186,13 @@ void ntuple_GraphB::initBranches(TTree* tree){
     addBranch(tree,"gtrack_dotProdTrack",&gtrack_dotProdTrack, "gtrack_dotProdTrack[n_gtracks]/f");
     addBranch(tree,"gtrack_dotProdTrack2D",&gtrack_dotProdTrack2D, "gtrack_dotProdTrack2D[n_gtracks]/f");
     
-
 }
-
 
 void ntuple_GraphB::readEvent(const edm::Event& iEvent){
     iEvent.getByToken(CandidateToken, tracks);
     n_Npfcand_=0;
     n_Cpfcand_=0;
 }
-
 
 void ntuple_GraphB::readSetup(const edm::EventSetup& iSetup){
     
@@ -272,14 +269,6 @@ bool ntuple_GraphB::fillBranches(const pat::Jet & jet, const size_t& jetidx, con
     std::vector<reco::TransientTrack> selectedTracks;
     std::vector<float> masses;
 
-    std::vector<const reco::Candidate*> raw_gen_constituents;
-    std::vector<const reco::Candidate*> raw_cpf_constituents;
-    std::vector<const reco::Candidate*> raw_part_constituents;
-    float number_of_daughters = -1.0;
-    float number_of_gen_daughters = -1.0;
-    //float number_of_cpf_gen = -1.0;
-    float number_of_part_gen = -1.0;
-
     double jet_radius = jetR();
 
     math::XYZVector jetDir = jet.momentum().Unit();
@@ -339,12 +328,6 @@ bool ntuple_GraphB::fillBranches(const pat::Jet & jet, const size_t& jetidx, con
       bool hasNeighbour = false;
       bool include = false;
       float dist_part = -0.01;
-
-      float is_matched10 = -1.0;
-      float is_matched20 = -1.0;
-      float is_matched30 = -1.0;
-      float is_matched40 = -1.0;
-      float is_matched50 = -1.0;
 
       //matching the track with the jet radius
       if(/*(angular_distance < 1.50*jet_radius) &&*/ (angular_distance > jet_radius)){
@@ -406,92 +389,6 @@ bool ntuple_GraphB::fillBranches(const pat::Jet & jet, const size_t& jetidx, con
       
       if(include){
 
-	if(jet.genJet()){
-	    bool is_gmatched10 = false;
-	    bool is_gmatched20 = false;
-	    bool is_gmatched30 = false;
-	    bool is_gmatched40 = false;
-	    bool is_gmatched50 = false;
-
-	    for(size_t n = 0; n < jet.genJet()->numberOfDaughters(); n++){	
-	      if(jet.genJet()->daughter(n)->charge() != 0){
-		if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - it->track().eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - it->track().phi(), 2)) < 0.10){
-		  is_gmatched10 = true;
-		}
-		if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - it->track().eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - it->track().phi(), 2)) < 0.20){
-		  is_gmatched20 = true;
-		}
-		if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - it->track().eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - it->track().phi(), 2)) < 0.30){
-		  is_gmatched30 = true;
-		}
-		if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - it->track().eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - it->track().phi(), 2)) < 0.40){
-		  is_gmatched40 = true;
-		}
-		if(std::sqrt(std::pow(jet.genJet()->daughter(n)->eta() - it->track().eta(), 2) + std::pow(jet.genJet()->daughter(n)->phi() - it->track().phi(), 2)) < 0.50){
-		  is_gmatched50 = true;
-		}
-	      }
-	    }
-	  if(is_gmatched10){
-	    num_gen_match10++;
-	  }
-	  if(is_gmatched20){
-	    num_gen_match20++;
-	  }
-	  if(is_gmatched30){
-	    num_gen_match30++;
-	  }
-	  if(is_gmatched40){
-	    num_gen_match40++;
-	  }
-	  if(is_gmatched50){
-	    num_gen_match50++;
-	  }
-	}
-
-	if(jet.genParton()){
-	    is_matched10 = 0;
-	    is_matched20 = 0;
-	    is_matched30 = 0;
-	    is_matched40 = 0;
-	    is_matched50 = 0;
-
-	    for(size_t n = 0; n < raw_part_constituents.size();  n++){	
-	      if(raw_part_constituents.at(n)->charge() != 0){
-		if(std::sqrt(std::pow(raw_part_constituents.at(n)->eta() - it->track().eta(), 2) + std::pow(raw_part_constituents.at(n)->phi() - it->track().phi(), 2)) < 0.10){
-		  is_matched10 = 1.0;
-		}
-		if(std::sqrt(std::pow(raw_part_constituents.at(n)->eta() - it->track().eta(), 2) + std::pow(raw_part_constituents.at(n)->phi() - it->track().phi(), 2)) < 0.20){
-		  is_matched20 = 1.0;
-		}
-		if(std::sqrt(std::pow(raw_part_constituents.at(n)->eta() - it->track().eta(), 2) + std::pow(raw_part_constituents.at(n)->phi() - it->track().phi(), 2)) < 0.30){
-		  is_matched30 = 1.0;
-		}
-		if(std::sqrt(std::pow(raw_part_constituents.at(n)->eta() - it->track().eta(), 2) + std::pow(raw_part_constituents.at(n)->phi() - it->track().phi(), 2)) < 0.40){
-		  is_matched40 = 1.0;
-		}
-		if(std::sqrt(std::pow(raw_part_constituents.at(n)->eta() - it->track().eta(), 2) + std::pow(raw_part_constituents.at(n)->phi() - it->track().phi(), 2)) < 0.50){
-		  is_matched50 = 1.0;
-		}
-	      }
-	    }
-	  if(is_matched10 == 1.0){
-	    num_match10++;
-	  }
-	  if(is_matched20 == 1.0){
-	    num_match20++;
-	  }
-	  if(is_matched30 == 1.0){
-	    num_match30++;
-	  }
-	  if(is_matched40 == 1.0){
-	    num_match40++;
-	  }
-	  if(is_matched50 == 1.0){
-	    num_match50++;
-	  }
-	}
-
 	std::pair<bool,Measurement1D> ip = IPTools::signedImpactParameter3D(*it, direction, pv);        
         std::pair<bool,Measurement1D> ip2d = IPTools::signedTransverseImpactParameter(*it, direction, pv);
         std::pair<double, Measurement1D> jet_dist =IPTools::jetTrackDistance(*it, direction, pv);                   
@@ -532,31 +429,11 @@ bool ntuple_GraphB::fillBranches(const pat::Jet & jet, const size_t& jetidx, con
 
         gtrack_nPixelHits[counter] = catchInfsAndBound(it->hitPattern().numberOfValidPixelHits(),-1.0,0.0,100.0);
         gtrack_nHits[counter] = catchInfsAndBound(it->hitPattern().numberOfValidHits(),-1.0,0.0,100.0);	
-	gtrack_isMatched10[counter] = is_matched10;
-	gtrack_isMatched20[counter] = is_matched20;
-	gtrack_isMatched30[counter] = is_matched30;
-	gtrack_isMatched40[counter] = is_matched40;
-	gtrack_isMatched50[counter] = is_matched50;
 	counter++;
       }
     }
     n_gtracks = counter;
     nGtracks = n_gtracks;
-    n_daughters = number_of_daughters;
-    n_gen_daughters = number_of_gen_daughters;
-    n_gen_constit = number_of_part_gen;
-    n_match10 = num_match10;
-    n_match20 = num_match20;
-    n_match30 = num_match30;
-    n_match40 = num_match40;
-    n_match50 = num_match50;
-
-    n_gen_match10 = num_gen_match10;
-    n_gen_match20 = num_gen_match20;
-    n_gen_match30 = num_gen_match30;
-    n_gen_match40 = num_gen_match40;
-    n_gen_match50 = num_gen_match50;
-
     masses.clear();
 
     return true;
