@@ -51,6 +51,7 @@ private:
     static constexpr size_t max_gtracks=100;
 
     float nGtracks=0;
+    unsigned int n_gtracks=0;
     
     float gtrack_pt[max_gtracks];
     float gtrack_eta[max_gtracks];

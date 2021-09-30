@@ -330,7 +330,7 @@ bool ntuple_GraphB::fillBranches(const pat::Jet & jet, const size_t& jetidx, con
       float dist_part = -0.01;
 
       //matching the track with the jet radius
-      if(/*(angular_distance < 1.50*jet_radius) &&*/ (angular_distance > jet_radius)){
+      if((angular_distance < 1.50*jet_radius) && (angular_distance > jet_radius)){
 	if((std::fabs(pvp.z() - it->track().vz()) > 0.1)) {continue;}  	
 	   //matching the track with a cpf_seed of not
 
@@ -346,18 +346,18 @@ bool ntuple_GraphB::fillBranches(const pat::Jet & jet, const size_t& jetidx, con
 		TwoTrackMinimumDistance dist;
 		std::pair<bool, Measurement1D> ip=IPTools::absoluteImpactParameter3D(transientTrack, pv);
 		float near_angular_dist = reco::deltaR(jet,transientTrack.track());
-		//std::pair<double, Measurement1D> jet_dist =IPTools::jetTrackDistance(transientTrack, direction, pv);
-		//float length = 999;
-		//TrajectoryStateOnSurface closest = IPTools::closestApproachToJet(transientTrack.impactPointState(), pv, direction, transientTrack.field());
-		//if(closest.isValid()){
-		// length = (closest.globalPosition() - pvp).mag();
-		//}
+		std::pair<double, Measurement1D> jet_dist =IPTools::jetTrackDistance(transientTrack, direction, pv);
+		float length = 999;
+		TrajectoryStateOnSurface closest = IPTools::closestApproachToJet(transientTrack.impactPointState(), pv, direction, transientTrack.field());
+		if(closest.isValid()){
+		 length = (closest.globalPosition() - pvp).mag();
+		}
 		if (transientTrack == *it) {continue;}
 		if (near_angular_dist < jet_radius){
-		  /*if (!(ip.first && ip.second.value() >= 0.0 && ip.second.significance() >= 1.0 && ip.second.value() <= 9999. 
+		  if (!(ip.first && ip.second.value() >= 0.0 && ip.second.significance() >= 1.0 && ip.second.value() <= 9999. 
 			&& ip.second.significance() <= 9999. && transientTrack.track().normalizedChi2() < 5. && std::fabs(transientTrack.track().dxy(pv.position())) < 2 
-			&& std::fabs(transientTrack.track().dz(pv.position())) < 17 && jet_dist.second.value() < 0.07 && length < 5.)){continue;}*/
-		  if(ip.second.significance() < 1.0) {continue;}
+			&& std::fabs(transientTrack.track().dz(pv.position())) < 17 && jet_dist.second.value() < 0.07 && length < 5.)){continue;}
+		  /*if(ip.second.significance() < 1.0) {continue;}*/
 		  if(dist.calculate(transientTrack.impactPointState(),it->impactPointState())){
 		    float distance = dist.distance();
 		    if(distance < 0.02){
