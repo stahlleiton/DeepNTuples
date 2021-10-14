@@ -29,8 +29,8 @@ def doSub():
     parser.add_argument('--file',default='samples.cfg',help='file containing a sample list')
     parser.add_argument('--nosubmit',default=False,help='no submission')
     parser.add_argument('--outpath',default='',help='set path to store the .root output')
-    parser.add_argument('--walltime',default='21600',help='set job wall time in seconds')
-    parser.add_argument('--maxsize',default='2000',help='set maximum allowed size of output ntuple')
+    parser.add_argument('--walltime',default='192800',help='set job wall time in seconds')
+    parser.add_argument('--maxsize',default='7000',help='set maximum allowed size of output ntuple')
     
     args = parser.parse_args()
     
@@ -38,7 +38,10 @@ def doSub():
     maxSize=args.maxsize
     
     #eosGlobalOutDir='/eos/user/'+os.environ['USER'][0]+'/'+os.environ['USER']+'/DeepNtuples'
-    eosGlobalOutDir='/eos/cms/store/cmst3/group/dehep/DeepJet/NTuples/'
+    #eosGlobalOutDir='/eos/cms/store/cmst3/group/dehep/DeepJet/NTuples/'
+    eosGlobalOutDir='/afs/cern.ch/work/a/ademoor/NTuples_DV/'
+    #eosGlobalOutDir='/afs/cern.ch/work/m/mullerd/NTuples_DV/'
+
     if len(args.outpath):
         eosGlobalOutDir=args.outpath
         if not os.path.isdir(eosGlobalOutDir):

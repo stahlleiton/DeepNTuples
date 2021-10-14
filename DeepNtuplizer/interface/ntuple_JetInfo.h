@@ -147,21 +147,21 @@ public:
    
     float Delta_gen_pt_;
     //classification
-    int isB_;
-    int isGBB_;
-    int isBB_;
-    int isC_;
-    int isGCC_;
-    int isCC_;
-    int isUD_;
-    int isS_;
-    int isG_;
-    int isPU_;
-    int isUndefined_;
+    unsigned int isB_;
+    unsigned int isGBB_;
+    unsigned int isBB_;
+    unsigned int isC_;
+    unsigned int isGCC_;
+    unsigned int isCC_;
+    unsigned int isUD_;
+    unsigned int isS_;
+    unsigned int isG_;
+    unsigned int isPU_;
+    unsigned int isUndefined_;
     float genDecay_;
-    int isLeptonicB_;
-    int isLeptonicB_C_;
-    int isTau_;
+    unsigned int isLeptonicB_;
+    unsigned int isLeptonicB_C_;
+    unsigned int isTau_;
 
     //truth labeling with fallback to physics definition for light/gluon/undefined of standard flavor definition
     int isPhysB_;

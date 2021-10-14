@@ -29,7 +29,7 @@ public:
 private:
 
     // SV candidates
-    int   sv_num_;
+    unsigned int   sv_num_;
     float nsv_;
     std::string prefix_;
 

@@ -134,7 +134,7 @@ std::vector<TChain* > mergeDescriptor::createChains(
     branchinfos.push_back(new ntuple_bTagVars());
     branchinfos.push_back(new ntuple_pfCands());
     //branchinfos.push_back(new ntuple_DeepVertex());
-    //branchinfos.push_back(new ntuple_GraphB());
+    branchinfos.push_back(new ntuple_GraphB());
 
     std::vector<TChain* > chains;
     for(size_t i=0;i<infiles.size();i++){

@@ -156,9 +156,9 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
         
     }
     */  
-    //ntuple_GraphB* deepvertexmodule=new ntuple_GraphB(jetR);
-    //deepvertexmodule->setCandidatesToken(consumes<edm::View<pat::PackedCandidate> >(iConfig.getParameter<edm::InputTag>("candidates")));
-    //addModule(deepvertexmodule);
+    ntuple_GraphB* deepvertexmodule=new ntuple_GraphB(jetR);
+    deepvertexmodule->setCandidatesToken(consumes<edm::View<pat::PackedCandidate> >(iConfig.getParameter<edm::InputTag>("candidates")));
+    addModule(deepvertexmodule);
      
 
     ntuple_JetInfo* jetinfo=new ntuple_JetInfo();
