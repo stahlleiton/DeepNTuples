@@ -2,7 +2,7 @@
 NTuple framework for DeepFlavour
 
 
-Installation (CMSSW 10_6_X)
+Installation (CMSSW 11_1_2)
 ============
 
 ```
