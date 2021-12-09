@@ -1,0 +1,13 @@
+executable            = /afs/cern.ch/work/a/ademoor/CMSSW_11_1_2_patch3/src/DeepNTuples/test/ntuple_qcd_300_470/batchscript.sh
+arguments             = /afs/cern.ch/work/a/ademoor/CMSSW_11_1_2_patch3/src/DeepNTuples/test/DeepNtuplizer.py inputScript=QCDPt300to470TuneCP513TeVpythia8RunIISummer19UL17MiniAOD106Xmc2017realisticv6v2MINIAODSIM nJobs=2 job=$(ProcId) gluonReduction=0.5
+log                   = /afs/cern.ch/work/a/ademoor/CMSSW_11_1_2_patch3/src/DeepNTuples/test/ntuple_qcd_300_470/batch/con_out.$(ProcId).log
+getenv = True
+environment = "NTUPLEOUTFILEPATH=/eos/home-a/ademoor/UL17_DV_mini_dataset/111X/Thu_153359_test/ntuple_qcd_300_470/output/ntuple_qcd_300_470_$(ProcId).root"
+use_x509userproxy = True
++MaxRuntime = 192800
+max_transfer_output_mb = 7000
+RequestCpus = 2
+transfer_output_remaps = "stdout.txt=/afs/cern.ch/work/a/ademoor/CMSSW_11_1_2_patch3/src/DeepNTuples/test/ntuple_qcd_300_470/batch/con_out.$(ProcId).out"
+max_retries = 20
+queue 2
+    

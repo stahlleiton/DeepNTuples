@@ -158,33 +158,33 @@ void ntuple_GraphB::getInput(const edm::ParameterSet& iConfig){
 
 void ntuple_GraphB::initBranches(TTree* tree){
     
-    addBranch(tree,"n_gtracks",&n_gtracks, "n_gtracks/i");
-    addBranch(tree,"nGtracks",&nGtracks, "nGtracks/f");
-    addBranch(tree,"gtrack_pt",&gtrack_pt, "gtrack_pt[n_gtracks]/f");
-    addBranch(tree,"gtrack_eta",&gtrack_eta, "gtrack_eta[n_gtracks]/f");
-    addBranch(tree,"gtrack_phi",&gtrack_phi, "gtrack_phi[n_gtracks]/f");
-    addBranch(tree,"gtrack_mass",&gtrack_mass, "gtrack_mass[n_gtracks]/f");
+    addBranch(tree,"n_gtracks",&n_gtracks, "n_gtracks/I");
+    addBranch(tree,"nGtracks",&nGtracks, "nGtracks/F");
+    addBranch(tree,"gtrack_pt",&gtrack_pt, "gtrack_pt[n_gtracks]/F");
+    addBranch(tree,"gtrack_eta",&gtrack_eta, "gtrack_eta[n_gtracks]/F");
+    addBranch(tree,"gtrack_phi",&gtrack_phi, "gtrack_phi[n_gtracks]/F");
+    addBranch(tree,"gtrack_mass",&gtrack_mass, "gtrack_mass[n_gtracks]/F");
     
-    addBranch(tree,"gtrack_dz", &gtrack_dz, "gtrack_dz[n_gtracks]/f");
-    addBranch(tree,"gtrack_dxy", &gtrack_dxy, "gtrack_dxy[n_gtracks]/f");
-    addBranch(tree,"gtrack_3D_ip", &gtrack_3D_ip, "gtrack_3D_ip[n_gtracks]/f");
-    addBranch(tree,"gtrack_3D_sip", &gtrack_3D_sip, "gtrack_3D_sip[n_gtracks]/f");
-    addBranch(tree,"gtrack_2D_ip", &gtrack_2D_ip, "gtrack_2D_ip[n_gtracks]/f");
-    addBranch(tree,"gtrack_2D_sip", &gtrack_2D_sip, "gtrack_2D_sip[n_gtracks]/f");
-    addBranch(tree,"gtrack_dR", &gtrack_dR, "gtrack_dR[n_gtracks]/f");
-    addBranch(tree,"gtrack_dist_neigh", &gtrack_dist_neigh, "gtrack_dist_neigh[n_gtracks]/f");
+    addBranch(tree,"gtrack_dz", &gtrack_dz, "gtrack_dz[n_gtracks]/F");
+    addBranch(tree,"gtrack_dxy", &gtrack_dxy, "gtrack_dxy[n_gtracks]/F");
+    addBranch(tree,"gtrack_3D_ip", &gtrack_3D_ip, "gtrack_3D_ip[n_gtracks]/F");
+    addBranch(tree,"gtrack_3D_sip", &gtrack_3D_sip, "gtrack_3D_sip[n_gtracks]/F");
+    addBranch(tree,"gtrack_2D_ip", &gtrack_2D_ip, "gtrack_2D_ip[n_gtracks]/F");
+    addBranch(tree,"gtrack_2D_sip", &gtrack_2D_sip, "gtrack_2D_sip[n_gtracks]/F");
+    addBranch(tree,"gtrack_dR", &gtrack_dR, "gtrack_dR[n_gtracks]/F");
+    addBranch(tree,"gtrack_dist_neigh", &gtrack_dist_neigh, "gtrack_dist_neigh[n_gtracks]/F");
     
-    addBranch(tree,"gtrack_3D_TrackProbability", &gtrack_3D_TrackProbability, "gtrack_3D_TrackProbability[n_gtracks]/f");
-    addBranch(tree,"gtrack_2D_TrackProbability", &gtrack_2D_TrackProbability, "gtrack_2D_TrackProbability[n_gtracks]/f");
+    addBranch(tree,"gtrack_3D_TrackProbability", &gtrack_3D_TrackProbability, "gtrack_3D_TrackProbability[n_gtracks]/F");
+    addBranch(tree,"gtrack_2D_TrackProbability", &gtrack_2D_TrackProbability, "gtrack_2D_TrackProbability[n_gtracks]/F");
     
-    addBranch(tree,"gtrack_chi2reduced",&gtrack_chi2reduced, "gtrack_chi2reduced[n_gtracks]/f");
-    addBranch(tree,"gtrack_nPixelHits",&gtrack_nPixelHits, "gtrack_nPixelHits[n_gtracks]/f");
-    addBranch(tree,"gtrack_nHits",&gtrack_nHits, "gtrack_nHits[n_gtracks]/f");
-    addBranch(tree,"gtrack_jetAxisDistance",&gtrack_jetAxisDistance, "gtrack_jetAxisDistance[n_gtracks]/f");
-    addBranch(tree,"gtrack_jetAxisDlength",&gtrack_jetAxisDlength, "gtrack_jetAxisDlength[n_gtracks]/f");
-    addBranch(tree,"gtrack_PCAtrackFromPV",&gtrack_PCAtrackFromPV, "gtrack_PCAtrackFromPV[n_gtracks]/f");
-    addBranch(tree,"gtrack_dotProdTrack",&gtrack_dotProdTrack, "gtrack_dotProdTrack[n_gtracks]/f");
-    addBranch(tree,"gtrack_dotProdTrack2D",&gtrack_dotProdTrack2D, "gtrack_dotProdTrack2D[n_gtracks]/f");
+    addBranch(tree,"gtrack_chi2reduced",&gtrack_chi2reduced, "gtrack_chi2reduced[n_gtracks]/F");
+    addBranch(tree,"gtrack_nPixelHits",&gtrack_nPixelHits, "gtrack_nPixelHits[n_gtracks]/F");
+    addBranch(tree,"gtrack_nHits",&gtrack_nHits, "gtrack_nHits[n_gtracks]/F");
+    addBranch(tree,"gtrack_jetAxisDistance",&gtrack_jetAxisDistance, "gtrack_jetAxisDistance[n_gtracks]/F");
+    addBranch(tree,"gtrack_jetAxisDlength",&gtrack_jetAxisDlength, "gtrack_jetAxisDlength[n_gtracks]/F");
+    addBranch(tree,"gtrack_PCAtrackFromPV",&gtrack_PCAtrackFromPV, "gtrack_PCAtrackFromPV[n_gtracks]/F");
+    addBranch(tree,"gtrack_dotProdTrack",&gtrack_dotProdTrack, "gtrack_dotProdTrack[n_gtracks]/F");
+    addBranch(tree,"gtrack_dotProdTrack2D",&gtrack_dotProdTrack2D, "gtrack_dotProdTrack2D[n_gtracks]/F");
     
 }
 
@@ -337,7 +337,7 @@ bool ntuple_GraphB::fillBranches(const pat::Jet & jet, const size_t& jetidx, con
 	  for (unsigned int i = 0; i <  jet.numberOfDaughters(); i++){
 	    const pat::PackedCandidate* PackedCandidate = dynamic_cast<const pat::PackedCandidate*>(jet.daughter(i));
 	    if(PackedCandidate->hasTrackDetails()){
-	      if(PackedCandidate->pt() < min_candidate_pt_) {continue;} 
+	      //if(PackedCandidate->pt() < min_candidate_pt_) {continue;} 
 	      if(PackedCandidate->charge()!=0){
 		const reco::Track & PseudoTrack =  PackedCandidate->pseudoTrack();
 		reco::TransientTrack transientTrack;
@@ -352,17 +352,18 @@ bool ntuple_GraphB::fillBranches(const pat::Jet & jet, const size_t& jetidx, con
 		if(closest.isValid()){
 		 length = (closest.globalPosition() - pvp).mag();
 		}
-		if (transientTrack == *it) {continue;}
+		if (transientTrack == *it) {include = true;}
 		if (near_angular_dist < jet_radius){
-		  if (!(ip.first && ip.second.value() >= 0.0 && ip.second.significance() >= 1.0 && ip.second.value() <= 9999. 
+		  if ((ip.first && ip.second.value() >= 0.0 && ip.second.significance() >= 1.00 && ip.second.value() <= 9999. 
 			&& ip.second.significance() <= 9999. && transientTrack.track().normalizedChi2() < 5. && std::fabs(transientTrack.track().dxy(pv.position())) < 2 
-			&& std::fabs(transientTrack.track().dz(pv.position())) < 17 && jet_dist.second.value() < 0.07 && length < 5.)){continue;}
-		  /*if(ip.second.significance() < 1.0) {continue;}*/
-		  if(dist.calculate(transientTrack.impactPointState(),it->impactPointState())){
-		    float distance = dist.distance();
-		    if(distance < 0.02){
-		      hasNeighbour = true;
-		      dist_part = distance;
+			&& std::fabs(transientTrack.track().dz(pv.position())) < 17 && jet_dist.second.value() < 0.07 && length < 5.)){
+		    /*if(ip.second.significance() < 1.0) {continue;}*/
+		    if(dist.calculate(transientTrack.impactPointState(),it->impactPointState())){
+		      float distance = dist.distance();
+		      if(distance < 0.02){
+			hasNeighbour = true;
+			dist_part = distance;
+		      }
 		    }
 		  }
 		}

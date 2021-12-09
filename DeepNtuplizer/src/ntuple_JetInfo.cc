@@ -33,31 +33,31 @@ void ntuple_JetInfo::getInput(const edm::ParameterSet& iConfig){
 void ntuple_JetInfo::initBranches(TTree* tree){
 
     //more general event info, here applied per jet
-    addBranch(tree,"npv"    ,&npv_    ,"npv/f"    );
-    addBranch(tree,"rho", &rho_, "rho/f");
-    addBranch(tree,"ntrueInt",&ntrueInt_,"ntrueInt/f");
-    addBranch(tree,"event_no"    ,&event_no_    ,"event_no/i"    );
-    addBranch(tree,"jet_no"    ,&jet_no_    ,"jet_no/i"    );
+    addBranch(tree,"npv"    ,&npv_    ,"npv/F"    );
+    addBranch(tree,"rho", &rho_, "rho/F");
+    addBranch(tree,"ntrueInt",&ntrueInt_,"ntrueInt/F");
+    addBranch(tree,"event_no"    ,&event_no_    ,"event_no/I"    );
+    addBranch(tree,"jet_no"    ,&jet_no_    ,"jet_no/I"    );
 
 
     // truth labels
-    addBranch(tree,"gen_pt"    ,&gen_pt_    ,"gen_pt_/f"    );
-    addBranch(tree,"Delta_gen_pt"    ,&Delta_gen_pt_,"Delta_gen_pt_/f"    );
-    addBranch(tree,"isB",&isB_, "isB_/i");
-    addBranch(tree,"isGBB",&isGBB_, "isGBB_/i");
-    addBranch(tree,"isBB",&isBB_, "isBB_/i");
-    addBranch(tree,"isLeptonicB",&isLeptonicB_, "isLeptonicB_/i");
-    addBranch(tree,"isLeptonicB_C",&isLeptonicB_C_, "isLeptonicB_C_/i");
-    addBranch(tree,"isC",&isC_, "isC_/i");
-    addBranch(tree,"isGCC",&isGCC_, "isGCC_/i");
-    addBranch(tree,"isCC",&isCC_, "isCC_/i");
+    addBranch(tree,"gen_pt"    ,&gen_pt_    ,"gen_pt_/F"    );
+    addBranch(tree,"Delta_gen_pt"    ,&Delta_gen_pt_,"Delta_gen_pt_/F"    );
+    addBranch(tree,"isB",&isB_, "isB_/I");
+    addBranch(tree,"isGBB",&isGBB_, "isGBB_/I");
+    addBranch(tree,"isBB",&isBB_, "isBB_/I");
+    addBranch(tree,"isLeptonicB",&isLeptonicB_, "isLeptonicB_/I");
+    addBranch(tree,"isLeptonicB_C",&isLeptonicB_C_, "isLeptonicB_C_/I");
+    addBranch(tree,"isC",&isC_, "isC_/I");
+    addBranch(tree,"isGCC",&isGCC_, "isGCC_/I");
+    addBranch(tree,"isCC",&isCC_, "isCC_/I");
 //    addBranch(tree,"isTau",&isTau_, "isTau_/i");
-    addBranch(tree,"isUD",&isUD_, "isUD_/i");
-    addBranch(tree,"isS",&isS_, "isS_/i");
-    addBranch(tree,"isG",&isG_, "isG_/i");
-    addBranch(tree,"isPU",&isPU_, "isPU_/i");
-    addBranch(tree,"isUndefined",&isUndefined_, "isUndefined_/i");
-    addBranch(tree,"genDecay",&genDecay_, "genDecay_/f"); //dxy corresponds to the distance the Bhadron traveled
+    addBranch(tree,"isUD",&isUD_, "isUD_/I");
+    addBranch(tree,"isS",&isS_, "isS_/I");
+    addBranch(tree,"isG",&isG_, "isG_/I");
+    addBranch(tree,"isPU",&isPU_, "isPU_/I");
+    addBranch(tree,"isUndefined",&isUndefined_, "isUndefined_/I");
+    addBranch(tree,"genDecay",&genDecay_, "genDecay_/F"); //dxy corresponds to the distance the Bhadron traveled
     
     addBranch(tree,"jet_hflav", &jet_hflav_);
     addBranch(tree,"jet_pflav", &jet_pflav_);
@@ -131,10 +131,10 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"electrons_energy", &electrons_energy_, "electrons_energy_[electrons_number_]/f");
     */
 
-    addBranch(tree,"gen_pt_Recluster"    ,&gen_pt_Recluster_    ,"gen_pt_Recluster_/f"    );
-    addBranch(tree,"gen_pt_WithNu"    ,&gen_pt_WithNu_    ,"gen_pt_WithNu_/f"    );
-    addBranch(tree,"Delta_gen_pt_Recluster"    ,&Delta_gen_pt_Recluster_    ,"Delta_gen_pt_Recluster_/f"    );
-    addBranch(tree,"Delta_gen_pt_WithNu"    ,&Delta_gen_pt_WithNu_    ,"Delta_gen_pt_WithNu_/f"    );
+    addBranch(tree,"gen_pt_Recluster"    ,&gen_pt_Recluster_    ,"gen_pt_Recluster_/F"    );
+    addBranch(tree,"gen_pt_WithNu"    ,&gen_pt_WithNu_    ,"gen_pt_WithNu_/F"    );
+    addBranch(tree,"Delta_gen_pt_Recluster"    ,&Delta_gen_pt_Recluster_    ,"Delta_gen_pt_Recluster_/F"    );
+    addBranch(tree,"Delta_gen_pt_WithNu"    ,&Delta_gen_pt_WithNu_    ,"Delta_gen_pt_WithNu_/F"    );
 
     if(1) // discriminators might need to be filled differently. FIXME
         for(auto& entry : discriminators_) {

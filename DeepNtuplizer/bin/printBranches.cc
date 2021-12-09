@@ -6,6 +6,7 @@
 #include "../interface/ntuple_pfCands.h"
 #include "../interface/ntuple_FatJetInfo.h"
 #include "../interface/ntuple_DeepVertex.h"
+#include "../interface/ntuple_GraphB.h"
 #include "TFile.h"
 #include <vector>
 #include "TH1F.h"
@@ -25,6 +26,7 @@ int main(int argc, char *argv[]) {
     branchinfos.push_back(new ntuple_pfCands());
   //  branchinfos.push_back(new ntuple_FatJetInfo());
   //  branchinfos.push_back(new ntuple_DeepVertex());
+    branchinfos.push_back(new ntuple_GraphB());
 
     if (argc < 3)
         return -1;
