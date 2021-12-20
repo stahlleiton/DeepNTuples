@@ -14,6 +14,7 @@
 #include "../interface/ntuple_FatJetInfo.h"
 #include "../interface/ntuple_DeepVertex.h"
 #include "../interface/ntuple_GraphB.h"
+#include "../interface/ntuple_pixelclusters.h"
 //ROOT includes
 #include "TTree.h"
 #include <TFile.h>
@@ -160,6 +161,9 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
     ntuple_GraphB* deepvertexmodule=new ntuple_GraphB(jetR);
     deepvertexmodule->setCandidatesToken(consumes<edm::View<pat::PackedCandidate> >(iConfig.getParameter<edm::InputTag>("candidates")));
     addModule(deepvertexmodule, "DeepVertextuple");
+
+    ntuple_pixelclusters* pixelclustersmodule=new ntuple_pixelclusters(jetR);
+    addModule(pixelclustersmodule, "pixelclusterstuple");
      
 
     ntuple_JetInfo* jetinfo=new ntuple_JetInfo();

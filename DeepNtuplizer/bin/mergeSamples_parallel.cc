@@ -41,6 +41,7 @@
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_pfCands.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_SV.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_GraphB.h"
+#include "DeepNTuples/DeepNtuplizer/interface/ntuple_pixelclusters.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_FatJetInfo.h"
 
 #include <dirent.h>
@@ -125,6 +126,7 @@ std::vector<TChain* > createChains(const std::vector<std::vector<TString> >& inf
     branchinfos.push_back(new ntuple_bTagVars());
     branchinfos.push_back(new ntuple_pfCands());
     branchinfos.push_back(new ntuple_GraphB());
+    branchinfos.push_back(new ntuple_pixelclusters());
     branchinfos.push_back(new ntuple_FatJetInfo());
 
     std::vector<TChain* > chains;
