@@ -163,6 +163,7 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
     addModule(deepvertexmodule, "DeepVertextuple");
 
     ntuple_pixelclusters* pixelclustersmodule=new ntuple_pixelclusters(jetR);
+    pixelclustersmodule->setPixelHits(consumes<edmNew::DetSetVector<SiPixelCluster> >(iConfig.getParameter<edm::InputTag>("pixelhit")));
     addModule(pixelclustersmodule, "pixelclusterstuple");
      
 

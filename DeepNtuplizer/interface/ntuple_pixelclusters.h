@@ -42,8 +42,8 @@ public:
     bool fillBranches(const pat::Jet &, const size_t& jetidx, const  edm::View<pat::Jet> * coll=0);
 
 
-    void setCandidatesToken(const edm::EDGetTokenT<edm::View<pat::PackedCandidate> > & t){
-        CandidateToken=t;
+    void setPixelHits(const edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster> > & t){
+        m_pixelhit=t;
      }
 
 private:
@@ -61,19 +61,16 @@ private:
     float rvar[max_gtracks];
     float rvwt[max_gtracks];
 
-    edm::EDGetTokenT<edm::View<reco::Jet> > m_jets;
-    edm::EDGetTokenT<reco::VertexCollection> m_vertices;
+    const edm::EDGetTokenT<edm::View<reco::Jet> > m_jets;
+    const edm::EDGetTokenT<reco::VertexCollection> m_vertices;
     edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster> > m_pixelhit; //To header !
     edm::Handle<edmNew::DetSetVector<SiPixelCluster> > collectionHandle; //To header !
-    edm::ESGetToken<TrackerGeometry, TrackerDigiGeometryRecord> m_geomToken; //To header !
-    edm::ESGetToken<TrackerTopology, TrackerTopologyRcd> m_topoToken; //To header !
+    
+    edm::ESHandle<TrackerGeometry> geom; //To header !
+    edm::ESHandle<TrackerTopology> tTopoH; //To header !
 
     //tokens to be defined from main analyzer                                                                                                                                                              
-    edm::EDGetTokenT<edm::View<pat::PackedCandidate> > CandidateToken;
-    // Open Geometry                                                                                                                                                                                       
-    const TrackerGeometry* theTracker;
-    // Retrieve tracker topology from geometry                                                                                                                                                             
-    const TrackerTopology* tTopo;
+    //edm::EDGetTokenT<edm::View<pat::PackedCandidate> > CandidateToken;
 };
 
 #endif /* DEEPNTUPLES_DEEPNTUPLIZER_INTERFACE_NTUPLE_PIXEL_CLUSTERS_ */

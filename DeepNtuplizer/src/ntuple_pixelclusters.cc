@@ -1,7 +1,7 @@
 /*
  * ntuple_pixelclusters.cc
  *
- *  Created on: 1 November 2021
+ *  Created on: 22 December 2021
  *      Author: Alexandre De Moor
 
  */
@@ -87,7 +87,8 @@ ntuple_pixelclusters::ntuple_pixelclusters(double jetR):ntuple_content(jetR){}
 
 ntuple_pixelclusters::~ntuple_pixelclusters(){}
 
-void ntuple_pixelclusters::getInput(const edm::ParameterSet& iConfig){}
+void ntuple_pixelclusters::getInput(const edm::ParameterSet& iConfig){
+}
 
 void ntuple_pixelclusters::initBranches(TTree* tree){
     
@@ -109,27 +110,22 @@ void ntuple_pixelclusters::readEvent(const edm::Event& iEvent){
 
 void ntuple_pixelclusters::readSetup(const edm::EventSetup& iSetup){
     // Open Geometry
-    theTracker = &iSetup.getData(m_geomToken);
-
-    // Retrieve tracker topology from geometry
-    tTopo = &iSetup.getData(m_topoToken);
+    iSetup.get<TrackerDigiGeometryRecord>().get(geom);
+    // Retrieve tracker topology from geometry 
+    iSetup.get<TrackerTopologyRcd>().get(tTopoH);
 }
 
 void ntuple_pixelclusters::checkEventSetup(const edm::EventSetup & iSetup) {
-    // Open Geometry
-    theTracker = &iSetup.getData(m_geomToken);
-
+    // Open Geometry                                                                                                                                                                                       
+    //theTracker = &iSetup.getData(m_geomToken);
     // Retrieve tracker topology from geometry
-    tTopo = &iSetup.getData(m_topoToken);
+    //tTopo = &iSetup.getData(m_topoToken);
 }
 
 bool ntuple_pixelclusters::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  edm::View<pat::Jet> * coll){
 
-    //    const bool m_isPhase1 = true;
     const bool m_addFPIX = true;
     const int m_minADC = -1;
-    //    const float m_minJetPt = 0.0;
-    //    const float m_maxJetEta = 2.5;    
     unsigned int m_nLayers = 4;
     float m_hadronMass = 12.0;
     
@@ -139,6 +135,8 @@ bool ntuple_pixelclusters::fillBranches(const pat::Jet & jet, const size_t& jeti
     
     // Open Pixel Cluster collection
     const edmNew::DetSetVector<SiPixelCluster>& collectionClusters(*collectionHandle);
+    const TrackerGeometry& theTracker(*geom);
+    const TrackerTopology* tTopo = tTopoH.product();
     
     std::vector<reco::PixelClusterProperties> clusters;
     
@@ -157,8 +155,8 @@ bool ntuple_pixelclusters::fillBranches(const pat::Jet & jet, const size_t& jeti
             continue;
         
         // Get the geom-detector
-        const auto* geomDet = theTracker->idToDet(detId);
-        const auto* topol = &geomDet->topology();
+        const auto* geomDet = theTracker.idToDet(detId);
+	const auto* topol = &geomDet->topology();
         
         for (auto const& clUnit : detUnit) {
             if (m_minADC > 0 and clUnit.charge() < m_minADC)

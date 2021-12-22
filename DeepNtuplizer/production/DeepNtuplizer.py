@@ -53,7 +53,8 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
 #'auto:run2_mc'
 #process.GlobalTag.globaltag = "112X_mcRun3_2021_realistic_v8" #GlobalTag(process.GlobalTag, '110X_mcRun3_2021_realistic_v6', '')
-process.GlobalTag = GlobalTag(process.GlobalTag, '106X_mc2017_realistic_v8', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '94X_mc2017_realistic_v11', '')
+#process.GlobalTag = GlobalTag(process.GlobalTag, '106X_mc2017_realistic_v8', '')
 #process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
