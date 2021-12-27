@@ -65,10 +65,11 @@ process.MessageLogger.cerr.FwkReport.reportEvery = options.reportEvery
 process.options = cms.untracked.PSet(
    allowUnscheduled = cms.untracked.bool(True),  
    wantSummary=cms.untracked.bool(False)
+#   SkipEvent = cms.untracked.vstring('ProductNotFound')
 )
 
 
-process.load('DeepNTuples.DeepNtuplizer.samples.TTJetsPhase1_cfg') #default input
+process.load('DeepNTuples.DeepNtuplizer.samples.HighPt_cfg') #default input
 
 
 if options.inputFiles:
@@ -184,6 +185,7 @@ process.ak4GenJetsRecluster = ak4GenJets.clone(src = 'packedGenParticlesForJetsN
 
 process.patGenJetMatchAllowDuplicates = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
     src         = cms.InputTag("selectedUpdatedPatJetsDeepFlavour"),      # RECO jets (any View<Jet> is ok) 
+    pixelhit   = cms.InputTag("siPixelClusters"),
     matched     = cms.InputTag("ak4GenJetsWithNu"),        # GEN jets  (must be GenJetCollection)              
     mcPdgId     = cms.vint32(),                      # n/a   
     mcStatus    = cms.vint32(),                      # n/a   
@@ -197,6 +199,7 @@ process.patGenJetMatchAllowDuplicates = cms.EDProducer("GenJetMatcher",  # cut o
  
 process.patGenJetMatchWithNu = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
     src         = cms.InputTag("selectedUpdatedPatJetsDeepFlavour"),      # RECO jets (any View<Jet> is ok) 
+    pixelhit   = cms.InputTag("siPixelClusters"), 
     matched     = cms.InputTag("ak4GenJetsWithNu"),        # GEN jets  (must be GenJetCollection)              
     mcPdgId     = cms.vint32(),                      # n/a   
     mcStatus    = cms.vint32(),                      # n/a   
@@ -209,6 +212,7 @@ process.patGenJetMatchWithNu = cms.EDProducer("GenJetMatcher",  # cut on deltaR;
 
 process.patGenJetMatchRecluster = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
     src         = cms.InputTag("selectedUpdatedPatJetsDeepFlavour"),      # RECO jets (any View<Jet> is ok) 
+    pixelhit   = cms.InputTag("siPixelClusters"), 
     matched     = cms.InputTag("ak4GenJetsRecluster"),        # GEN jets  (must be GenJetCollection)              
     mcPdgId     = cms.vint32(),                      # n/a   
     mcStatus    = cms.vint32(),                      # n/a   
@@ -266,6 +270,8 @@ if options.phase2 :
     process.deepntuplizer.jetAbsEtaMax = cms.double(3.0)
 
 process.deepntuplizer.gluonReduction  = cms.double(options.gluonReduction)
+#process.deepntuplizer.pixelhit =  cms.InputTag("siPixelClusters")
+#process.pixelhit = cms.InputTag("siPixelClusters")
 
 #1631
 process.ProfilerService = cms.Service (
@@ -283,7 +289,10 @@ for mod in process.filters_().itervalues():
     process.tsk.add(mod)
 
 process.p = cms.Path(
-	process.QGTagger + process.genJetSequence*  
+       process.QGTagger * 
+       process.genJetSequence *  
 	process.deepntuplizer,
 	process.tsk
 	)
+
+#process.p = cms.Path(process.deepntuplizer)

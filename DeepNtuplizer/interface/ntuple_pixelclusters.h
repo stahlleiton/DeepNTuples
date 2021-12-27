@@ -43,7 +43,7 @@ public:
 
 
     void setPixelHits(const edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster> > & t){
-        m_pixelhit=t;
+      m_pixelhit=t;
      }
 
 private:
