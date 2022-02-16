@@ -2,14 +2,14 @@
 import FWCore.ParameterSet.Config as cms
 
 import FWCore.ParameterSet.VarParsing as VarParsing
-### parsing job options 
+#1;5202;0c## parsing job options 
 import sys
 
 options = VarParsing.VarParsing()
 
 options.register('inputScript','',VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.string,"input Script")
 options.register('outputFile','output',VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.string,"output File (w/o .root)")
-options.register('maxEvents',101,VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.int,"maximum events")
+options.register('maxEvents',1001,VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.int,"maximum events")
 options.register('skipEvents', 0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "skip N events")
 options.register('job', 0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "job number")
 options.register('nJobs', 1, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "total jobs")
@@ -52,9 +52,7 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
 #'auto:run2_mc'
-#process.GlobalTag.globaltag = "112X_mcRun3_2021_realistic_v8" #GlobalTag(process.GlobalTag, '110X_mcRun3_2021_realistic_v6', '')
-process.GlobalTag = GlobalTag(process.GlobalTag, '94X_mc2017_realistic_v11', '')
-#process.GlobalTag = GlobalTag(process.GlobalTag, '106X_mc2017_realistic_v8', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '106X_mc2017_realistic_v8', '')
 #process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
@@ -65,11 +63,10 @@ process.MessageLogger.cerr.FwkReport.reportEvery = options.reportEvery
 process.options = cms.untracked.PSet(
    allowUnscheduled = cms.untracked.bool(True),  
    wantSummary=cms.untracked.bool(False)
-#   SkipEvent = cms.untracked.vstring('ProductNotFound')
 )
 
 
-process.load('DeepNTuples.DeepNtuplizer.samples.HighPt_cfg') #default input
+process.load('DeepNTuples.DeepNtuplizer.samples.TTJetsPhase1_cfg') #default input
 
 
 if options.inputFiles:
@@ -97,8 +94,7 @@ if ( int(releases[0]) >8 ) or ( (int(releases[0])==8) and (int(releases[1]) >= 4
  bTagInfos = [
 	'pfImpactParameterTagInfos',
 	'pfInclusiveSecondaryVertexFinderTagInfos',
-	'pfDeepCSVTagInfos',
-]
+	'pfDeepCSVTagInfos' ]
 else : 
  bTagInfos = [
         'pfImpactParameterTagInfos',
@@ -185,7 +181,6 @@ process.ak4GenJetsRecluster = ak4GenJets.clone(src = 'packedGenParticlesForJetsN
 
 process.patGenJetMatchAllowDuplicates = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
     src         = cms.InputTag("selectedUpdatedPatJetsDeepFlavour"),      # RECO jets (any View<Jet> is ok) 
-    pixelhit   = cms.InputTag("siPixelClusters"),
     matched     = cms.InputTag("ak4GenJetsWithNu"),        # GEN jets  (must be GenJetCollection)              
     mcPdgId     = cms.vint32(),                      # n/a   
     mcStatus    = cms.vint32(),                      # n/a   
@@ -199,7 +194,6 @@ process.patGenJetMatchAllowDuplicates = cms.EDProducer("GenJetMatcher",  # cut o
  
 process.patGenJetMatchWithNu = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
     src         = cms.InputTag("selectedUpdatedPatJetsDeepFlavour"),      # RECO jets (any View<Jet> is ok) 
-    pixelhit   = cms.InputTag("siPixelClusters"), 
     matched     = cms.InputTag("ak4GenJetsWithNu"),        # GEN jets  (must be GenJetCollection)              
     mcPdgId     = cms.vint32(),                      # n/a   
     mcStatus    = cms.vint32(),                      # n/a   
@@ -212,7 +206,6 @@ process.patGenJetMatchWithNu = cms.EDProducer("GenJetMatcher",  # cut on deltaR;
 
 process.patGenJetMatchRecluster = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
     src         = cms.InputTag("selectedUpdatedPatJetsDeepFlavour"),      # RECO jets (any View<Jet> is ok) 
-    pixelhit   = cms.InputTag("siPixelClusters"), 
     matched     = cms.InputTag("ak4GenJetsRecluster"),        # GEN jets  (must be GenJetCollection)              
     mcPdgId     = cms.vint32(),                      # n/a   
     mcStatus    = cms.vint32(),                      # n/a   
@@ -249,7 +242,7 @@ process.TFileService = cms.Service("TFileService",
 
 # DeepNtuplizer
 process.load("DeepNTuples.DeepNtuplizer.DeepNtuplizer_cfi")
-process.deepntuplizer.jets = cms.InputTag('selectedUpdatedPatJetsDeepFlavour');
+process.deepntuplizer.jets = cms.InputTag('selectedUpdatedPatJetsDeepFlavour')
 process.deepntuplizer.bDiscriminators = bTagDiscriminators 
 process.deepntuplizer.bDiscriminators.append('pfCombinedMVAV2BJetTags')
 process.deepntuplizer.LooseSVs = cms.InputTag("looseIVFinclusiveCandidateSecondaryVertices")
@@ -270,8 +263,6 @@ if options.phase2 :
     process.deepntuplizer.jetAbsEtaMax = cms.double(3.0)
 
 process.deepntuplizer.gluonReduction  = cms.double(options.gluonReduction)
-#process.deepntuplizer.pixelhit =  cms.InputTag("siPixelClusters")
-#process.pixelhit = cms.InputTag("siPixelClusters")
 
 #1631
 process.ProfilerService = cms.Service (
@@ -283,16 +274,13 @@ process.ProfilerService = cms.Service (
 
 #Trick to make it work in 9_1_X
 process.tsk = cms.Task()
-for mod in process.producers_().itervalues():
+for mod in process.producers_().itervalues(): #.values():
     process.tsk.add(mod)
-for mod in process.filters_().itervalues():
+for mod in process.filters_().itervalues(): #.values():
     process.tsk.add(mod)
 
 process.p = cms.Path(
-       process.QGTagger * 
-       process.genJetSequence *  
+	process.QGTagger + process.genJetSequence*  
 	process.deepntuplizer,
 	process.tsk
 	)
-
-#process.p = cms.Path(process.deepntuplizer)

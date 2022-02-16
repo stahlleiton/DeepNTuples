@@ -10,6 +10,9 @@
 
 #include "ntuple_content.h"
 
+// TagInfo                                                                                                                                                                                                 
+#include "DataFormats/BTauReco/interface/PixelClusterTagInfo.h"
+
 // For pixel clusters and topology
 #include "DataFormats/SiPixelCluster/interface/SiPixelCluster.h"
 #include "DataFormats/Common/interface/DetSetVectorNew.h"
@@ -41,36 +44,21 @@ public:
 
     bool fillBranches(const pat::Jet &, const size_t& jetidx, const  edm::View<pat::Jet> * coll=0);
 
-
-    void setPixelHits(const edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster> > & t){
-      m_pixelhit=t;
-     }
-
 private:
 
     // seed candidates
-    static constexpr size_t max_gtracks=4;
+    static constexpr size_t max_gtracks=10;
     
     unsigned int n_layers;
-    
-    float r004[max_gtracks];
-    float r006[max_gtracks];
-    float r008[max_gtracks];
-    float r010[max_gtracks];
-    float r016[max_gtracks];
-    float rvar[max_gtracks];
-    float rvwt[max_gtracks];
 
-    const edm::EDGetTokenT<edm::View<reco::Jet> > m_jets;
-    const edm::EDGetTokenT<reco::VertexCollection> m_vertices;
-    edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster> > m_pixelhit; //To header !
-    edm::Handle<edmNew::DetSetVector<SiPixelCluster> > collectionHandle; //To header !
-    
-    edm::ESHandle<TrackerGeometry> geom; //To header !
-    edm::ESHandle<TrackerTopology> tTopoH; //To header !
+    unsigned int r004[max_gtracks];
+    unsigned int r006[max_gtracks];
+    unsigned int r008[max_gtracks];
+    unsigned int r010[max_gtracks];
+    unsigned int r016[max_gtracks];
+    unsigned int rvar[max_gtracks];
+    unsigned int rvwt[max_gtracks];
 
-    //tokens to be defined from main analyzer                                                                                                                                                              
-    //edm::EDGetTokenT<edm::View<pat::PackedCandidate> > CandidateToken;
 };
 
 #endif /* DEEPNTUPLES_DEEPNTUPLIZER_INTERFACE_NTUPLE_PIXEL_CLUSTERS_ */
