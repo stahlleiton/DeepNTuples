@@ -125,7 +125,7 @@ std::vector<TChain* > createChains(const std::vector<std::vector<TString> >& inf
     branchinfos.push_back(new ntuple_SV());
     branchinfos.push_back(new ntuple_bTagVars());
     branchinfos.push_back(new ntuple_pfCands());
-    //branchinfos.push_back(new ntuple_GraphB());
+    branchinfos.push_back(new ntuple_GraphB());
     branchinfos.push_back(new ntuple_pixelclusters());
     branchinfos.push_back(new ntuple_FatJetInfo());
 

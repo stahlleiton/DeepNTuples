@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     branchinfos.push_back(new ntuple_pfCands());
   //  branchinfos.push_back(new ntuple_FatJetInfo());
   //  branchinfos.push_back(new ntuple_DeepVertex());
-    //    branchinfos.push_back(new ntuple_GraphB());
+    branchinfos.push_back(new ntuple_GraphB());
     branchinfos.push_back(new ntuple_pixelclusters());
 
     if (argc < 3)
