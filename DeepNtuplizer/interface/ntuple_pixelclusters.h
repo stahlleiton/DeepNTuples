@@ -1,8 +1,8 @@
 /*
  * ntuple_pixelclusters.h
  *
- *  Created on: 1 November 2021
- *      Author: Alexandre De Moor
+ *  Created on: 16 February 2022
+ *      Author: Alexandre De Moor & Joshuha Thomas-Wilsker
  */
 
 #ifndef DEEPNTUPLES_DEEPNTUPLIZER_INTERFACE_NTUPLE_PIXEL_CLUSTERS_
