@@ -2,7 +2,7 @@
 import FWCore.ParameterSet.Config as cms
 
 import FWCore.ParameterSet.VarParsing as VarParsing
-#1;5202;0c## parsing job options 
+### parsing job options 
 import sys
 
 options = VarParsing.VarParsing()
@@ -274,9 +274,9 @@ process.ProfilerService = cms.Service (
 
 #Trick to make it work in 9_1_X
 process.tsk = cms.Task()
-for mod in process.producers_().itervalues(): #.values():
+for mod in process.producers_().values(): #.itervalues():
     process.tsk.add(mod)
-for mod in process.filters_().itervalues(): #.values():
+for mod in process.filters_().values(): #.itervalues():
     process.tsk.add(mod)
 
 process.p = cms.Path(
