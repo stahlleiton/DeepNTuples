@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 
 from __future__ import print_function
@@ -164,7 +164,7 @@ def doSub():
                 cmd = 'dasgoclient -query="file dataset=%s"' % (samplename)
                 dasquery = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 sout = dasquery.communicate()[0]
-                filelist = ['"%s",' % f for f in sout.strip().split('\n')]
+                filelist = ['"%s",' % f.decode('UTF-8') for f in sout.strip().split('\n'.encode(encoding='UTF-8'))]
 
                 template_sample = os.path.join(os.environ['CMSSW_BASE'], 'src/DeepNTuples/DeepNtuplizer/python/samples/samples_template.py')
                 dest_file = samplescriptdir+scriptfile+'.py'
