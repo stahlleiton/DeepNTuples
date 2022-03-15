@@ -31,7 +31,7 @@ def submitjob(path,condorfile,jobno=-1):
     print (out)
     if err and len(err):
         print (err)
-    elif jobno>-1:
+    elif int(jobno)>-1:
         os.system('touch '+path +'/helper/'+str(jobno)+".submitted")
         #os.system('touch '+path+'/batch/con_out.'+ str(jobno) +'.out')
     cluster=0
@@ -55,11 +55,13 @@ def getCondorStatus():
     import subprocess
     proc = subprocess.Popen(['condor_q -nobatch'], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
-    out=out.split('\n')
+    out=out.split('\n'.encode(encoding='UTF-8'))
     clustersandjobs=[]
     statuses=[]
     isdata=False
+
     for line in out:
+        line = line.decode('UTF-8')
         if len(line)<10 : continue
         tline=line.split()
         if tline[0] == 'ID':

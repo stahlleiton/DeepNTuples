@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # read stdout from each job to get job status (cmsRun success or not)
 # use log files to evaluate batch status
@@ -269,12 +269,12 @@ for dir in dirs:
            print('merging...')
            for out in succoutfile:
                outputroot=ntupleOutDir+'/'+dir+'_merged_'+str(idx)+'.root'
-	       print (outputroot)
+               print(outputroot)
                idx+=1
                #can run in parallel
                os.system('hadd '+outputroot+ out) #use subprocess for parallelisatio later
            
-           print ('merged to '+str(idx) +' files')
+           print('merged to '+str(idx) +' files')
             #os.system('hadd '+outputroot+ succoutfile)
              
         
