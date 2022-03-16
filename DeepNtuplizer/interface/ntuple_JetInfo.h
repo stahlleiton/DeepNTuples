@@ -183,8 +183,8 @@ public:
     float npv_;
     float ntrueInt_;
     float rho_;
-    unsigned int event_no_;
-    unsigned int jet_no_;
+    int event_no_;
+    int jet_no_;
 
     // jet variables
     float jet_pt_;

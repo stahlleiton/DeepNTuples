@@ -32,11 +32,11 @@ public:
 private:
 
     float jetradius_;
-		float min_candidate_pt_ = -1;
+    float min_candidate_pt_ = -1;
 
     edm::ESHandle<TransientTrackBuilder> builder;
 
-    unsigned int n_Cpfcand_;
+    int n_Cpfcand_;
     float nCpfcand_;
 
     static constexpr size_t max_pfcand_=50;
@@ -182,7 +182,7 @@ private:
     float Cpfcan_stripTECLayersNull_[max_pfcand_];
 
     //Neutral Pf candidates
-    unsigned int n_Npfcand_;
+    int n_Npfcand_;
     float nNpfcand_;
     float  Npfcan_pt_[max_pfcand_];
     float  Npfcan_eta_[max_pfcand_];

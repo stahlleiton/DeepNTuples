@@ -49,7 +49,7 @@ private:
     // seed candidates
     static constexpr size_t max_gtracks=10;
     
-    unsigned int n_layers;
+    int n_layers;
 
     unsigned int r004[max_gtracks];
     unsigned int r006[max_gtracks];
