@@ -37,6 +37,7 @@ void ntuple_SV::initBranches(TTree* tree){
     addBranch(tree,(prefix_+"sv_pt").c_str()          ,&sv_pt_          ,(prefix_+"sv_pt_["+prefix_+"sv_num_]/f").c_str()        );
     addBranch(tree,(prefix_+"sv_eta").c_str()          ,&sv_eta_          ,(prefix_+"sv_eta_["+prefix_+"sv_num_]/f").c_str()        );
     addBranch(tree,(prefix_+"sv_phi").c_str()          ,&sv_phi_          ,(prefix_+"sv_phi_["+prefix_+"sv_num_]/f").c_str()        );
+    addBranch(tree,(prefix_+"sv_e").c_str()          ,&sv_e_          ,(prefix_+"sv_e_["+prefix_+"sv_num_]/f").c_str()        );
     addBranch(tree,(prefix_+"sv_etarel").c_str()         ,&sv_etarel_         ,(prefix_+"sv_etarel_["+prefix_+"sv_num_]/f").c_str()         );
     addBranch(tree,(prefix_+"sv_phirel").c_str()         ,&sv_phirel_         ,(prefix_+"sv_phirel_["+prefix_+"sv_num_]/f").c_str()         );
     addBranch(tree,(prefix_+"sv_deltaR").c_str()         ,&sv_deltaR_         ,(prefix_+"sv_deltaR_["+prefix_+"sv_num_]/f").c_str()         );
@@ -131,6 +132,7 @@ bool ntuple_SV::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  
             // of the tracks in the SV and the flight direction betwen PV and SV)
 
             sv_enratio_[sv_num_]=sv.energy()/jet_uncorr_e;
+            sv_e_[sv_num_]=sv.energy();
 
 
 
