@@ -106,7 +106,6 @@ else :
 if (int(releases[0])>8) or ( (int(releases[0])==8) and (int(releases[1]) >= 4) ) :
  bTagDiscriminators = [
      'softPFMuonBJetTags',
-     'softPFElectronBJetTags',
          'pfJetBProbabilityBJetTags',
          'pfJetProbabilityBJetTags',
      'pfCombinedInclusiveSecondaryVertexV2BJetTags',
