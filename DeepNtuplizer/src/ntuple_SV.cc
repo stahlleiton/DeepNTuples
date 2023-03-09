@@ -37,7 +37,7 @@ void ntuple_SV::initBranches(TTree* tree){
     addBranch(tree,(prefix_+"sv_pt").c_str()          ,&sv_pt_          ,(prefix_+"sv_pt_["+prefix_+"sv_num_]/F").c_str()        );
     addBranch(tree,(prefix_+"sv_eta").c_str()          ,&sv_eta_          ,(prefix_+"sv_eta_["+prefix_+"sv_num_]/F").c_str()        );
     addBranch(tree,(prefix_+"sv_phi").c_str()          ,&sv_phi_          ,(prefix_+"sv_phi_["+prefix_+"sv_num_]/F").c_str()        );
-    addBranch(tree,(prefix_+"sv_e").c_str()          ,&sv_e_          ,(prefix_+"sv_e_["+prefix_+"sv_num_]/f").c_str()        );
+    addBranch(tree,(prefix_+"sv_e").c_str()          ,&sv_e_          ,(prefix_+"sv_e_["+prefix_+"sv_num_]/F").c_str()        );
     addBranch(tree,(prefix_+"sv_etarel").c_str()         ,&sv_etarel_         ,(prefix_+"sv_etarel_["+prefix_+"sv_num_]/F").c_str()         );
     addBranch(tree,(prefix_+"sv_phirel").c_str()         ,&sv_phirel_         ,(prefix_+"sv_phirel_["+prefix_+"sv_num_]/F").c_str()         );
     addBranch(tree,(prefix_+"sv_deltaR").c_str()         ,&sv_deltaR_         ,(prefix_+"sv_deltaR_["+prefix_+"sv_num_]/F").c_str()         );
