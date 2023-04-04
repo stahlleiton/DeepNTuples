@@ -13,9 +13,9 @@
 #include "../interface/ntuple_pfCands.h"
 #include "../interface/ntuple_bTagVars.h"
 #include "../interface/ntuple_FatJetInfo.h"
-#include "../interface/ntuple_DeepVertex.h"
-#include "../interface/ntuple_GraphB.h"
-#include "../interface/ntuple_pixelclusters.h"
+// AS #include "../interface/ntuple_DeepVertex.h"
+// AS #include "../interface/ntuple_GraphB.h"
+// AS #include "../interface/ntuple_pixelclusters.h"
 //ROOT includes
 #include "TTree.h"
 #include <TFile.h>
@@ -40,6 +40,9 @@
 #include "DataFormats/Candidate/interface/VertexCompositePtrCandidate.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "TLorentzVector.h"
+
+// AS #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+// AS #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 
 #include "DataFormats/BTauReco/interface/PixelClusterTagInfo.h"
 
@@ -129,7 +132,7 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   // read configuration parameters
   const double jetR = iConfig.getParameter<double>("jetR");
   const bool  runFatJets_ = iConfig.getParameter<bool>("runFatJet");
-  const bool  runDeepVertex_ = iConfig.getParameter<bool>("runDeepVertex");
+  // AS const bool  runDeepVertex_ = iConfig.getParameter<bool>("runDeepVertex");
 
   //not implemented yet
   const bool useHerwigCompatibleMatching=iConfig.getParameter<bool>("useHerwigCompatible");
@@ -161,13 +164,13 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
     }
   */
 
-  ntuple_GraphB* deepvertexmodule=new ntuple_GraphB(jetR);
-  deepvertexmodule->setCandidatesToken(consumes<edm::View<pat::PackedCandidate> >(iConfig.getParameter<edm::InputTag>("candidates")));
-  addModule(deepvertexmodule, "DeepVertextuple");
+  // AS ntuple_GraphB* deepvertexmodule=new ntuple_GraphB(jetR);
+  // AS deepvertexmodule->setCandidatesToken(consumes<edm::View<pat::PackedCandidate> >(iConfig.getParameter<edm::InputTag>("candidates")));
+  // AS addModule(deepvertexmodule, "DeepVertextuple");
 
-  ntuple_pixelclusters* pixelclustersmodule=new ntuple_pixelclusters(jetR);
+  // AS ntuple_pixelclusters* pixelclustersmodule=new ntuple_pixelclusters(jetR);
   //pixelclustersmodule->setPixelHits(consumes<edmNew::DetSetVector<SiPixelCluster> >(iConfig.getParameter<edm::InputTag>("pixelhit")));
-  addModule(pixelclustersmodule, "pixelclusterstuple");
+  // AS addModule(pixelclustersmodule, "pixelclusterstuple");
 
 
   ntuple_JetInfo* jetinfo=new ntuple_JetInfo();
@@ -207,6 +210,11 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
 
   ntuple_pfCands * pfcands = new ntuple_pfCands();
   pfcands->setJetRadius(jetR);
+  pfcands->setTrackBuilderToken(
+      esConsumes<TransientTrackBuilder, TransientTrackRecord>(
+                          edm::ESInputTag("", "TransientTrackBuilder")));
+  // AS    track_builder_token_(
+  // AS         esConsumes<TransientTrackBuilder, TransientTrackRecord>(edm::ESInputTag("", "TransientTrackBuilder")));
 
   addModule(pfcands, "pfcands");
 

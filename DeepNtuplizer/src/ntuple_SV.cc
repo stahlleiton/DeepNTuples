@@ -16,6 +16,7 @@
 #include "DataFormats/Math/interface/deltaR.h"
 #include "TrackingTools/IPTools/interface/IPTools.h"
 #include "DataFormats/GeometryCommonDetAlgo/interface/Measurement1D.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 
 
 const reco::Vertex * ntuple_SV::spvp_;
@@ -54,6 +55,9 @@ void ntuple_SV::initBranches(TTree* tree){
     addBranch(tree,(prefix_+"sv_d3dsig").c_str()      ,&sv_d3dsig_      ,(prefix_+"sv_d3dsig_["+prefix_+"sv_num_]/F").c_str()      );
     addBranch(tree,(prefix_+"sv_costhetasvpv").c_str(),&sv_costhetasvpv_,(prefix_+"sv_costhetasvpv_["+prefix_+"sv_num_]/F").c_str());
     addBranch(tree,(prefix_+"sv_enratio").c_str()     ,&sv_enratio_     ,(prefix_+"sv_enratio_["+prefix_+"sv_num_]/F").c_str());
+
+    addBranch(tree,(prefix_+"sv_hcal_frac").c_str()     ,&sv_hcal_frac_     ,(prefix_+"sv_hcal_frac_["+prefix_+"sv_num_]/F").c_str());
+    addBranch(tree,(prefix_+"sv_calo_frac").c_str()     ,&sv_calo_frac_     ,(prefix_+"sv_calo_frac_["+prefix_+"sv_num_]/F").c_str());
 
 
 }
@@ -134,7 +138,17 @@ bool ntuple_SV::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  
             sv_enratio_[sv_num_]=sv.energy()/jet_uncorr_e;
             sv_e_[sv_num_]=sv.energy();
 
+	    float calo_frac = 0.0;
+	    float hcal_frac = 0.0;
 
+	    for (unsigned idx=0; idx<sv.numberOfDaughters(); ++idx){
+	      const pat::PackedCandidate* PackedCandidate_ = dynamic_cast<const pat::PackedCandidate*>(sv.daughter(idx));
+	      calo_frac = calo_frac + PackedCandidate_->caloFraction();
+	      hcal_frac = hcal_frac + PackedCandidate_->hcalFraction();
+	    }
+
+	    sv_calo_frac_[sv_num_]          = calo_frac / sv.numberOfDaughters();
+	    sv_hcal_frac_[sv_num_]          = hcal_frac / sv.numberOfDaughters();
 
             sv_num_++;
         }

@@ -11,12 +11,16 @@
 #include "ntuple_content.h"
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "FWCore/Utilities/interface/ESGetToken.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
 
 class ntuple_pfCands: public ntuple_content{
 public:
 
     ntuple_pfCands():ntuple_content(),jetradius_(0.4),
     n_Cpfcand_(0),n_Npfcand_(0){}
+  //n_Cpfcand_(0),n_Npfcand_(0),n_p_Cpfcand_(0),n_p_Npfcand_(0),n_p_Svcand_(0){}
 
     void setJetRadius(const float& radius){jetradius_=radius;}
     void getInput(const edm::ParameterSet& iConfig);
@@ -29,14 +33,21 @@ public:
 
     bool fillBranches(const pat::Jet &, const size_t& jetidx, const  edm::View<pat::Jet> * coll=0);
 
+    void setTrackBuilderToken(const edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord>& track_builder_token) {
+		track_builder_token_ = track_builder_token;
+	}
+    
 private:
 
     float jetradius_;
     float min_candidate_pt_ = -1;
 
     edm::ESHandle<TransientTrackBuilder> builder;
+    edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord> track_builder_token_;
 
     int n_Cpfcand_;
+    int n_Npfcand_;
+
     float nCpfcand_;
 
     static constexpr size_t max_pfcand_=50;
@@ -51,9 +62,9 @@ private:
     float  Cpfcan_etarel_[max_pfcand_];
     float  Cpfcan_deltaR_[max_pfcand_];
     float  Cpfcan_puppiw_[max_pfcand_];
-    float   Cpfcan_VTX_ass_[max_pfcand_];
+    float  Cpfcan_VTX_ass_[max_pfcand_];
 
-    float   Cpfcan_fromPV_[max_pfcand_];
+    float  Cpfcan_fromPV_[max_pfcand_];
 
     float Cpfcan_vertexChi2_[max_pfcand_];
     float Cpfcan_vertexNdof_[max_pfcand_];
@@ -62,7 +73,6 @@ private:
     float Cpfcan_vertex_phirel_[max_pfcand_];
     float Cpfcan_vertex_etarel_[max_pfcand_];
     float Cpfcan_vertexRef_mass_[max_pfcand_];
-
     // covariance
     float  Cpfcan_dz_[max_pfcand_];
     float  Cpfcan_dxy_[max_pfcand_];
@@ -78,8 +88,6 @@ private:
     float  Cpfcan_dxydz_[max_pfcand_];
     float  Cpfcan_dphidxy_[max_pfcand_];
     float  Cpfcan_dlambdadz_[max_pfcand_];
-
-
 
     float Cpfcan_BtagPf_trackMomentum_[max_pfcand_];
     float Cpfcan_BtagPf_trackEta_[max_pfcand_];
@@ -111,6 +119,7 @@ private:
     float Cpfcan_chi2_[max_pfcand_];
     float Cpfcan_quality_[max_pfcand_];
     float Cpfcan_drminsv_[max_pfcand_];
+    float Cpfcan_distminsv_[max_pfcand_];
     //hit pattern variables, as defined here https://github.com/cms-sw/cmssw/blob/master/DataFormats/TrackReco/interface/HitPattern.h
     //Tracker per layer 
     //Pixel barrel 
@@ -183,8 +192,7 @@ private:
     float Cpfcan_stripTECLayersNull_[max_pfcand_];
 
     //Neutral Pf candidates
-    int n_Npfcand_;
-    float nNpfcand_;
+    float  nNpfcand_;
     float  Npfcan_pt_[max_pfcand_];
     float  Npfcan_eta_[max_pfcand_];
     float  Npfcan_phi_[max_pfcand_];
@@ -197,10 +205,18 @@ private:
     float  Npfcan_deltaR_[max_pfcand_];
     float  Npfcan_isGamma_[max_pfcand_];
     float  Npfcan_HadFrac_[max_pfcand_];
+    float  Npfcan_CaloFrac_[max_pfcand_];
     float  Npfcan_drminsv_[max_pfcand_];
+
+    float  Npfcan_pdgID_[max_pfcand_];
+    float  Cpfcan_pdgID_[max_pfcand_];
+
+    float  Cpfcan_HadFrac_[max_pfcand_];
+    float  Cpfcan_CaloFrac_[max_pfcand_];
 
 
     float mindrsvpfcand(const pat::PackedCandidate* pfcand);
+    float mindistsvpfcand(const reco::TransientTrack track);
 
 };
 
