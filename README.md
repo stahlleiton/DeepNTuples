@@ -17,7 +17,7 @@ git checkout 106X
 git submodule init
 git submodule update
 
-scram b -j 4
+scram b -j 8
 ```
 
 Further settings
