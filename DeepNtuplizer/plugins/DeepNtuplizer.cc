@@ -11,9 +11,9 @@
 #include "../interface/ntuple_JetInfo.h"
 #include "../interface/ntuple_pfCands.h"
 #include "../interface/ntuple_bTagVars.h"
-#include "../interface/ntuple_FatJetInfo.h"
-#include "../interface/ntuple_DeepVertex.h"
-#include "../interface/ntuple_GraphB.h"
+//#include "../interface/ntuple_FatJetInfo.h"
+//#include "../interface/ntuple_DeepVertex.h"
+//#include "../interface/ntuple_GraphB.h"
 //ROOT includes
 #include "TTree.h"
 #include <TFile.h>
@@ -157,9 +157,9 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
     }
     */  
 
-    ntuple_GraphB* deepvertexmodule=new ntuple_GraphB(jetR);
+    /*ntuple_GraphB* deepvertexmodule=new ntuple_GraphB(jetR);
     deepvertexmodule->setCandidatesToken(consumes<edm::View<pat::PackedCandidate> >(iConfig.getParameter<edm::InputTag>("candidates")));
-    addModule(deepvertexmodule, "DeepVertextuple");
+    addModule(deepvertexmodule, "DeepVertextuple");*/
      
 
     ntuple_JetInfo* jetinfo=new ntuple_JetInfo();
@@ -204,12 +204,12 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
 
     addModule(new ntuple_bTagVars(), "bTagVars");
 
-    if(runFatJets_){
+    /*if(runFatJets_){
         auto *fatjetinfo = new ntuple_FatJetInfo(jetR);
         fatjetinfo->setGenParticleToken(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("pruned")));
         fatjetinfo->setFatJetToken(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjets")));
         addModule(fatjetinfo, "fatJets");
-    }
+	}*/
     /*
      *
      * Modules initialized

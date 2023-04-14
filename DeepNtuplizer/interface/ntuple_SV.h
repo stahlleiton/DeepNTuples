@@ -9,6 +9,8 @@
 #define DEEPNTUPLES_DEEPNTUPLIZER_INTERFACE_NTUPLE_SV_H_
 
 #include "ntuple_content.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 
 class ntuple_SV: public ntuple_content{
 public:
@@ -19,6 +21,7 @@ public:
     void getInput(const edm::ParameterSet& iConfig);
     void initBranches(TTree* );
     void readEvent(const edm::Event& iEvent);
+    void readSetup(const edm::EventSetup& iSetup);
 
     //use either of these functions
 
@@ -32,6 +35,8 @@ private:
     int   sv_num_;
     float nsv_;
     std::string prefix_;
+
+    edm::ESHandle<TransientTrackBuilder> builder;
 
     static constexpr size_t max_sv=10;
 
@@ -58,7 +63,15 @@ private:
     float sv_costhetasvpv_[max_sv];
     float sv_enratio_[max_sv];
 
-
+    float sv_hcal_frac_[max_sv];
+    float sv_calo_frac_[max_sv];
+    float sv_dz_[max_sv];
+    float sv_pfd2dval_[max_sv];
+    float sv_pfd2dsig_[max_sv];
+    float sv_pfd3dval_[max_sv];
+    float sv_pfd3dsig_[max_sv];
+    float sv_puppiw_[max_sv];
+    float sv_charge_sum_[max_sv];
 
     static const reco::Vertex * spvp_;
 

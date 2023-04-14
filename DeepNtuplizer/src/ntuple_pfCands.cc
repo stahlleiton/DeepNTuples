@@ -28,162 +28,134 @@
 
 class TrackInfoBuilder{
 public:
-    TrackInfoBuilder(edm::ESHandle<TransientTrackBuilder> & build):
-        builder(build),
-        trackMomentum_(0),
-        trackEta_(0),
-        trackEtaRel_(0),
-        trackPtRel_(0),
-        trackPPar_(0),
-        trackDeltaR_(0),
-        trackPtRatio_(0),
-        trackPParRatio_(0),
-        trackSip2dVal_(0),
-        trackSip2dSig_(0),
-        trackSip3dVal_(0),
-        trackSip3dSig_(0),
+  TrackInfoBuilder(edm::ESHandle<TransientTrackBuilder> & build):
+    builder(build),
+    trackMomentum_(0),
+    trackEta_(0),
+    trackEtaRel_(0),
+    trackPtRel_(0),
+    trackPPar_(0),
+    trackDeltaR_(0),
+    trackPtRatio_(0),
+    trackPParRatio_(0),
+    trackSip2dVal_(0),
+    trackSip2dSig_(0),
+    trackSip3dVal_(0),
+    trackSip3dSig_(0),
 
-        trackJetDistVal_(0),
-        trackJetDistSig_(0),
-	//trackMinDistSV_(0),
-	//trackMinDistXSV_(0),
-	//trackMinDistYSV_(0),
-	//trackMinDistZSV_(0)
-	ttrack_(0)
-
-{
+    trackJetDecayLen_(0),
+    trackJetDistVal_(0),
+    trackJetDistSig_(0),
+    ttrack_(0)
+  {
 
 
-}
+  }
 
-    void buildTrackInfo(const pat::PackedCandidate* PackedCandidate_ ,const math::XYZVector&  jetDir, GlobalVector refjetdirection, const reco::Vertex & pv){
-			TVector3 jetDir3(jetDir.x(),jetDir.y(),jetDir.z());
-			if(!PackedCandidate_->hasTrackDetails()) {
-				TVector3 trackMom3(
-					PackedCandidate_->momentum().x(),
-					PackedCandidate_->momentum().y(),
-					PackedCandidate_->momentum().z()
-					);
-				trackMomentum_=PackedCandidate_->p();
-				trackEta_= PackedCandidate_->eta();
-				trackEtaRel_=reco::btau::etaRel(jetDir, PackedCandidate_->momentum());
-				trackPtRel_=trackMom3.Perp(jetDir3);
-				trackPPar_=jetDir.Dot(PackedCandidate_->momentum());
-				trackDeltaR_=reco::deltaR(PackedCandidate_->momentum(), jetDir);
-				trackPtRatio_=trackMom3.Perp(jetDir3) / PackedCandidate_->p();
-				trackPParRatio_=jetDir.Dot(PackedCandidate_->momentum()) / PackedCandidate_->p();
-				trackSip2dVal_=0.;
-				trackSip2dSig_=0.;
-				trackSip3dVal_=0.;
-				trackSip3dSig_=0.;
-				trackJetDistVal_=0.;
-				trackJetDistSig_=0.;
-				//ttrack_ = 0;
-				//trackMinDistSV_=0.;
-				//trackMinDistXSV_=0.;
-				//trackMinDistYSV_=0.;
-				//trackMinDistZSV_=0.;
-				return;
-			}
-
-        const reco::Track & PseudoTrack =  PackedCandidate_->pseudoTrack();
-
-        reco::TransientTrack transientTrack;
-        //reco::TransientTrack* transientTrack2;
-        transientTrack=builder->build(PseudoTrack);
-        Measurement1D meas_ip2d=IPTools::signedTransverseImpactParameter(transientTrack, refjetdirection, pv).second;
-        Measurement1D meas_ip3d=IPTools::signedImpactParameter3D(transientTrack, refjetdirection, pv).second;
-        Measurement1D jetdist=IPTools::jetTrackDistance(transientTrack, refjetdirection, pv).second;
-        math::XYZVector trackMom = PseudoTrack.momentum();
-        double trackMag = std::sqrt(trackMom.Mag2());
-        TVector3 trackMom3(trackMom.x(),trackMom.y(),trackMom.z());
-	//float mindistsv = mindistsvpfcand(transientTrack);
-	//GlobalPoint mindistgpsv = mingpsvpfcand(transientTrack);
-
-
-        trackMomentum_=std::sqrt(trackMom.Mag2());
-        trackEta_= trackMom.Eta();
-        trackEtaRel_=reco::btau::etaRel(jetDir, trackMom);
-        trackPtRel_=trackMom3.Perp(jetDir3);
-        trackPPar_=jetDir.Dot(trackMom);
-        trackDeltaR_=reco::deltaR(trackMom, jetDir);
-        trackPtRatio_=trackMom3.Perp(jetDir3) / trackMag;
-        trackPParRatio_=jetDir.Dot(trackMom) / trackMag;
-        trackSip2dVal_=(meas_ip2d.value());
-
-        trackSip2dSig_=(meas_ip2d.significance());
-        trackSip3dVal_=(meas_ip3d.value());
-
-
-        trackSip3dSig_= meas_ip3d.significance();
-        trackJetDistVal_= jetdist.value();
-        trackJetDistSig_= jetdist.significance();
-
-	//trackMinDistSV_= mindistsv;
-	//trackMinDistXSV_= mindistgpsv.x();
-	//trackMinDistYSV_= mindistgpsv.y();
-	//trackMinDistZSV_= mindistgpsv.z();
-	ttrack_ = transientTrack;
-
-
+  void buildTrackInfo(const pat::PackedCandidate* PackedCandidate_ ,const math::XYZVector&  jetDir, GlobalVector refjetdirection, const reco::Vertex & pv){
+    TVector3 jetDir3(jetDir.x(),jetDir.y(),jetDir.z());
+    if(!PackedCandidate_->hasTrackDetails()) {
+      TVector3 trackMom3(
+			 PackedCandidate_->momentum().x(),
+			 PackedCandidate_->momentum().y(),
+			 PackedCandidate_->momentum().z()
+			 );
+      trackMomentum_=PackedCandidate_->p();
+      trackEta_= PackedCandidate_->eta();
+      trackEtaRel_=reco::btau::etaRel(jetDir, PackedCandidate_->momentum());
+      trackPtRel_=trackMom3.Perp(jetDir3);
+      trackPPar_=jetDir.Dot(PackedCandidate_->momentum());
+      trackDeltaR_=reco::deltaR(PackedCandidate_->momentum(), jetDir);
+      trackPtRatio_=trackMom3.Perp(jetDir3) / PackedCandidate_->p();
+      trackPParRatio_=jetDir.Dot(PackedCandidate_->momentum()) / PackedCandidate_->p();
+      trackSip2dVal_=0.;
+      trackSip2dSig_=0.;
+      trackSip3dVal_=0.;
+      trackSip3dSig_=0.;
+      trackJetDecayLen_=0.;
+      trackJetDistVal_=0.;
+      trackJetDistSig_=0.;
+      return;
     }
 
-    const float& getTrackDeltaR() const {return trackDeltaR_;}
-    const float& getTrackEta() const {return trackEta_;}
-    const float& getTrackEtaRel() const {return trackEtaRel_;}
-    const float& getTrackJetDistSig() const {return trackJetDistSig_;}
-    const float& getTrackJetDistVal() const {return trackJetDistVal_;}
-    const float& getTrackMomentum() const {return trackMomentum_;}
-    const float& getTrackPPar() const {return trackPPar_;}
-    const float& getTrackPParRatio() const {return trackPParRatio_;}
-    const float& getTrackPtRatio() const {return trackPtRatio_;}
-    const float& getTrackPtRel() const {return trackPtRel_;}
-    const float& getTrackSip2dSig() const {return trackSip2dSig_;}
-    const float& getTrackSip2dVal() const {return trackSip2dVal_;}
-    const float& getTrackSip3dSig() const {return trackSip3dSig_;}
-    const float& getTrackSip3dVal() const {return trackSip3dVal_;}
+    const reco::Track & PseudoTrack =  PackedCandidate_->pseudoTrack();
 
-    const reco::TransientTrack getTTrack() const {return ttrack_;}
+    reco::TransientTrack transientTrack;
+    transientTrack=builder->build(PseudoTrack);
+    Measurement1D meas_ip2d=IPTools::signedTransverseImpactParameter(transientTrack, refjetdirection, pv).second;
+    Measurement1D meas_ip3d=IPTools::signedImpactParameter3D(transientTrack, refjetdirection, pv).second;
+    Measurement1D jetdist=IPTools::jetTrackDistance(transientTrack, refjetdirection, pv).second;
+    Measurement1D decayl = IPTools::signedDecayLength3D(transientTrack, refjetdirection, pv).second;
+    math::XYZVector trackMom = PseudoTrack.momentum();
+    double trackMag = std::sqrt(trackMom.Mag2());
+    TVector3 trackMom3(trackMom.x(),trackMom.y(),trackMom.z());
 
-  //const float& getrackMinDistSV() const {return trackMinDistSV_;}
-  //const float& getTrackMinDistXSV() const {return trackMinDistXSV_;}
-  //const float& getTrackMinDistYSV() const {return trackMinDistYSV_;}
-  //const float& getTrackMinDistZSV() const {return trackMinDistZSV_;}
+
+    trackMomentum_=std::sqrt(trackMom.Mag2());
+    trackEta_= trackMom.Eta();
+    trackEtaRel_=reco::btau::etaRel(jetDir, trackMom);
+    trackPtRel_=trackMom3.Perp(jetDir3);
+    trackPPar_=jetDir.Dot(trackMom);
+    trackDeltaR_=reco::deltaR(trackMom, jetDir);
+    trackPtRatio_=trackMom3.Perp(jetDir3) / trackMag;
+    trackPParRatio_=jetDir.Dot(trackMom) / trackMag;
+
+    trackSip2dVal_=(meas_ip2d.value());
+    trackSip2dSig_=(meas_ip2d.significance());
+    trackSip3dVal_=(meas_ip3d.value());
+    trackSip3dSig_=meas_ip3d.significance();
+
+    trackJetDecayLen_= decayl.value();
+    trackJetDistVal_= jetdist.value();
+    trackJetDistSig_= jetdist.significance();
+
+    ttrack_ = transientTrack;
+
+  }
+
+  const float& getTrackDeltaR() const {return trackDeltaR_;}
+  const float& getTrackEta() const {return trackEta_;}
+  const float& getTrackEtaRel() const {return trackEtaRel_;}
+  const float& getTrackJetDecayLen() const {return trackJetDecayLen_;}
+  const float& getTrackJetDistSig() const {return trackJetDistSig_;}
+  const float& getTrackJetDistVal() const {return trackJetDistVal_;}
+  const float& getTrackMomentum() const {return trackMomentum_;}
+  const float& getTrackPPar() const {return trackPPar_;}
+  const float& getTrackPParRatio() const {return trackPParRatio_;}
+  const float& getTrackPtRatio() const {return trackPtRatio_;}
+  const float& getTrackPtRel() const {return trackPtRel_;}
+  const float& getTrackSip2dSig() const {return trackSip2dSig_;}
+  const float& getTrackSip2dVal() const {return trackSip2dVal_;}
+  const float& getTrackSip3dSig() const {return trackSip3dSig_;}
+  const float& getTrackSip3dVal() const {return trackSip3dVal_;}
+  const reco::TransientTrack getTTrack() const {return ttrack_;}
 
 private:
 
     edm::ESHandle<TransientTrackBuilder>& builder;
 
-    float trackMomentum_;
-    float trackEta_;
-    float trackEtaRel_;
-    float trackPtRel_;
-    float trackPPar_;
-    float trackDeltaR_;
-    float trackPtRatio_;
-    float trackPParRatio_;
-    float trackSip2dVal_;
-    float trackSip2dSig_;
-    float trackSip3dVal_;
-    float trackSip3dSig_;
+  float trackMomentum_;
+  float trackEta_;
+  float trackEtaRel_;
+  float trackPtRel_;
+  float trackPPar_;
+  float trackDeltaR_;
+  float trackPtRatio_;
+  float trackPParRatio_;
+  float trackSip2dVal_;
+  float trackSip2dSig_;
+  float trackSip3dVal_;
+  float trackSip3dSig_;
 
-    float trackJetDistVal_;
-    float trackJetDistSig_;
-    reco::TransientTrack ttrack_;
-  //float trackMinDistSV_;
-  //float trackMinDistXSV_;
-  //float trackMinDistYSV_;
-  //float trackMinDistZSV_;
+  float trackJetDecayLen_;
+  float trackJetDistVal_;
+  float trackJetDistSig_;
+  reco::TransientTrack ttrack_;
 
 };
 
-
-
-
 void ntuple_pfCands::readSetup(const edm::EventSetup& iSetup){
-
     iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", builder);
-
 }
 
 void ntuple_pfCands::getInput(const edm::ParameterSet& iConfig){
@@ -218,7 +190,9 @@ void ntuple_pfCands::initBranches(TTree* tree){
     addBranch(tree,"Cpfcan_fromPV",&Cpfcan_fromPV_,"Cpfcan_fromPV_[n_Cpfcand_]/F");
 
     addBranch(tree,"Cpfcan_drminsv",&Cpfcan_drminsv_,"Cpfcan_drminsv_[n_Cpfcand_]/F");
+    addBranch(tree,"Cpfcan_distminsvold",&Cpfcan_distminsvold_,"Cpfcan_distminsvold_[n_Cpfcand_]/F");
     addBranch(tree,"Cpfcan_distminsv",&Cpfcan_distminsv_,"Cpfcan_distminsv_[n_Cpfcand_]/F");
+    addBranch(tree,"Cpfcan_distminsv2",&Cpfcan_distminsv2_,"Cpfcan_distminsv2_[n_Cpfcand_]/F");
     addBranch(tree,"Cpfcan_dxminsv",&Cpfcan_dxminsv_,"Cpfcan_dxminsv_[n_Cpfcand_]/F");
     addBranch(tree,"Cpfcan_dyminsv",&Cpfcan_dyminsv_,"Cpfcan_dyminsv_[n_Cpfcand_]/F");
     addBranch(tree,"Cpfcan_dzminsv",&Cpfcan_dzminsv_,"Cpfcan_dzminsv_[n_Cpfcand_]/F");
@@ -368,6 +342,11 @@ void ntuple_pfCands::initBranches(TTree* tree){
     addBranch(tree,"Npfcan_HadFrac",&Npfcan_HadFrac_,"Npfcan_HadFrac_[n_Npfcand_]/F");
     addBranch(tree,"Npfcan_drminsv",&Npfcan_drminsv_,"Npfcan_drminsv_[n_Npfcand_]/F");
 
+    addBranch(tree,"Npfcan_pdgID",&Npfcan_pdgID_,"Npfcan_pdgID_[n_Npfcand_]/F");
+    addBranch(tree,"Cpfcan_pdgID",&Cpfcan_pdgID_,"Cpfcan_pdgID_[n_Cpfcand_]/F");
+
+    addBranch(tree,"Cpfcan_HadFrac",&Cpfcan_HadFrac_,"Cpfcan_HadFrac_[n_Cpfcand_]/F");
+    addBranch(tree,"Cpfcan_CaloFrac",&Cpfcan_CaloFrac_,"Cpfcan_CaloFrac_[n_Cpfcand_]/F");
 
 }
 
@@ -433,6 +412,31 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
         // get the dr with the closest sv
         float drminpfcandsv_ = mindrsvpfcand(PackedCandidate_);
 
+	float pdgid_;
+	if (abs(PackedCandidate_->pdgId()) == 11 and PackedCandidate_->charge() != 0){
+	  pdgid_ = 0.0;
+	}
+	else if (abs(PackedCandidate_->pdgId()) == 13 and PackedCandidate_->charge() != 0){
+	  pdgid_ = 1.0;
+	}
+	else if (abs(PackedCandidate_->pdgId()) == 22 and PackedCandidate_->charge() == 0){
+	  pdgid_ = 2.0;
+	}
+	else if (abs(PackedCandidate_->pdgId()) != 22 and PackedCandidate_->charge() == 0 and abs(PackedCandidate_->pdgId()) != 1 and abs(PackedCandidate_->pdgId()) != 2){
+	  pdgid_ = 3.0;
+	}
+	else if (abs(PackedCandidate_->pdgId()) != 11 and abs(PackedCandidate_->pdgId()) != 13 and PackedCandidate_->charge() != 0){
+	  pdgid_ = 4.0;
+	}
+	else if (PackedCandidate_->charge() == 0 and abs(PackedCandidate_->pdgId()) == 1){
+	  pdgid_ = 5.0;
+	}
+	else if (PackedCandidate_->charge() == 0 and abs(PackedCandidate_->pdgId()) == 2){
+	  pdgid_ = 6.0;
+	}
+	else{
+	  pdgid_ = 7.0;
+	}
 
         /// This might include more than PF candidates, e.g. Reco muons and could
         /// be double counting. Needs to be checked.!!!!
@@ -443,7 +447,7 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
             size_t fillntupleentry= sortedchargedindices.at(i);
             if(fillntupleentry>=max_pfcand_) continue;
 
-
+            Cpfcan_pdgID_[fillntupleentry] = pdgid_;
             Cpfcan_pt_[fillntupleentry] = PackedCandidate_->pt();
             Cpfcan_eta_[fillntupleentry] = PackedCandidate_->eta();
             Cpfcan_phi_[fillntupleentry] = PackedCandidate_->phi();
@@ -470,40 +474,26 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 
             Cpfcan_vertexChi2_[fillntupleentry]=PackedCandidate_->vertexChi2();
             Cpfcan_vertexNdof_[fillntupleentry]=PackedCandidate_->vertexNdof();
+
+            Cpfcan_CaloFrac_[fillntupleentry] = PackedCandidate_->caloFraction();
+            Cpfcan_HadFrac_[fillntupleentry] = PackedCandidate_->hcalFraction();
+
             //divided
             Cpfcan_vertexNormalizedChi2_[fillntupleentry]=PackedCandidate_->vertexNormalizedChi2();
             Cpfcan_vertex_rho_[fillntupleentry]=catchInfsAndBound(PackedCandidate_->vertex().rho(),0,-1,50);
             Cpfcan_vertex_phirel_[fillntupleentry]=reco::deltaPhi(PackedCandidate_->vertex().phi(),jet.phi());
             Cpfcan_vertex_etarel_[fillntupleentry]=etasign*(PackedCandidate_->vertex().eta()-jet.eta());
             Cpfcan_vertexRef_mass_[fillntupleentry]=PackedCandidate_->vertexRef()->p4().M();
-
-
             Cpfcan_puppiw_[fillntupleentry] = PackedCandidate_->puppiWeight();
-
-
-            /*
-            reco::Track::CovarianceMatrix myCov = PseudoTrack.covariance ();
-            //https://github.com/cms-sw/cmssw/blob/CMSSW_9_0_X/DataFormats/PatCandidates/interface/PackedCandidate.h#L394
-
-            Cpfcan_dptdpt_[fillntupleentry] =    catchInfsAndBound(myCov[0][0],0,-1,1);
-            Cpfcan_detadeta_[fillntupleentry]=   catchInfsAndBound(myCov[1][1],0,-1,0.01);
-            Cpfcan_dphidphi_[fillntupleentry]=   catchInfsAndBound(myCov[2][2],0,-1,0.1);
-
-            Cpfcan_dxydxy_[fillntupleentry] =    catchInfsAndBound(myCov[3][3],7.,-1,7); //zero if pvAssociationQuality ==7 ?
-            Cpfcan_dzdz_[fillntupleentry] =      catchInfsAndBound(myCov[4][4],6.5,-1,6.5); //zero if pvAssociationQuality ==7 ?
-            Cpfcan_dxydz_[fillntupleentry] =     catchInfsAndBound(myCov[3][4],6.,-6,6); //zero if pvAssociationQuality ==7 ?
-            Cpfcan_dphidxy_[fillntupleentry] =   catchInfs(myCov[2][3],-0.03); //zero if pvAssociationQuality ==7 ?
-            Cpfcan_dlambdadz_[fillntupleentry]=  catchInfs(myCov[1][4],-0.03); //zero if pvAssociationQuality ==7 ?
-             */
 
             trackinfo.buildTrackInfo(PackedCandidate_,jetDir,jetRefTrackDir,pv);
 
 	    const reco::TransientTrack ttrack = trackinfo.getTTrack();
-	    float mindistsv = mindistsvpfcand(ttrack);
+	    float mindistsvold = mindistsvpfcandold(ttrack);
 	    GlobalPoint mindistgpsv = mingpsvpfcand(ttrack); 
 	    GlobalPoint gppv = gppvpfcand(ttrack, jetRefTrackDir, pv); 
 
-	    Cpfcan_distminsv_[fillntupleentry] = mindistsv;
+	    Cpfcan_distminsvold_[fillntupleentry] = mindistsvold;
 	    Cpfcan_dxminsv_[fillntupleentry] = mindistgpsv.x();
 	    Cpfcan_dyminsv_[fillntupleentry] = mindistgpsv.y();
 	    Cpfcan_dzminsv_[fillntupleentry] = mindistgpsv.z();
@@ -511,11 +501,11 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 	    Cpfcan_dypv_[fillntupleentry] = gppv.y();
 	    Cpfcan_dzpv_[fillntupleentry] = gppv.z();
 
-	    //trackMinDistSV_= mindistsv;                                                                                                                                                   
-	    //trackMinDistXSV_= mindistgpsv.x();                                                                                                                                   
-	    //trackMinDistYSV_= mindistgpsv.y();                                                                                                                                       
-	    //trackMinDistZSV_= mindistgpsv.z();                                                                                                                                      
+	    float mindistsv = mindistsvpfcand(ttrack);
+	    float eng_mindistsv = std::log(std::fabs(mindistsv)+1.0);
 
+	    Cpfcan_distminsv_[fillntupleentry] = mindistsv;
+	    Cpfcan_distminsv2_[fillntupleentry] = eng_mindistsv;
 
             Cpfcan_BtagPf_trackMomentum_[fillntupleentry]   =catchInfsAndBound(trackinfo.getTrackMomentum(),0,0 ,1000);
             Cpfcan_BtagPf_trackEta_[fillntupleentry]        =catchInfsAndBound(trackinfo.getTrackEta()   ,  0,-5,5);
@@ -529,7 +519,7 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
             Cpfcan_BtagPf_trackSip3dSig_[fillntupleentry]   =catchInfsAndBound(trackinfo.getTrackSip3dSig(), 0, -1,4e4 );
             Cpfcan_BtagPf_trackSip2dVal_[fillntupleentry]   =catchInfsAndBound(trackinfo.getTrackSip2dVal(), 0, -1,70 );
             Cpfcan_BtagPf_trackSip2dSig_[fillntupleentry]   =catchInfsAndBound(trackinfo.getTrackSip2dSig(), 0, -1,4e4 );
-            Cpfcan_BtagPf_trackDecayLen_[fillntupleentry]   =0;
+            Cpfcan_BtagPf_trackDecayLen_[fillntupleentry]   =trackinfo.getTrackJetDecayLen();
             Cpfcan_BtagPf_trackJetDistVal_[fillntupleentry] =catchInfsAndBound(trackinfo.getTrackJetDistVal(),0,-20,1 );
             Cpfcan_BtagPf_trackJetDistSig_[fillntupleentry] =catchInfsAndBound(trackinfo.getTrackJetDistSig(),0,-1,1e5 );
 
@@ -833,7 +823,9 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
             Npfcan_deltaR_[fillntupleentry] = catchInfsAndBound(reco::deltaR(*PackedCandidate_,jet),0,-0.6,0,-0.6);
             Npfcan_isGamma_[fillntupleentry] = 0;
             if(fabs(PackedCandidate_->pdgId())==22)  Npfcan_isGamma_[fillntupleentry] = 1;
+            Npfcan_CaloFrac_[fillntupleentry] = PackedCandidate_->caloFraction();
             Npfcan_HadFrac_[fillntupleentry] = PackedCandidate_->hcalFraction();
+            Npfcan_pdgID_[fillntupleentry] = pdgid_;
 
             Npfcan_drminsv_[fillntupleentry] = catchInfsAndBound(drminpfcandsv_,0,-0.4,0,-0.4);
 
@@ -875,7 +867,7 @@ float ntuple_pfCands::mindrsvpfcand(const pat::PackedCandidate* pfcand) {
     return mindr_;
 }
 
-float ntuple_pfCands::mindistsvpfcand(const reco::TransientTrack track) {
+float ntuple_pfCands::mindistsvpfcandold(const reco::TransientTrack track) {
 
     float mindist_ = 999.999;
     float out_dist = 0.0;
@@ -980,4 +972,45 @@ GlobalPoint ntuple_pfCands::gppvpfcand(const reco::TransientTrack track, const G
     }
     out_dist = pca;
     return out_dist;
+}
+
+float ntuple_pfCands::mindistsvpfcand(const reco::TransientTrack track) {
+
+  float mindist_ = 999.999;
+  float out_dist = 0.0;
+  for (unsigned int i=0; i<secVertices()->size(); ++i) {
+    if (!track.isValid()) {continue;}
+    reco::Vertex::CovarianceMatrix csv; secVertices()->at(i).fillVertexCovariance(csv);
+    reco::Vertex vertex(secVertices()->at(i).vertex(), csv);
+    if (!vertex.isValid()) {continue;}
+
+    GlobalVector direction(secVertices()->at(i).px(),secVertices()->at(i).py(),secVertices()->at(i).pz());
+
+
+    AnalyticalImpactPointExtrapolator extrapolator(track.field());
+    TrajectoryStateOnSurface tsos =  extrapolator.extrapolate(track.impactPointState(), RecoVertex::convertPos(vertex.position()));
+    
+    VertexDistance3D dist;
+
+    if (!tsos.isValid()) {continue;}
+    GlobalPoint refPoint = tsos.globalPosition();
+    GlobalError refPointErr = tsos.cartesianError().position();
+    GlobalPoint vertexPosition = RecoVertex::convertPos(vertex.position());
+    GlobalError vertexPositionErr = RecoVertex::convertError(vertex.error());
+
+    std::pair<bool, Measurement1D> result(true, dist.distance(VertexState(vertexPosition, vertexPositionErr), VertexState(refPoint, refPointErr)));
+    if (!result.first) {continue;}
+
+    GlobalPoint impactPoint = tsos.globalPosition();
+    GlobalVector IPVec(impactPoint.x() - vertex.x(), impactPoint.y() - vertex.y(), impactPoint.z() - vertex.z());
+    double prod = IPVec.dot(direction);
+    double sign = (prod >= 0) ? 1. : -1.;
+
+    if(result.second.value() < mindist_){
+      float inv_dist = 1.0 / (sign * result.second.value() + 0.001);
+      out_dist = inv_dist;
+      mindist_ = result.second.value();
+    } 
+  }
+  return out_dist;
 }

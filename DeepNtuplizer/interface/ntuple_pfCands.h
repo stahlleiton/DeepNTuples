@@ -111,7 +111,9 @@ private:
     float Cpfcan_chi2_[max_pfcand_];
     float Cpfcan_quality_[max_pfcand_];
     float Cpfcan_drminsv_[max_pfcand_];
+    float Cpfcan_distminsvold_[max_pfcand_];
     float Cpfcan_distminsv_[max_pfcand_];
+    float Cpfcan_distminsv2_[max_pfcand_];
     float Cpfcan_dxminsv_[max_pfcand_];
     float Cpfcan_dyminsv_[max_pfcand_];
     float Cpfcan_dzminsv_[max_pfcand_];
@@ -205,10 +207,17 @@ private:
     float  Npfcan_deltaR_[max_pfcand_];
     float  Npfcan_isGamma_[max_pfcand_];
     float  Npfcan_HadFrac_[max_pfcand_];
+    float  Npfcan_CaloFrac_[max_pfcand_];
     float  Npfcan_drminsv_[max_pfcand_];
 
+    float  Npfcan_pdgID_[max_pfcand_];
+    float  Cpfcan_pdgID_[max_pfcand_];
+
+    float  Cpfcan_HadFrac_[max_pfcand_];
+    float  Cpfcan_CaloFrac_[max_pfcand_];
 
     float mindrsvpfcand(const pat::PackedCandidate* pfcand);
+    float mindistsvpfcandold(const reco::TransientTrack track);
     float mindistsvpfcand(const reco::TransientTrack track);
     GlobalPoint mingpsvpfcand(const reco::TransientTrack track);
     GlobalPoint gppvpfcand(const reco::TransientTrack track, GlobalVector direction, const reco::Vertex vertex);
