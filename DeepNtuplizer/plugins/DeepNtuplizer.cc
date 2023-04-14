@@ -13,9 +13,6 @@
 #include "../interface/ntuple_pfCands.h"
 #include "../interface/ntuple_bTagVars.h"
 #include "../interface/ntuple_FatJetInfo.h"
-// AS #include "../interface/ntuple_DeepVertex.h"
-// AS #include "../interface/ntuple_GraphB.h"
-// AS #include "../interface/ntuple_pixelclusters.h"
 //ROOT includes
 #include "TTree.h"
 #include <TFile.h>
@@ -40,9 +37,6 @@
 #include "DataFormats/Candidate/interface/VertexCompositePtrCandidate.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "TLorentzVector.h"
-
-// AS #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
-// AS #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 
 #include "DataFormats/BTauReco/interface/PixelClusterTagInfo.h"
 
@@ -143,6 +137,9 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   applySelection_=iConfig.getParameter<bool>("applySelection");
 
   ntuple_SV* svmodule=new ntuple_SV("", jetR);
+  svmodule->setTrackBuilderToken(
+      esConsumes<TransientTrackBuilder, TransientTrackRecord>(
+                          edm::ESInputTag("", "TransientTrackBuilder")));
   addModule(svmodule, "SVNtuple");
 
   //Loose IVF vertices
@@ -182,29 +179,12 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   jetinfo->setUseHerwigCompatibleMatching(useHerwigCompatibleMatching);
   jetinfo->setIsHerwig(isHerwig);
 
-  jetinfo->setGenJetMatchReclusterToken(
-					consumes<edm::Association<reco::GenJetCollection> >(
-											    iConfig.getParameter<edm::InputTag>( "genJetMatchRecluster" )));
-  jetinfo->setGenJetMatchWithNuToken(
-				     consumes<edm::Association<reco::GenJetCollection> >(
-											 iConfig.getParameter<edm::InputTag>( "genJetMatchWithNu" )));
-
-  jetinfo->setGenJetMatchAllowDuplicatesToken(
-					      consumes<edm::Association<reco::GenJetCollection> >(
-												  iConfig.getParameter<edm::InputTag>( "genJetMatchAllowDuplicates" )));
-
-
-  jetinfo->setGenParticlesToken(
-				consumes<reco::GenParticleCollection>(
-								      iConfig.getParameter<edm::InputTag>("pruned")));
-
-  jetinfo->setMuonsToken(
-			 consumes<pat::MuonCollection>(
-						       iConfig.getParameter<edm::InputTag>("muons")));
-
-  jetinfo->setElectronsToken(
-			     consumes<pat::ElectronCollection>(
-							       iConfig.getParameter<edm::InputTag>("electrons")));
+  jetinfo->setGenJetMatchReclusterToken(consumes<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchRecluster" )));
+  jetinfo->setGenJetMatchWithNuToken(consumes<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchWithNu" )));
+  jetinfo->setGenJetMatchAllowDuplicatesToken(consumes<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchAllowDuplicates" ))); 
+  jetinfo->setGenParticlesToken(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("pruned")));
+  jetinfo->setMuonsToken(consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("muons")));
+  jetinfo->setElectronsToken(consumes<pat::ElectronCollection>(iConfig.getParameter<edm::InputTag>("electrons")));
 
   addModule(jetinfo, "jetinfo");
 

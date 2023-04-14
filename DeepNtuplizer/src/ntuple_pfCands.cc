@@ -220,6 +220,7 @@ void ntuple_pfCands::initBranches(TTree* tree){
 
     addBranch(tree,"Cpfcan_drminsv",&Cpfcan_drminsv_,"Cpfcan_drminsv_[n_Cpfcand_]/F");
     addBranch(tree,"Cpfcan_distminsv",&Cpfcan_distminsv_,"Cpfcan_distminsv_[n_Cpfcand_]/F");
+    addBranch(tree,"Cpfcan_distminsv2",&Cpfcan_distminsv2_,"Cpfcan_distminsv2_[n_Cpfcand_]/F");
 
     //commented ones don't work
     addBranch(tree,"Cpfcan_vertex_rho",&Cpfcan_vertex_rho_,"Cpfcan_vertex_rho_[n_Cpfcand_]/F");
@@ -506,8 +507,11 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 
 	    const reco::TransientTrack ttrack = trackinfo.getTTrack();
 	    float mindistsv = mindistsvpfcand(ttrack);
+	    float eng_mindistsv = std::log(std::fabs(mindistsv)+1.0);
 
 	    Cpfcan_distminsv_[fillntupleentry] = mindistsv;
+	    Cpfcan_distminsv2_[fillntupleentry] = eng_mindistsv;
+
 
             Cpfcan_BtagPf_trackMomentum_[fillntupleentry]   =catchInfsAndBound(trackinfo.getTrackMomentum(),0,0 ,1000);
             Cpfcan_BtagPf_trackEta_[fillntupleentry]        =catchInfsAndBound(trackinfo.getTrackEta()   ,  0,-5,5);
@@ -901,8 +905,9 @@ float ntuple_pfCands::mindistsvpfcand(const reco::TransientTrack track) {
     double prod = IPVec.dot(direction);
     double sign = (prod >= 0) ? 1. : -1.;
 
-    if(result.second.value() < mindist_){ 
-      out_dist = sign * result.second.value();
+    if(result.second.value() < mindist_){
+      float inv_dist = 1.0 / (sign * result.second.value() + 0.001);
+      out_dist = inv_dist;
       mindist_ = result.second.value();
     } 
   }

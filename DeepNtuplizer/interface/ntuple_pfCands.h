@@ -120,6 +120,7 @@ private:
     float Cpfcan_quality_[max_pfcand_];
     float Cpfcan_drminsv_[max_pfcand_];
     float Cpfcan_distminsv_[max_pfcand_];
+    float Cpfcan_distminsv2_[max_pfcand_];
     //hit pattern variables, as defined here https://github.com/cms-sw/cmssw/blob/master/DataFormats/TrackReco/interface/HitPattern.h
     //Tracker per layer 
     //Pixel barrel 

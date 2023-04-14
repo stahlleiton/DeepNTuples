@@ -9,6 +9,11 @@
 #define DEEPNTUPLES_DEEPNTUPLIZER_INTERFACE_NTUPLE_SV_H_
 
 #include "ntuple_content.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "FWCore/Utilities/interface/ESGetToken.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
 
 class ntuple_SV: public ntuple_content{
 public:
@@ -19,12 +24,14 @@ public:
     void getInput(const edm::ParameterSet& iConfig);
     void initBranches(TTree* );
     void readEvent(const edm::Event& iEvent);
+    void readSetup(const edm::EventSetup& iSetup);
 
     //use either of these functions
-
     bool fillBranches(const pat::Jet &, const size_t& jetidx, const  edm::View<pat::Jet> * coll=0);
 
-
+    void setTrackBuilderToken(const edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord>& track_builder_token) {
+      track_builder_token_ = track_builder_token;
+    }
 
 private:
 
@@ -33,6 +40,9 @@ private:
     int sv_p_num_;
     float nsv_;
     std::string prefix_;
+
+    edm::ESHandle<TransientTrackBuilder> builder;
+    edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord> track_builder_token_;
 
     static constexpr size_t max_sv=10;
 
@@ -61,8 +71,13 @@ private:
 
     float sv_hcal_frac_[max_sv];
     float sv_calo_frac_[max_sv];
-
-
+    float sv_dz_[max_sv];
+    float sv_pfd2dval_[max_sv];
+    float sv_pfd2dsig_[max_sv];
+    float sv_pfd3dval_[max_sv];
+    float sv_pfd3dsig_[max_sv];
+    float sv_puppiw_[max_sv];
+    float sv_charge_sum_[max_sv];
 
     static const reco::Vertex * spvp_;
 
