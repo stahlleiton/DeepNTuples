@@ -6,8 +6,8 @@ Installation (CMSSW 10_6_X)
 ============
 
 ```
-cmsrel CMSSW_10_6_0
-cd CMSSW_10_6_0/src/
+cmsrel CMSSW_10_6_30
+cd CMSSW_10_6_30/src/
 cmsenv
 git cms-init
 git clone https://github.com/AlexDeMoor/DeepNTuples
@@ -17,7 +17,7 @@ git checkout 106X
 git submodule init
 git submodule update
 
-scram b -j 4
+scram b -j 8
 ```
 
 Further settings
