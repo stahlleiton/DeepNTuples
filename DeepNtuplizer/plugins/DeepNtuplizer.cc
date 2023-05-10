@@ -13,7 +13,7 @@
 #include "../interface/ntuple_bTagVars.h"
 //#include "../interface/ntuple_FatJetInfo.h"
 //#include "../interface/ntuple_DeepVertex.h"
-//#include "../interface/ntuple_GraphB.h"
+#include "../interface/ntuple_pairwise.h"
 //ROOT includes
 #include "TTree.h"
 #include <TFile.h>
@@ -199,8 +199,11 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
 
     ntuple_pfCands * pfcands = new ntuple_pfCands();
     pfcands->setJetRadius(jetR);
-
     addModule(pfcands, "pfcands");
+
+    ntuple_pairwise * pairwise = new ntuple_pairwise();
+    pairwise->setJetRadius(jetR);
+    addModule(pairwise, "pairwise");
 
     addModule(new ntuple_bTagVars(), "bTagVars");
 

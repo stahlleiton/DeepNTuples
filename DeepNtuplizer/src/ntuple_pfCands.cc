@@ -823,7 +823,7 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
             Npfcan_deltaR_[fillntupleentry] = catchInfsAndBound(reco::deltaR(*PackedCandidate_,jet),0,-0.6,0,-0.6);
             Npfcan_isGamma_[fillntupleentry] = 0;
             if(fabs(PackedCandidate_->pdgId())==22)  Npfcan_isGamma_[fillntupleentry] = 1;
-            Npfcan_CaloFrac_[fillntupleentry] = PackedCandidate_->caloFraction();
+            //Npfcan_CaloFrac_[fillntupleentry] = PackedCandidate_->caloFraction();
             Npfcan_HadFrac_[fillntupleentry] = PackedCandidate_->hcalFraction();
             Npfcan_pdgID_[fillntupleentry] = pdgid_;
 

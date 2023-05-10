@@ -1,11 +1,11 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 from argparse import ArgumentParser
 import os
 import subprocess
 
 def syscall(cmd):
-  print 'Executing: %s' % cmd
+  print('Executing: %s' % cmd)
   retval = os.system(cmd)
   if retval != 0:
     raise RuntimeError('Command failed!')
@@ -25,7 +25,10 @@ if not os.path.isdir(args.outdir):
     allins=''
     for l in args.infiles:
         allins+=' '+l
-        
+
+    print(str(args.nsamples))
+    print(args.outdir)
+    print(allins)
     syscall('createMergeList '+str(args.nsamples)+' '+args.outdir+' '+allins)
     
     
@@ -87,7 +90,7 @@ queue
 		condor.write(''.join(jobs))
 	os.chdir(dname)
 	syscall('condor_submit condor.sub')
-	print 'Once all the jobs are run please run again this command to ensure everything worked'
+	print('Once all the jobs are run please run again this command to ensure everything worked')
 else:
 	import multiprocessing as mp
 
