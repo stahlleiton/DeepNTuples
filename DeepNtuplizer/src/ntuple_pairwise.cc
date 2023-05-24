@@ -2,7 +2,7 @@
  * ntuple_pairwise.cc
  *
  *  Created on: 01 Sep 2022
- *      Author: Alexandre De Moor
+ *      Authors: Matteo Malucchi & Alexandre De Moor
  */
 
 #include "../interface/ntuple_pairwise.h"
