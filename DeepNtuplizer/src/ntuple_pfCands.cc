@@ -154,6 +154,12 @@ private:
 
 };
 
+void ntuple_pfCands::readConfig(const edm::ParameterSet& iConfig, edm::ConsumesCollector&& cc) {
+  ltToken_ = cc.consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("losttracks"));
+  packedToken_ = cc.consumes<std::vector<pat::PackedGenParticle>>(iConfig.getParameter<edm::InputTag>("packed"));
+  prunedToken_ = cc.consumes<std::vector<reco::GenParticle>>(iConfig.getParameter<edm::InputTag>("pruned"));
+}
+
 void ntuple_pfCands::readSetup(const edm::EventSetup& iSetup){
     iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", builder);
 }
@@ -164,204 +170,190 @@ void ntuple_pfCands::getInput(const edm::ParameterSet& iConfig){
 
 void ntuple_pfCands::initBranches(TTree* tree){
 
-    addBranch(tree,"n_Cpfcand", &n_Cpfcand_,"n_Cpfcand_/I");
+  addBranch(tree,"n_Cpfcand", &n_Cpfcand_,"n_Cpfcand_/I");
 
-    addBranch(tree,"nCpfcand", &nCpfcand_,"nCpfcand_/F");
+  addBranch(tree,"nCpfcand", &nCpfcand_,"nCpfcand_/F");
 
-    addBranch(tree,"Cpfcan_pt", &Cpfcan_pt_,"Cpfcan_pt_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_eta", &Cpfcan_eta_,"Cpfcan_eta_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_phi", &Cpfcan_phi_,"Cpfcan_phi_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_ptrel", &Cpfcan_ptrel_,"Cpfcan_ptrel_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_e", &Cpfcan_e_,"Cpfcan_e_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_erel", &Cpfcan_erel_,"Cpfcan_erel_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_phirel",&Cpfcan_phirel_,"Cpfcan_phirel_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_etarel",&Cpfcan_etarel_,"Cpfcan_etarel_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_deltaR",&Cpfcan_deltaR_,"Cpfcan_deltaR_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_puppiw",&Cpfcan_puppiw_,"Cpfcan_puppiw_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_dxy",&Cpfcan_dxy_,"Cpfcan_dxy_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_pt", &Cpfcan_pt_,"Cpfcan_pt_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_eta", &Cpfcan_eta_,"Cpfcan_eta_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_phi", &Cpfcan_phi_,"Cpfcan_phi_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_ptrel", &Cpfcan_ptrel_,"Cpfcan_ptrel_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_e", &Cpfcan_e_,"Cpfcan_e_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_erel", &Cpfcan_erel_,"Cpfcan_erel_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_phirel",&Cpfcan_phirel_,"Cpfcan_phirel_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_etarel",&Cpfcan_etarel_,"Cpfcan_etarel_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_deltaR",&Cpfcan_deltaR_,"Cpfcan_deltaR_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_puppiw",&Cpfcan_puppiw_,"Cpfcan_puppiw_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_dxy",&Cpfcan_dxy_,"Cpfcan_dxy_[n_Cpfcand_]/F");
 
-    addBranch(tree,"Cpfcan_dxyerrinv",&Cpfcan_dxyerrinv_,"Cpfcan_dxyerrinv_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_dxysig",&Cpfcan_dxysig_,"Cpfcan_dxysig_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_dxyerrinv",&Cpfcan_dxyerrinv_,"Cpfcan_dxyerrinv_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_dxysig",&Cpfcan_dxysig_,"Cpfcan_dxysig_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_dz",&Cpfcan_dz_,"Cpfcan_dz_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_VTX_ass",&Cpfcan_VTX_ass_,"Cpfcan_VTX_ass_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_fromPV",&Cpfcan_fromPV_,"Cpfcan_fromPV_[n_Cpfcand_]/F");
 
-    addBranch(tree,"Cpfcan_dz",&Cpfcan_dz_,"Cpfcan_dz_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_drminsv",&Cpfcan_drminsv_,"Cpfcan_drminsv_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_distminsvold",&Cpfcan_distminsvold_,"Cpfcan_distminsvold_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_distminsv",&Cpfcan_distminsv_,"Cpfcan_distminsv_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_distminsv2",&Cpfcan_distminsv2_,"Cpfcan_distminsv2_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_dxminsv",&Cpfcan_dxminsv_,"Cpfcan_dxminsv_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_dyminsv",&Cpfcan_dyminsv_,"Cpfcan_dyminsv_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_dzminsv",&Cpfcan_dzminsv_,"Cpfcan_dzminsv_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_dxpv",&Cpfcan_dxpv_,"Cpfcan_dxpv_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_dypv",&Cpfcan_dypv_,"Cpfcan_dypv_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_dzpv",&Cpfcan_dzpv_,"Cpfcan_dzpv_[n_Cpfcand_]/F");
 
-    addBranch(tree,"Cpfcan_VTX_ass",&Cpfcan_VTX_ass_,"Cpfcan_VTX_ass_[n_Cpfcand_]/F");
+  //commented ones don't work
+  addBranch(tree,"Cpfcan_vertex_rho",&Cpfcan_vertex_rho_,"Cpfcan_vertex_rho_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_vertex_phirel",&Cpfcan_vertex_phirel_,"Cpfcan_vertex_phirel_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_vertex_etarel",&Cpfcan_vertex_etarel_,"Cpfcan_vertex_etarel_[n_Cpfcand_]/F");
 
-    addBranch(tree,"Cpfcan_fromPV",&Cpfcan_fromPV_,"Cpfcan_fromPV_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackMomentum",&Cpfcan_BtagPf_trackMomentum_,"Cpfcan_BtagPf_trackMomentum_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackEta",&Cpfcan_BtagPf_trackEta_,"Cpfcan_BtagPf_trackEta_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackEtaRel",&Cpfcan_BtagPf_trackEtaRel_,"Cpfcan_BtagPf_trackEtaRel_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackPtRel",&Cpfcan_BtagPf_trackPtRel_,"Cpfcan_BtagPf_trackPtRel_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackPPar",&Cpfcan_BtagPf_trackPPar_,"Cpfcan_BtagPf_trackPPar_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackDeltaR",&Cpfcan_BtagPf_trackDeltaR_,"Cpfcan_BtagPf_trackDeltaR_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackPtRatio",&Cpfcan_BtagPf_trackPtRatio_,"Cpfcan_BtagPf_trackPtRatio_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackPParRatio",&Cpfcan_BtagPf_trackPParRatio_,"Cpfcan_BtagPf_trackPParRatio[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackSip3dVal",&Cpfcan_BtagPf_trackSip3dVal_,"Cpfcan_BtagPf_trackSip3dVal_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackSip3dSig",&Cpfcan_BtagPf_trackSip3dSig_,"Cpfcan_BtagPf_trackSip3dSig_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackSip2dVal",&Cpfcan_BtagPf_trackSip2dVal_,"Cpfcan_BtagPf_trackSip2dVal_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackSip2dSig",&Cpfcan_BtagPf_trackSip2dSig_,"Cpfcan_BtagPf_trackSip2dSig_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackDecayLen",&Cpfcan_BtagPf_trackDecayLen_,"Cpfcan_BtagPf_trackDecayLen_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackJetDistVal",&Cpfcan_BtagPf_trackJetDistVal_,"Cpfcan_BtagPf_trackJetDistVal_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_BtagPf_trackJetDistSig",&Cpfcan_BtagPf_trackJetDistSig_,"Cpfcan_BtagPf_trackJetDistSig_[n_Cpfcand_]/F");
 
-    addBranch(tree,"Cpfcan_drminsv",&Cpfcan_drminsv_,"Cpfcan_drminsv_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_distminsvold",&Cpfcan_distminsvold_,"Cpfcan_distminsvold_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_distminsv",&Cpfcan_distminsv_,"Cpfcan_distminsv_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_distminsv2",&Cpfcan_distminsv2_,"Cpfcan_distminsv2_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_dxminsv",&Cpfcan_dxminsv_,"Cpfcan_dxminsv_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_dyminsv",&Cpfcan_dyminsv_,"Cpfcan_dyminsv_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_dzminsv",&Cpfcan_dzminsv_,"Cpfcan_dzminsv_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_dxpv",&Cpfcan_dxpv_,"Cpfcan_dxpv_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_dypv",&Cpfcan_dypv_,"Cpfcan_dypv_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_dzpv",&Cpfcan_dzpv_,"Cpfcan_dzpv_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_isMu",&Cpfcan_isMu_,"Cpfcan_isMu_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_isEl",&Cpfcan_isEl_,"Cpfcan_isEl_[n_Cpfcand_]/F");
+  // did not give integers !!
+  addBranch(tree,"Cpfcan_charge",&Cpfcan_charge_,"Cpfcan_charge_[n_Cpfcand_]/F");
 
-    //commented ones don't work
-    /**///addBranch(tree,"Cpfcan_vertexChi2",&Cpfcan_vertexChi2_,"Cpfcan_vertexChi2_[n_Cpfcand_]/f");
-    /**///addBranch(tree,"Cpfcan_vertexNdof",&Cpfcan_vertexNdof_,"Cpfcan_vertexNdof_[n_Cpfcand_]/f");
-    /**///addBranch(tree,"Cpfcan_vertexNormalizedChi2",&Cpfcan_vertexNormalizedChi2_,"Cpfcan_vertexNormalizedChi2_[n_Cpfcand_]/f");
-    addBranch(tree,"Cpfcan_vertex_rho",&Cpfcan_vertex_rho_,"Cpfcan_vertex_rho_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_vertex_phirel",&Cpfcan_vertex_phirel_,"Cpfcan_vertex_phirel_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_vertex_etarel",&Cpfcan_vertex_etarel_,"Cpfcan_vertex_etarel_[n_Cpfcand_]/F");
-    /**///addBranch(tree,"Cpfcan_vertexRef_mass",&Cpfcan_vertexRef_mass_,"Cpfcan_vertexRef_mass_[n_Cpfcand_]/f");
+  //in16 conversion broken
+  addBranch(tree,"Cpfcan_lostInnerHits",&Cpfcan_lostInnerHits_,"Cpfcan_lostInnerHits_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_numberOfPixelHits",&Cpfcan_numberOfPixelHits_,"Cpfcan_numberOfPixelHits_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_chi2",&Cpfcan_chi2_,"Cpfcan_chi2_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_quality",&Cpfcan_quality_,"Cpfcan_quality_[n_Cpfcand_]/F");
+  //hit pattern variables, as defined here https://github.com/cms-sw/cmssw/blob/master/DataFormats/TrackReco/interface/HitPattern.h
+  //Tracker per layer
+  //Pixel barrel 
+  addBranch(tree,"Cpfcan_nhitpixelBarrelLayer1",&Cpfcan_nhitpixelBarrelLayer1_,"Cpfcan_nhitpixelBarrelLayer1_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_nhitpixelBarrelLayer2",&Cpfcan_nhitpixelBarrelLayer2_,"Cpfcan_nhitpixelBarrelLayer2_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitpixelBarrelLayer3",&Cpfcan_nhitpixelBarrelLayer3_,"Cpfcan_nhitpixelBarrelLayer3_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitpixelBarrelLayer4",&Cpfcan_nhitpixelBarrelLayer4_,"Cpfcan_nhitpixelBarrelLayer4_[n_Cpfcand_]/F");
+  //Pixel Endcap 
+  addBranch(tree,"Cpfcan_nhitpixelEndcapLayer1",&Cpfcan_nhitpixelEndcapLayer1_,"Cpfcan_nhitpixelEndcapLayer1_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitpixelEndcapLayer2",&Cpfcan_nhitpixelEndcapLayer2_,"Cpfcan_nhitpixelEndcapLayer2_[n_Cpfcand_]/F");
+  //Strip TIB
+  addBranch(tree,"Cpfcan_nhitstripTIBLayer1",&Cpfcan_nhitstripTIBLayer1_,"Cpfcan_nhitstripTIBLayer1_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTIBLayer2",&Cpfcan_nhitstripTIBLayer2_,"Cpfcan_nhitstripTIBLayer2_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTIBLayer3",&Cpfcan_nhitstripTIBLayer3_,"Cpfcan_nhitstripTIBLayer3_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTIBLayer4",&Cpfcan_nhitstripTIBLayer4_,"Cpfcan_nhitstripTIBLayer4_[n_Cpfcand_]/F");
+  //Strip TID
+  addBranch(tree,"Cpfcan_nhitstripTIDLayer1",&Cpfcan_nhitstripTIDLayer1_,"Cpfcan_nhitstripTIDLayer1_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTIDLayer2",&Cpfcan_nhitstripTIDLayer2_,"Cpfcan_nhitstripTIDLayer2_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTIDLayer3",&Cpfcan_nhitstripTIDLayer3_,"Cpfcan_nhitstripTIDLayer3_[n_Cpfcand_]/F");
+  //Strip TOB
+  addBranch(tree,"Cpfcan_nhitstripTOBLayer1",&Cpfcan_nhitstripTOBLayer1_,"Cpfcan_nhitstripTOBLayer1_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTOBLayer2",&Cpfcan_nhitstripTOBLayer2_,"Cpfcan_nhitstripTOBLayer2_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTOBLayer3",&Cpfcan_nhitstripTOBLayer3_,"Cpfcan_nhitstripTOBLayer3_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTOBLayer4",&Cpfcan_nhitstripTOBLayer4_,"Cpfcan_nhitstripTOBLayer4_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTOBLayer5",&Cpfcan_nhitstripTOBLayer5_,"Cpfcan_nhitstripTOBLayer5_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTOBLayer6",&Cpfcan_nhitstripTOBLayer6_,"Cpfcan_nhitstripTOBLayer6_[n_Cpfcand_]/F");
+  //Strip TEC
+  addBranch(tree,"Cpfcan_nhitstripTECLayer1",&Cpfcan_nhitstripTECLayer1_,"Cpfcan_nhitstripTECLayer1_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTECLayer2",&Cpfcan_nhitstripTECLayer2_,"Cpfcan_nhitstripTECLayer2_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTECLayer3",&Cpfcan_nhitstripTECLayer3_,"Cpfcan_nhitstripTECLayer3_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTECLayer4",&Cpfcan_nhitstripTECLayer4_,"Cpfcan_nhitstripTECLayer4_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTECLayer5",&Cpfcan_nhitstripTECLayer5_,"Cpfcan_nhitstripTECLayer5_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTECLayer6",&Cpfcan_nhitstripTECLayer6_,"Cpfcan_nhitstripTECLayer6_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTECLayer7",&Cpfcan_nhitstripTECLayer7_,"Cpfcan_nhitstripTECLayer7_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTECLayer8",&Cpfcan_nhitstripTECLayer8_,"Cpfcan_nhitstripTECLayer8_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_nhitstripTECLayer9",&Cpfcan_nhitstripTECLayer9_,"Cpfcan_nhitstripTECLayer9_[n_Cpfcand_]/F");
+  //Tracker all layers together
+  //Valid hits
+  addBranch(tree,"Cpfcan_numberOfValidHits",&Cpfcan_numberOfValidHits_,"Cpfcan_numberOfValidHits_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_numberOfValidTrackerHits",&Cpfcan_numberOfValidTrackerHits_,"Cpfcan_numberOfValidTrackerHits_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_numberOfValidPixelHits",&Cpfcan_numberOfValidPixelHits_,"Cpfcan_numberOfValidPixelHits_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_numberOfValidPixelBarrelHits",&Cpfcan_numberOfValidPixelBarrelHits_,"Cpfcan_numberOfValidPixelBarrelHits_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_numberOfValidPixelEndcapHits",&Cpfcan_numberOfValidPixelEndcapHits_,"Cpfcan_numberOfValidPixelEndcapHits_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_numberOfValidStripHits",&Cpfcan_numberOfValidStripHits_,"Cpfcan_numberOfValidStripHits_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_numberOfValidStripTIBHits",&Cpfcan_numberOfValidStripTIBHits_,"Cpfcan_numberOfValidStripTIBHits_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_numberOfValidStripTIDHits",&Cpfcan_numberOfValidStripTIDHits_,"Cpfcan_numberOfValidStripTIDHits_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_numberOfValidStripTOBHits",&Cpfcan_numberOfValidStripTOBHits_,"Cpfcan_numberOfValidStripTOBHits_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_numberOfValidStripTECHits",&Cpfcan_numberOfValidStripTECHits_,"Cpfcan_numberOfValidStripTECHits_[n_Cpfcand_]/F"); 
+  //LayersWithMeasuremen
+  addBranch(tree,"Cpfcan_trackerLayersWithMeasurementOld",&Cpfcan_trackerLayersWithMeasurementOld_,"Cpfcan_trackerLayersWithMeasurementOld_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_trackerLayersWithMeasurement",&Cpfcan_trackerLayersWithMeasurement_,"Cpfcan_trackerLayersWithMeasurement_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_pixelLayersWithMeasurementOld",&Cpfcan_pixelLayersWithMeasurementOld_,"Cpfcan_pixelLayersWithMeasurementOld_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_pixelLayersWithMeasurement",&Cpfcan_pixelLayersWithMeasurement_,"Cpfcan_pixelLayersWithMeasurement_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_stripLayersWithMeasurement",&Cpfcan_stripLayersWithMeasurement_,"Cpfcan_stripLayersWithMeasurement_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_pixelBarrelLayersWithMeasurement",&Cpfcan_pixelBarrelLayersWithMeasurement_,"Cpfcan_pixelBarrelLayersWithMeasurement_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_pixelEndcapLayersWithMeasurement",&Cpfcan_pixelEndcapLayersWithMeasurement_,"Cpfcan_pixelEndcapLayersWithMeasurement_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_stripTIBLayersWithMeasurement",&Cpfcan_stripTIBLayersWithMeasurement_,"Cpfcan_stripTIBLayersWithMeasurement_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_stripTIDLayersWithMeasurement",&Cpfcan_stripTIDLayersWithMeasurement_,"Cpfcan_stripTIDLayersWithMeasurement_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_stripTOBLayersWithMeasurement",&Cpfcan_stripTOBLayersWithMeasurement_,"Cpfcan_stripTOBLayersWithMeasurement_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_stripTECLayersWithMeasurement",&Cpfcan_stripTECLayersWithMeasurement_,"Cpfcan_stripTECLayersWithMeasurement_[n_Cpfcand_]/F"); 
+  //Null
+  addBranch(tree,"Cpfcan_trackerLayersNull",&Cpfcan_trackerLayersNull_,"Cpfcan_trackerLayersNull_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_pixelLayersNull",&Cpfcan_pixelLayersNull_,"Cpfcan_pixelLayersNull_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_stripLayersNull",&Cpfcan_stripLayersNull_,"Cpfcan_stripLayersNull_[n_Cpfcand_]/F"); 
+  addBranch(tree,"Cpfcan_pixelBarrelLayersNull",&Cpfcan_pixelBarrelLayersNull_,"Cpfcan_pixelBarrelLayersNull_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_pixelEndcapLayersNull",&Cpfcan_pixelEndcapLayersNull_,"Cpfcan_pixelEndcapLayersNull_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_stripTIBLayersNull",&Cpfcan_stripTIBLayersNull_,"Cpfcan_stripTIBLayersNull_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_stripTIDLayersNull",&Cpfcan_stripTIDLayersNull_,"Cpfcan_stripTIDLayersNull_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_stripTOBLayersNull",&Cpfcan_stripTOBLayersNull_,"Cpfcan_stripTOBLayersNull_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_stripTECLayersNull",&Cpfcan_stripTECLayersNull_,"Cpfcan_stripTECLayersNull_[n_Cpfcand_]/F");
 
-    /*
-    addBranch(tree,"Cpfcan_dptdpt",&Cpfcan_dptdpt_,"Cpfcan_dptdpt_[n_Cpfcand_]/f");
-    addBranch(tree,"Cpfcan_detadeta",&Cpfcan_detadeta_,"Cpfcan_detadeta_[n_Cpfcand_]/f");
-    addBranch(tree,"Cpfcan_dphidphi",&Cpfcan_dphidphi_,"Cpfcan_dphidphi_[n_Cpfcand_]/f");
+  //Neutral Pf candidates
+  addBranch(tree,"n_Npfcand", &n_Npfcand_,"n_Npfcand_/I");
+  addBranch(tree,"nNpfcand", &nNpfcand_,"nNpfcand/F");
 
+  addBranch(tree,"Npfcan_pt", &Npfcan_pt_,"Npfcan_pt_[n_Npfcand_]/F");
+  addBranch(tree,"Npfcan_eta", &Npfcan_eta_,"Npfcan_eta_[n_Npfcand_]/F");
+  addBranch(tree,"Npfcan_phi", &Npfcan_phi_,"Npfcan_phi_[n_Npfcand_]/F");
+  addBranch(tree,"Npfcan_ptrel", &Npfcan_ptrel_,"Npfcan_ptrel_[n_Npfcand_]/F");
+  addBranch(tree,"Npfcan_e", &Npfcan_e_,"Npfcan_e_[n_Npfcand_]/F");
+  addBranch(tree,"Npfcan_erel", &Npfcan_erel_,"Npfcan_erel_[n_Npfcand_]/F");
 
-    addBranch(tree,"Cpfcan_dxydxy",&Cpfcan_dxydxy_,"Cpfcan_dxydxy_[n_Cpfcand_]/f");
-    addBranch(tree,"Cpfcan_dzdz",&Cpfcan_dzdz_,"Cpfcan_dzdz_[n_Cpfcand_]/f");
-    addBranch(tree,"Cpfcan_dxydz",&Cpfcan_dxydz_,"Cpfcan_dxydz_[n_Cpfcand_]/f");
-    addBranch(tree,"Cpfcan_dphidxy",&Cpfcan_dphidxy_,"Cpfcan_dphidxy_[n_Cpfcand_]/f");
-    addBranch(tree,"Cpfcan_dlambdadz",&Cpfcan_dlambdadz_,"Cpfcan_dlambdadz_[n_Cpfcand_]/f");
-     */
+  addBranch(tree,"Npfcan_puppiw", &Npfcan_puppiw_,"Npfcan_puppiw_[n_Npfcand_]/F");
 
+  addBranch(tree,"Npfcan_phirel",&Npfcan_phirel_,"Npfcan_phirel_[n_Npfcand_]/F");
+  addBranch(tree,"Npfcan_etarel",&Npfcan_etarel_,"Npfcan_etarel_[n_Npfcand_]/F");
+  addBranch(tree,"Npfcan_deltaR",&Npfcan_deltaR_,"Npfcan_deltaR_[n_Npfcand_]/F");
+  addBranch(tree,"Npfcan_isGamma",&Npfcan_isGamma_,"Npfcan_isGamma_[n_Npfcand_]/F");
+  addBranch(tree,"Npfcan_HadFrac",&Npfcan_HadFrac_,"Npfcan_HadFrac_[n_Npfcand_]/F");
+  addBranch(tree,"Npfcan_drminsv",&Npfcan_drminsv_,"Npfcan_drminsv_[n_Npfcand_]/F");
 
+  addBranch(tree,"Npfcan_pdgID",&Npfcan_pdgID_,"Npfcan_pdgID_[n_Npfcand_]/F");
+  addBranch(tree,"Cpfcan_pdgID",&Cpfcan_pdgID_,"Cpfcan_pdgID_[n_Cpfcand_]/F");
 
-    addBranch(tree,"Cpfcan_BtagPf_trackMomentum",&Cpfcan_BtagPf_trackMomentum_,"Cpfcan_BtagPf_trackMomentum_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_BtagPf_trackEta",&Cpfcan_BtagPf_trackEta_,"Cpfcan_BtagPf_trackEta_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_BtagPf_trackEtaRel",&Cpfcan_BtagPf_trackEtaRel_,"Cpfcan_BtagPf_trackEtaRel_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_BtagPf_trackPtRel",&Cpfcan_BtagPf_trackPtRel_,"Cpfcan_BtagPf_trackPtRel_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_BtagPf_trackPPar",&Cpfcan_BtagPf_trackPPar_,"Cpfcan_BtagPf_trackPPar_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_BtagPf_trackDeltaR",&Cpfcan_BtagPf_trackDeltaR_,"Cpfcan_BtagPf_trackDeltaR_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_BtagPf_trackPtRatio",&Cpfcan_BtagPf_trackPtRatio_,"Cpfcan_BtagPf_trackPtRatio_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_BtagPf_trackPParRatio",&Cpfcan_BtagPf_trackPParRatio_,"Cpfcan_BtagPf_trackPParRatio[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_BtagPf_trackSip3dVal",&Cpfcan_BtagPf_trackSip3dVal_,"Cpfcan_BtagPf_trackSip3dVal_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_BtagPf_trackSip3dSig",&Cpfcan_BtagPf_trackSip3dSig_,"Cpfcan_BtagPf_trackSip3dSig_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_BtagPf_trackSip2dVal",&Cpfcan_BtagPf_trackSip2dVal_,"Cpfcan_BtagPf_trackSip2dVal_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_BtagPf_trackSip2dSig",&Cpfcan_BtagPf_trackSip2dSig_,"Cpfcan_BtagPf_trackSip2dSig_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_BtagPf_trackDecayLen",&Cpfcan_BtagPf_trackDecayLen_,"Cpfcan_BtagPf_trackDecayLen_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_BtagPf_trackJetDistVal",&Cpfcan_BtagPf_trackJetDistVal_,"Cpfcan_BtagPf_trackJetDistVal_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_BtagPf_trackJetDistSig",&Cpfcan_BtagPf_trackJetDistSig_,"Cpfcan_BtagPf_trackJetDistSig_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_HadFrac",&Cpfcan_HadFrac_,"Cpfcan_HadFrac_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_CaloFrac",&Cpfcan_CaloFrac_,"Cpfcan_CaloFrac_[n_Cpfcand_]/F");
 
-    addBranch(tree,"Cpfcan_isMu",&Cpfcan_isMu_,"Cpfcan_isMu_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_isEl",&Cpfcan_isEl_,"Cpfcan_isEl_[n_Cpfcand_]/F");
-    // did not give integers !!
-    addBranch(tree,"Cpfcan_charge",&Cpfcan_charge_,"Cpfcan_charge_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_b_tag",&Cpfcan_b_tag_,"Cpfcan_b_tag_[n_Cpfcand_]/I");
+  addBranch(tree,"Cpfcan_c_tag",&Cpfcan_c_tag_,"Cpfcan_c_tag_[n_Cpfcand_]/I");
+  addBranch(tree,"Cpfcan_g_tag",&Cpfcan_g_tag_,"Cpfcan_g_tag_[n_Cpfcand_]/I");
 
-    //in16 conversion broken
-    addBranch(tree,"Cpfcan_lostInnerHits",&Cpfcan_lostInnerHits_,"Cpfcan_lostInnerHits_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_numberOfPixelHits",&Cpfcan_numberOfPixelHits_,"Cpfcan_numberOfPixelHits_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_chi2",&Cpfcan_chi2_,"Cpfcan_chi2_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_quality",&Cpfcan_quality_,"Cpfcan_quality_[n_Cpfcand_]/F");
-    //hit pattern variables, as defined here https://github.com/cms-sw/cmssw/blob/master/DataFormats/TrackReco/interface/HitPattern.h
-    //Tracker per layer
-    //Pixel barrel 
-    addBranch(tree,"Cpfcan_nhitpixelBarrelLayer1",&Cpfcan_nhitpixelBarrelLayer1_,"Cpfcan_nhitpixelBarrelLayer1_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_nhitpixelBarrelLayer2",&Cpfcan_nhitpixelBarrelLayer2_,"Cpfcan_nhitpixelBarrelLayer2_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitpixelBarrelLayer3",&Cpfcan_nhitpixelBarrelLayer3_,"Cpfcan_nhitpixelBarrelLayer3_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitpixelBarrelLayer4",&Cpfcan_nhitpixelBarrelLayer4_,"Cpfcan_nhitpixelBarrelLayer4_[n_Cpfcand_]/F");
-    //Pixel Endcap 
-    addBranch(tree,"Cpfcan_nhitpixelEndcapLayer1",&Cpfcan_nhitpixelEndcapLayer1_,"Cpfcan_nhitpixelEndcapLayer1_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitpixelEndcapLayer2",&Cpfcan_nhitpixelEndcapLayer2_,"Cpfcan_nhitpixelEndcapLayer2_[n_Cpfcand_]/F");
-    //Strip TIB
-    addBranch(tree,"Cpfcan_nhitstripTIBLayer1",&Cpfcan_nhitstripTIBLayer1_,"Cpfcan_nhitstripTIBLayer1_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTIBLayer2",&Cpfcan_nhitstripTIBLayer2_,"Cpfcan_nhitstripTIBLayer2_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTIBLayer3",&Cpfcan_nhitstripTIBLayer3_,"Cpfcan_nhitstripTIBLayer3_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTIBLayer4",&Cpfcan_nhitstripTIBLayer4_,"Cpfcan_nhitstripTIBLayer4_[n_Cpfcand_]/F");
-    //Strip TID
-    addBranch(tree,"Cpfcan_nhitstripTIDLayer1",&Cpfcan_nhitstripTIDLayer1_,"Cpfcan_nhitstripTIDLayer1_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTIDLayer2",&Cpfcan_nhitstripTIDLayer2_,"Cpfcan_nhitstripTIDLayer2_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTIDLayer3",&Cpfcan_nhitstripTIDLayer3_,"Cpfcan_nhitstripTIDLayer3_[n_Cpfcand_]/F");
-    //Strip TOB
-    addBranch(tree,"Cpfcan_nhitstripTOBLayer1",&Cpfcan_nhitstripTOBLayer1_,"Cpfcan_nhitstripTOBLayer1_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTOBLayer2",&Cpfcan_nhitstripTOBLayer2_,"Cpfcan_nhitstripTOBLayer2_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTOBLayer3",&Cpfcan_nhitstripTOBLayer3_,"Cpfcan_nhitstripTOBLayer3_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTOBLayer4",&Cpfcan_nhitstripTOBLayer4_,"Cpfcan_nhitstripTOBLayer4_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTOBLayer5",&Cpfcan_nhitstripTOBLayer5_,"Cpfcan_nhitstripTOBLayer5_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTOBLayer6",&Cpfcan_nhitstripTOBLayer6_,"Cpfcan_nhitstripTOBLayer6_[n_Cpfcand_]/F");
-    //Strip TEC
-    addBranch(tree,"Cpfcan_nhitstripTECLayer1",&Cpfcan_nhitstripTECLayer1_,"Cpfcan_nhitstripTECLayer1_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTECLayer2",&Cpfcan_nhitstripTECLayer2_,"Cpfcan_nhitstripTECLayer2_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTECLayer3",&Cpfcan_nhitstripTECLayer3_,"Cpfcan_nhitstripTECLayer3_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTECLayer4",&Cpfcan_nhitstripTECLayer4_,"Cpfcan_nhitstripTECLayer4_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTECLayer5",&Cpfcan_nhitstripTECLayer5_,"Cpfcan_nhitstripTECLayer5_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTECLayer6",&Cpfcan_nhitstripTECLayer6_,"Cpfcan_nhitstripTECLayer6_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTECLayer7",&Cpfcan_nhitstripTECLayer7_,"Cpfcan_nhitstripTECLayer7_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTECLayer8",&Cpfcan_nhitstripTECLayer8_,"Cpfcan_nhitstripTECLayer8_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_nhitstripTECLayer9",&Cpfcan_nhitstripTECLayer9_,"Cpfcan_nhitstripTECLayer9_[n_Cpfcand_]/F");
-    //Tracker all layers together
-    //Valid hits
-    addBranch(tree,"Cpfcan_numberOfValidHits",&Cpfcan_numberOfValidHits_,"Cpfcan_numberOfValidHits_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_numberOfValidTrackerHits",&Cpfcan_numberOfValidTrackerHits_,"Cpfcan_numberOfValidTrackerHits_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_numberOfValidPixelHits",&Cpfcan_numberOfValidPixelHits_,"Cpfcan_numberOfValidPixelHits_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_numberOfValidPixelBarrelHits",&Cpfcan_numberOfValidPixelBarrelHits_,"Cpfcan_numberOfValidPixelBarrelHits_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_numberOfValidPixelEndcapHits",&Cpfcan_numberOfValidPixelEndcapHits_,"Cpfcan_numberOfValidPixelEndcapHits_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_numberOfValidStripHits",&Cpfcan_numberOfValidStripHits_,"Cpfcan_numberOfValidStripHits_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_numberOfValidStripTIBHits",&Cpfcan_numberOfValidStripTIBHits_,"Cpfcan_numberOfValidStripTIBHits_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_numberOfValidStripTIDHits",&Cpfcan_numberOfValidStripTIDHits_,"Cpfcan_numberOfValidStripTIDHits_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_numberOfValidStripTOBHits",&Cpfcan_numberOfValidStripTOBHits_,"Cpfcan_numberOfValidStripTOBHits_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_numberOfValidStripTECHits",&Cpfcan_numberOfValidStripTECHits_,"Cpfcan_numberOfValidStripTECHits_[n_Cpfcand_]/F"); 
-    //LayersWithMeasuremen
-    addBranch(tree,"Cpfcan_trackerLayersWithMeasurementOld",&Cpfcan_trackerLayersWithMeasurementOld_,"Cpfcan_trackerLayersWithMeasurementOld_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_trackerLayersWithMeasurement",&Cpfcan_trackerLayersWithMeasurement_,"Cpfcan_trackerLayersWithMeasurement_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_pixelLayersWithMeasurementOld",&Cpfcan_pixelLayersWithMeasurementOld_,"Cpfcan_pixelLayersWithMeasurementOld_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_pixelLayersWithMeasurement",&Cpfcan_pixelLayersWithMeasurement_,"Cpfcan_pixelLayersWithMeasurement_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_stripLayersWithMeasurement",&Cpfcan_stripLayersWithMeasurement_,"Cpfcan_stripLayersWithMeasurement_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_pixelBarrelLayersWithMeasurement",&Cpfcan_pixelBarrelLayersWithMeasurement_,"Cpfcan_pixelBarrelLayersWithMeasurement_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_pixelEndcapLayersWithMeasurement",&Cpfcan_pixelEndcapLayersWithMeasurement_,"Cpfcan_pixelEndcapLayersWithMeasurement_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_stripTIBLayersWithMeasurement",&Cpfcan_stripTIBLayersWithMeasurement_,"Cpfcan_stripTIBLayersWithMeasurement_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_stripTIDLayersWithMeasurement",&Cpfcan_stripTIDLayersWithMeasurement_,"Cpfcan_stripTIDLayersWithMeasurement_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_stripTOBLayersWithMeasurement",&Cpfcan_stripTOBLayersWithMeasurement_,"Cpfcan_stripTOBLayersWithMeasurement_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_stripTECLayersWithMeasurement",&Cpfcan_stripTECLayersWithMeasurement_,"Cpfcan_stripTECLayersWithMeasurement_[n_Cpfcand_]/F"); 
-    //Null
-    addBranch(tree,"Cpfcan_trackerLayersNull",&Cpfcan_trackerLayersNull_,"Cpfcan_trackerLayersNull_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_pixelLayersNull",&Cpfcan_pixelLayersNull_,"Cpfcan_pixelLayersNull_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_stripLayersNull",&Cpfcan_stripLayersNull_,"Cpfcan_stripLayersNull_[n_Cpfcand_]/F"); 
-    addBranch(tree,"Cpfcan_pixelBarrelLayersNull",&Cpfcan_pixelBarrelLayersNull_,"Cpfcan_pixelBarrelLayersNull_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_pixelEndcapLayersNull",&Cpfcan_pixelEndcapLayersNull_,"Cpfcan_pixelEndcapLayersNull_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_stripTIBLayersNull",&Cpfcan_stripTIBLayersNull_,"Cpfcan_stripTIBLayersNull_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_stripTIDLayersNull",&Cpfcan_stripTIDLayersNull_,"Cpfcan_stripTIDLayersNull_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_stripTOBLayersNull",&Cpfcan_stripTOBLayersNull_,"Cpfcan_stripTOBLayersNull_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_stripTECLayersNull",&Cpfcan_stripTECLayersNull_,"Cpfcan_stripTECLayersNull_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_vtx_x",&Cpfcan_vtx_x_,"Cpfcan_vtx_x_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_vtx_y",&Cpfcan_vtx_y_,"Cpfcan_vtx_y_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_vtx_z",&Cpfcan_vtx_z_,"Cpfcan_vtx_z_[n_Cpfcand_]/F");
 
-    //Neutral Pf candidates
-    addBranch(tree,"n_Npfcand", &n_Npfcand_,"n_Npfcand_/I");
-    addBranch(tree,"nNpfcand", &nNpfcand_,"nNpfcand/F");
-
-    addBranch(tree,"Npfcan_pt", &Npfcan_pt_,"Npfcan_pt_[n_Npfcand_]/F");
-    addBranch(tree,"Npfcan_eta", &Npfcan_eta_,"Npfcan_eta_[n_Npfcand_]/F");
-    addBranch(tree,"Npfcan_phi", &Npfcan_phi_,"Npfcan_phi_[n_Npfcand_]/F");
-    addBranch(tree,"Npfcan_ptrel", &Npfcan_ptrel_,"Npfcan_ptrel_[n_Npfcand_]/F");
-    addBranch(tree,"Npfcan_e", &Npfcan_e_,"Npfcan_e_[n_Npfcand_]/F");
-    addBranch(tree,"Npfcan_erel", &Npfcan_erel_,"Npfcan_erel_[n_Npfcand_]/F");
-
-    addBranch(tree,"Npfcan_puppiw", &Npfcan_puppiw_,"Npfcan_puppiw_[n_Npfcand_]/F");
-
-
-    addBranch(tree,"Npfcan_phirel",&Npfcan_phirel_,"Npfcan_phirel_[n_Npfcand_]/F");
-    addBranch(tree,"Npfcan_etarel",&Npfcan_etarel_,"Npfcan_etarel_[n_Npfcand_]/F");
-    addBranch(tree,"Npfcan_deltaR",&Npfcan_deltaR_,"Npfcan_deltaR_[n_Npfcand_]/F");
-    addBranch(tree,"Npfcan_isGamma",&Npfcan_isGamma_,"Npfcan_isGamma_[n_Npfcand_]/F");
-    addBranch(tree,"Npfcan_HadFrac",&Npfcan_HadFrac_,"Npfcan_HadFrac_[n_Npfcand_]/F");
-    addBranch(tree,"Npfcan_drminsv",&Npfcan_drminsv_,"Npfcan_drminsv_[n_Npfcand_]/F");
-
-    addBranch(tree,"Npfcan_pdgID",&Npfcan_pdgID_,"Npfcan_pdgID_[n_Npfcand_]/F");
-    addBranch(tree,"Cpfcan_pdgID",&Cpfcan_pdgID_,"Cpfcan_pdgID_[n_Cpfcand_]/F");
-
-    addBranch(tree,"Cpfcan_HadFrac",&Cpfcan_HadFrac_,"Cpfcan_HadFrac_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_CaloFrac",&Cpfcan_CaloFrac_,"Cpfcan_CaloFrac_[n_Cpfcand_]/F");
+  addBranch(tree,"Cpfcan_dist_from_pv",&Cpfcan_dist_from_pv_,"Cpfcan_dist_from_pv_[n_Cpfcand_]/F");
 
 }
 
 void ntuple_pfCands::readEvent(const edm::Event& iEvent){
 
-
+    iEvent.getByToken(ltToken_, LTs);
+    iEvent.getByToken(packedToken_, packed);
+    iEvent.getByToken(prunedToken_, pruned);
     n_Npfcand_=0;
     n_Cpfcand_=0;
 
 }
 
-
-
 //use either of these functions
-
 bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  edm::View<pat::Jet> * coll){
     float etasign = 1.;
     if (jet.eta()<0) etasign =-1.;
@@ -369,7 +361,9 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     GlobalVector jetRefTrackDir(jet.px(),jet.py(),jet.pz());
     const reco::Vertex & pv = vertices()->at(0);
 
-
+    for(const auto &pruned_part : *pruned){
+      if(pruned_part.pdgId()!=2212) {
+	const auto pv_0 = pruned_part.vertex();
 
     std::vector<sorting::sortingClass<size_t> > sortedcharged, sortedneutrals;
 
@@ -394,14 +388,15 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
             }
         }
     }
-		std::sort(sortedcharged.begin(),sortedcharged.end(),sorting::sortingClass<size_t>::compareByABCInv);
+
+    std::sort(sortedcharged.begin(),sortedcharged.end(),sorting::sortingClass<size_t>::compareByABCInv);
     n_Cpfcand_ = std::min(sortedcharged.size(),max_pfcand_);
 
     std::sort(sortedneutrals.begin(),sortedneutrals.end(),sorting::sortingClass<size_t>::compareByABCInv);
     std::vector<size_t> sortedchargedindices,sortedneutralsindices;
     n_Npfcand_ = std::min(sortedneutrals.size(),max_pfcand_);
-		sortedchargedindices=sorting::invertSortingVector(sortedcharged);
-		sortedneutralsindices=sorting::invertSortingVector(sortedneutrals);
+    sortedchargedindices=sorting::invertSortingVector(sortedcharged);
+    sortedneutralsindices=sorting::invertSortingVector(sortedneutrals);
 
     for (unsigned int i = 0; i <  jet.numberOfDaughters(); i++){
         const pat::PackedCandidate* PackedCandidate_ = dynamic_cast<const pat::PackedCandidate*>(jet.daughter(i));
@@ -446,6 +441,46 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 
             size_t fillntupleentry= sortedchargedindices.at(i);
             if(fillntupleentry>=max_pfcand_) continue;
+
+	    int b_tag=-1, c_tag=-1, g_tag=-1;
+	    float dist_from_pv=-1;
+	    float vtx_x=0, vtx_y=0, vtx_z=0;
+
+	    double dR_min=pow10(6);
+
+	    const reco::Candidate * pruned_part_match=nullptr;
+	    for (const auto &packed_part : *packed){
+	      double dR = reco::deltaR(*PackedCandidate_, packed_part);
+	      double dpt = std::abs((PackedCandidate_->pt()- packed_part.pt())/PackedCandidate_->pt());
+
+	      if(dR<0.01 && dpt<0.1 && PackedCandidate_->charge()==packed_part.charge()){
+		if (dR<dR_min) {
+		  pruned_part_match=packed_part.lastPrunedRef().get();
+		}
+	      }
+	    }
+
+	    if (pruned_part_match != nullptr){
+	      c_tag=containParton(pruned_part_match, 4)? 1 : 0;
+	      b_tag=containParton(pruned_part_match, 5)? 1 : 0;
+	      g_tag=containParton(pruned_part_match, 21)? 1 : 0;
+
+	      dist_from_pv= sqrt((pv_0 - pruned_part_match->vertex()).mag2());
+
+	      vtx_x=pruned_part_match->vertex().x();
+	      vtx_y=pruned_part_match->vertex().y();
+	      vtx_z=pruned_part_match->vertex().z();
+	    }
+
+	    Cpfcan_c_tag_[fillntupleentry] = c_tag;
+	    Cpfcan_b_tag_[fillntupleentry] = b_tag;
+	    Cpfcan_g_tag_[fillntupleentry] = g_tag;
+
+	    Cpfcan_vtx_x_[fillntupleentry] = vtx_x;
+	    Cpfcan_vtx_y_[fillntupleentry] = vtx_y;
+	    Cpfcan_vtx_z_[fillntupleentry] = vtx_z;
+
+	    Cpfcan_dist_from_pv_[fillntupleentry] = dist_from_pv;
 
             Cpfcan_pdgID_[fillntupleentry] = pdgid_;
             Cpfcan_pt_[fillntupleentry] = PackedCandidate_->pt();
@@ -538,14 +573,11 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
             Cpfcan_charge_[fillntupleentry] = cand_charge_;
             Cpfcan_lostInnerHits_[fillntupleentry] = catchInfs(PackedCandidate_->lostInnerHits(),2);
 	    Cpfcan_numberOfPixelHits_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfPixelHits(),-1);
-	    //std::cout << PackedCandidate_->lostInnerHits()<< " inner hits " <<std::endl;
-	    //std::cout << PackedCandidate_->numberOfPixelHits()<< " Pixel hits + masked " <<std::endl;
-	    //std::cout <<PackedCandidate_->pixelLayersWithMeasurement()<< " Pixel hits " <<std::endl;
-			Cpfcan_chi2_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? \
-				catchInfsAndBound(PackedCandidate_->pseudoTrack().normalizedChi2(),300,-1,300) : -1;
-			//for some reason this returns the quality enum not a mask.
-			Cpfcan_quality_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? 
-				PackedCandidate_->pseudoTrack().qualityMask() : (1 << reco::TrackBase::loose);
+	    Cpfcan_chi2_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? \
+	      catchInfsAndBound(PackedCandidate_->pseudoTrack().normalizedChi2(),300,-1,300) : -1;
+	    //for some reason this returns the quality enum not a mask.
+	    Cpfcan_quality_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? 
+	      PackedCandidate_->pseudoTrack().qualityMask() : (1 << reco::TrackBase::loose);
             Cpfcan_drminsv_[fillntupleentry] = catchInfsAndBound(drminpfcandsv_,0,-0.4,0,-0.4);
             //hit pattern variables, as defined here https://github.com/cms-sw/cmssw/blob/master/DataFormats/TrackReco/interface/HitPattern.h
             //get track associated to a jet constituent
@@ -657,13 +689,6 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
                 if(p.getLayer(hit)==9) Cpfcan_nhitstripTECLayer9 = Cpfcan_nhitstripTECLayer9+1;
                } 
               }
-              //// expert level: printout the hit in 11-bit binary format
-              //std::cout << "hit in 11-bit binary format = ";
-              //for (int j = 10; j >= 0; j--){
-              //    int bit = (hit >> j) & 0x1;
-              //    std::cout << bit;
-              //}
-              //std::cout << std::endl;
              }
              //Pixel Barrel 
              Cpfcan_nhitpixelBarrelLayer1_[fillntupleentry] = (track_ptr->hitPattern().numberOfValidPixelBarrelHits()) ? catchInfsAndBound(Cpfcan_nhitpixelBarrelLayer1,-1,0,100,0) : -1;
@@ -823,29 +848,16 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
             Npfcan_deltaR_[fillntupleentry] = catchInfsAndBound(reco::deltaR(*PackedCandidate_,jet),0,-0.6,0,-0.6);
             Npfcan_isGamma_[fillntupleentry] = 0;
             if(fabs(PackedCandidate_->pdgId())==22)  Npfcan_isGamma_[fillntupleentry] = 1;
-            //Npfcan_CaloFrac_[fillntupleentry] = PackedCandidate_->caloFraction();
             Npfcan_HadFrac_[fillntupleentry] = PackedCandidate_->hcalFraction();
             Npfcan_pdgID_[fillntupleentry] = pdgid_;
 
             Npfcan_drminsv_[fillntupleentry] = catchInfsAndBound(drminpfcandsv_,0,-0.4,0,-0.4);
 
         }
-
-    } // end loop over jet.numberOfDaughters()
-
-    /*
-    std::cout <<"numbers charged/neutrals"<<std::endl;
-    std::cout << n_Cpfcand_ << std::endl;
-    std::cout << n_Npfcand_ << std::endl;
-    std::cout <<"charged IPs"<<std::endl;
-    for(size_t i=0;i<n_Cpfcand_;i++){
-        std::cout << Cpfcan_BtagPf_trackSip2dSig_[i] << " " << Npfcan_drminsv_[i] << " " << Npfcan_ptrel_[i]<<std::endl;
     }
-    std::cout <<"neutrals minDR"<<std::endl;
-    for(size_t i=0;i<n_Npfcand_;i++){
-        std::cout << Npfcan_drminsv_[i] << " " << Npfcan_ptrel_[i]<<std::endl;
+    break;
+      }
     }
-     */
 
     nCpfcand_=n_Cpfcand_;
     nNpfcand_=n_Npfcand_;
@@ -1013,4 +1025,12 @@ float ntuple_pfCands::mindistsvpfcand(const reco::TransientTrack track) {
     } 
   }
   return out_dist;
+}
+
+bool ntuple_pfCands::containParton(const reco::Candidate * pruned_part, int pdgid) {
+  if (abs(pruned_part->pdgId())==pdgid) return true;
+  for(size_t i=0;i< pruned_part->numberOfMothers();i++){
+    if (containParton(pruned_part->mother(i), pdgid)) return true;
+  }
+  return false;
 }

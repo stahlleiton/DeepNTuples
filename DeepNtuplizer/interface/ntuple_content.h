@@ -19,6 +19,8 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "DataFormats/Candidate/interface/VertexCompositePtrCandidate.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include <iostream>
 #include <math.h>
 #include <iostream>
@@ -34,6 +36,7 @@ public:
 
     virtual void getInput(const edm::ParameterSet& iConfig){}
     virtual void initBranches(TTree* )=0;
+    virtual void readConfig(const edm::ParameterSet& iConfig, edm::ConsumesCollector && cc) {}
     virtual void readEvent(const edm::Event& iEvent)=0;
     virtual void readSetup(const edm::EventSetup& iSetup){}
     //use either of these functions

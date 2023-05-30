@@ -8,6 +8,7 @@
 
 #include "../interface/ntuple_content.h"
 #include "../interface/ntuple_SV.h"
+#include "../interface/ntuple_LT.h"
 #include "../interface/ntuple_JetInfo.h"
 #include "../interface/ntuple_pfCands.h"
 #include "../interface/ntuple_bTagVars.h"
@@ -201,6 +202,10 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
     pfcands->setJetRadius(jetR);
     addModule(pfcands, "pfcands");
 
+    ntuple_LT * LT = new ntuple_LT();
+    LT->setJetRadius(jetR);
+    addModule(LT, "LT");
+
     ntuple_pairwise * pairwise = new ntuple_pairwise();
     pairwise->setJetRadius(jetR);
     addModule(pairwise, "pairwise");
@@ -219,9 +224,10 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
      *
      * parse the input parameters (if any)
      */
-    for(auto& m: modules_)
-        m->getInput(iConfig);
-
+    for(auto& m: modules_){
+      m->readConfig(iConfig, consumesCollector());        
+      m->getInput(iConfig);
+    }
 }
 
 

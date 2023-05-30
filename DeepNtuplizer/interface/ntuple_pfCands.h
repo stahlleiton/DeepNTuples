@@ -12,6 +12,10 @@
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 
+#include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+
 class ntuple_pfCands: public ntuple_content{
  public:
 
@@ -21,6 +25,7 @@ class ntuple_pfCands: public ntuple_content{
   void setJetRadius(const float& radius){jetradius_=radius;}
   void getInput(const edm::ParameterSet& iConfig);
   void initBranches(TTree* );
+  virtual void readConfig(const edm::ParameterSet& iConfig, edm::ConsumesCollector && cc) override;
   void readEvent(const edm::Event& iEvent);
   void readSetup(const edm::EventSetup& iSetup);
 
@@ -35,6 +40,15 @@ class ntuple_pfCands: public ntuple_content{
   float min_candidate_pt_ = -1;
 
   edm::ESHandle<TransientTrackBuilder> builder;
+
+  edm::EDGetTokenT<edm::View<reco::Candidate>> ltToken_;
+  edm::Handle<edm::View<reco::Candidate>> LTs;
+
+  edm::EDGetTokenT<std::vector<pat::PackedGenParticle>> packedToken_;
+  edm::Handle<std::vector<pat::PackedGenParticle>> packed;
+
+  edm::EDGetTokenT<std::vector<reco::GenParticle>> prunedToken_;
+  edm::Handle<std::vector<reco::GenParticle>> pruned;
 
   int n_Cpfcand_;
   float nCpfcand_;
@@ -216,11 +230,22 @@ class ntuple_pfCands: public ntuple_content{
   float  Cpfcan_HadFrac_[max_pfcand_];
   float  Cpfcan_CaloFrac_[max_pfcand_];
 
+  int Cpfcan_c_tag_[max_pfcand_];
+  int Cpfcan_b_tag_[max_pfcand_];
+  int Cpfcan_g_tag_[max_pfcand_];
+
+  float Cpfcan_vtx_x_[max_pfcand_];
+  float Cpfcan_vtx_y_[max_pfcand_];
+  float Cpfcan_vtx_z_[max_pfcand_];
+
+  float Cpfcan_dist_from_pv_[max_pfcand_];
+
   float mindrsvpfcand(const pat::PackedCandidate* pfcand);
   float mindistsvpfcandold(const reco::TransientTrack track);
   float mindistsvpfcand(const reco::TransientTrack track);
   GlobalPoint mingpsvpfcand(const reco::TransientTrack track);
   GlobalPoint gppvpfcand(const reco::TransientTrack track, GlobalVector direction, const reco::Vertex vertex);
+  bool containParton(const reco::Candidate *pruned_part, int pdgid);
 
 };
 
