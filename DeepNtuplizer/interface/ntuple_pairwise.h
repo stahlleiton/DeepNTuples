@@ -79,6 +79,8 @@ private:
     float pair_pca_jetAxis_dEta_[max_pfcand_];
     float pair_pca_jetAxis_dPhi_[max_pfcand_];
 
+    float pfcand_dist_vtx_12_[max_pfcand_];
+
     float mindrsvpfcand(const pat::PackedCandidate* pfcand);
 
 };
