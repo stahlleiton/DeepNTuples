@@ -105,6 +105,8 @@ void ntuple_pairwise::initBranches(TTree* tree){
     addBranch(tree,"pair_pca_jetAxis_dEta", &pair_pca_jetAxis_dEta_,"pair_pca_jetAxis_dEta_[n_Cpfpairs_]/F");
     addBranch(tree,"pair_pca_jetAxis_dPhi", &pair_pca_jetAxis_dPhi_,"pair_pca_jetAxis_dPhi_[n_Cpfpairs_]/F");
 
+    addBranch(tree,"pfcand_dist_vtx_12", &pfcand_dist_vtx_12_,"pfcand_dist_vtx_12_[n_Cpfpairs_]/F");
+
 }
 
 void ntuple_pairwise::readEvent(const edm::Event& iEvent){
@@ -180,6 +182,10 @@ bool ntuple_pairwise::fillBranches(const pat::Jet & jet, const size_t& jetidx, c
 	
 	trkpairinfo.buildTrackPairInfo(it,tt,vertices()->at(0),jet);
 
+	const reco::Candidate * pruned_part_match1 = Part_i_.lastPrunedRef().get();
+        const reco::Candidate * pruned_part_match2 = Part_j_.lastPrunedRef().get();
+	float dist_vtx_12 = sqrt((pruned_part_match1->vertex()- pruned_part_match2->vertex()).mag2());
+
 	pair_pca_distance_[counter] = trkpairinfo.pca_distance();
 	pair_pca_significance_[counter] = trkpairinfo.pca_significance();
 
@@ -214,6 +220,8 @@ bool ntuple_pairwise::fillBranches(const pat::Jet & jet, const size_t& jetidx, c
 	pair_pca_jetAxis_dotprod_[counter] = trkpairinfo.pca_jetAxis_dotprod();
 	pair_pca_jetAxis_dEta_[counter] = trkpairinfo.pca_jetAxis_dEta();
 	pair_pca_jetAxis_dPhi_[counter] = trkpairinfo.pca_jetAxis_dPhi();
+
+	pfcand_dist_vtx_12_[counter] = dist_vtx_12;
 	
 	counter++;
       }
