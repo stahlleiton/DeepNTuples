@@ -8,6 +8,7 @@
 #ifndef DEEPNTUPLES_DEEPNTUPLIZER_INTERFACE_NTUPLE_JETINFO_H_
 #define DEEPNTUPLES_DEEPNTUPLIZER_INTERFACE_NTUPLE_JETINFO_H_
 
+#include <TLorentzVector.h>
 #include "ntuple_content.h"
 #include "TRandom3.h"
 #include <map>
@@ -124,6 +125,33 @@ public:
     TRandom3 TRandom_;
     float gluonReduction_;
 
+    // Generator-level information (GEN particles)
+    std::vector<float>  gen_particle_pt;
+    std::vector<float>  gen_particle_eta;
+    std::vector<float>  gen_particle_phi;
+    std::vector<float>  gen_particle_mass;
+    std::vector<int>    gen_particle_id;
+    std::vector<unsigned int>  gen_particle_status;
+    std::vector<int>    gen_particle_daughters_id;
+    std::vector<unsigned int> gen_particle_daughters_igen;
+    std::vector<unsigned int> gen_particle_daughters_status;
+    std::vector<float>  gen_particle_daughters_pt;
+    std::vector<float>  gen_particle_daughters_eta;
+    std::vector<float>  gen_particle_daughters_phi;
+    std::vector<float>  gen_particle_daughters_mass;
+    std::vector<int>    gen_particle_daughters_charge;
+
+    // Gen leptons from resonance decay 
+    std::vector<TLorentzVector> genLepFromResonance4V_;
+    std::vector<TLorentzVector> genMuonsFromResonance4V_;
+    std::vector<TLorentzVector> genElectronsFromResonance4V_;
+    std::vector<TLorentzVector> tau_gen_visible_;
+    std::vector<TLorentzVector> tau_gen_;
+    std::vector<int> tau_gen_charge_;
+    std::vector<unsigned int> tau_gen_nch_;
+    std::vector<unsigned int> tau_gen_np0_;
+    std::vector<unsigned int> tau_gen_nnh_;
+
     std::vector <reco::GenParticle> neutrinosLepB;
     std::vector <reco::GenParticle> neutrinosLepB_C;
 
@@ -156,6 +184,8 @@ public:
     int isUD_;
     int isS_;
     int isG_;
+    int isMU_;
+    int isELE_;
     int isPU_;
     int isUndefined_;
     float genDecay_;

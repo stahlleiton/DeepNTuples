@@ -17,7 +17,7 @@ options.register('reportEvery', 1000, VarParsing.VarParsing.multiplicity.singlet
 options.register('gluonReduction', 0.0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.float, "gluon reduction")
 options.register('selectJets', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "select jets with good gen match")
 options.register('phase2', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "apply jet selection for phase 2. Currently sets JetEtaMax to 3.0 and picks slimmedJetsPuppi as jet collection.")
-options.register('puppi', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use puppi jets")
+options.register('puppi', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use puppi jets")
 options.register('eta', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use eta up to 5.0")
 
 
@@ -95,7 +95,9 @@ bTagInfos = ['pfDeepFlavourTagInfos',
              'pfImpactParameterTagInfos',
              'pfInclusiveSecondaryVertexFinderTagInfos',
              'pfParticleNetAK4TagInfos',] #['pfParticleTransformerAK4TagInfos',]
+
 from RecoBTag.ONNXRuntime.pfParticleNetAK4_cff import _pfParticleNetAK4JetTagsAll as pfParticleNetAK4JetTagsAll
+from RecoBTag.ONNXRuntime.pfParticleNetFromMiniAODAK4_cff import _pfParticleNetFromMiniAODAK4PuppiCentralJetTagsProbs
 
 if (int(releases[0])>8) or ( (int(releases[0])==8) and (int(releases[1]) >= 4) ) :
  bTagDiscriminators = [
@@ -109,13 +111,13 @@ if (int(releases[0])>8) or ( (int(releases[0])==8) and (int(releases[1]) >= 4) )
      'pfDeepFlavourJetTags:probc',
      'pfDeepFlavourJetTags:probuds',
      'pfDeepFlavourJetTags:probg',
-#     'pfParticleTransformerAK4JetTags:probb',
- #    'pfParticleTransformerAK4JetTags:probbb',
-  #   'pfParticleTransformerAK4JetTags:problepb',
-   #  'pfParticleTransformerAK4JetTags:probc',
-    # 'pfParticleTransformerAK4JetTags:probuds',
-     #'pfParticleTransformerAK4JetTags:probg',
- ] #+ pfParticleNetAK4JetTagsAll
+     'pfParticleTransformerAK4JetTags:probb',
+     'pfParticleTransformerAK4JetTags:probbb',
+     'pfParticleTransformerAK4JetTags:problepb',
+     'pfParticleTransformerAK4JetTags:probc',
+     'pfParticleTransformerAK4JetTags:probuds',
+     'pfParticleTransformerAK4JetTags:probg',
+ ] + _pfParticleNetFromMiniAODAK4PuppiCentralJetTagsProbs #+ pfParticleNetAK4JetTagsAll
 else :
   bTagDiscriminators = [
       'pfDeepCSVJetTags:probudsg', #to be fixed with new names
@@ -129,13 +131,13 @@ else :
       'pfDeepFlavourJetTags:probc',
       'pfDeepFlavourJetTags:probuds',
       'pfDeepFlavourJetTags:probg',
-#      'pfParticleTransformerAK4JetTags:probb',
- #     'pfParticleTransformerAK4JetTags:probbb',
-  #    'pfParticleTransformerAK4JetTags:problepb',
-   #   'pfParticleTransformerAK4JetTags:probc',
-    #  'pfParticleTransformerAK4JetTags:probuds',
-     # 'pfParticleTransformerAK4JetTags:probg',
- ] #+ pfParticleNetAK4JetTagsAll
+      'pfParticleTransformerAK4JetTags:probb',
+      'pfParticleTransformerAK4JetTags:probbb',
+      'pfParticleTransformerAK4JetTags:problepb',
+      'pfParticleTransformerAK4JetTags:probc',
+      'pfParticleTransformerAK4JetTags:probuds',
+      'pfParticleTransformerAK4JetTags:probg',
+ ] + _pfParticleNetFromMiniAODAK4PuppiCentralJetTagsProbs #+ pfParticleNetAK4JetTagsAll
 
 jetCorrectionsAK4 = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 

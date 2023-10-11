@@ -9,14 +9,17 @@
 #include "DataFormats/PatCandidates/interface/Electron.h"
 
 namespace deep_ntuples {
-  enum JetFlavor {UNDEFINED, G, UD, S, C, GCC, CC, B, GBB, BB, LeptonicB, LeptonicB_C, TAU, PU};
+  enum JetFlavor {UNDEFINED, G, UD, S, C, GCC, CC, B, GBB, BB, LeptonicB, LeptonicB_C, MU, ELE, TAU, PU};
     JetFlavor jet_flavour(const pat::Jet& jet,
-            const std::vector<reco::GenParticle>& gToBB,
-            const std::vector<reco::GenParticle>& gToCC,
-            const std::vector<reco::GenParticle>& neutrinosLepB,
-            const std::vector<reco::GenParticle>& neutrinosLepB_C,
-            const std::vector<reco::GenParticle>& alltaus,
-            bool usePhysForLightAndUndefined=false);
+			  const std::vector<reco::GenParticle>& gToBB,
+			  const std::vector<reco::GenParticle>& gToCC,
+			  const std::vector<reco::GenParticle>& neutrinosLepB,
+			  const std::vector<reco::GenParticle>& neutrinosLepB_C,
+			  const std::vector<reco::GenParticle>& alltaus,
+			  int pos_matched_genmu,
+			  int pos_matched_genele,
+			  int pos_matched_tauh,
+			  bool usePhysForLightAndUndefined=false);
     std::vector<std::size_t> jet_muonsIds(const pat::Jet& jet, const std::vector<pat::Muon>& event_muons); 
     std::vector<std::size_t> jet_electronsIds(const pat::Jet& jet, const std::vector<pat::Electron>& event_electrons); 
 }

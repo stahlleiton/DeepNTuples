@@ -22,12 +22,15 @@ std::vector<std::size_t> jet_electronsIds(const pat::Jet& jet, const std::vector
 }
 
 JetFlavor jet_flavour(const pat::Jet& jet,
-        const std::vector<reco::GenParticle>& gToBB,
-        const std::vector<reco::GenParticle>& gToCC,
-        const std::vector<reco::GenParticle>& neutrinosLepB,
-        const std::vector<reco::GenParticle>& neutrinosLepB_C,
-        const std::vector<reco::GenParticle>& alltaus,
-        bool usePhysForLightAndUndefined) { 
+		      const std::vector<reco::GenParticle>& gToBB,
+		      const std::vector<reco::GenParticle>& gToCC,
+		      const std::vector<reco::GenParticle>& neutrinosLepB,
+		      const std::vector<reco::GenParticle>& neutrinosLepB_C,
+		      const std::vector<reco::GenParticle>& alltaus,
+		      int pos_matched_genmu,
+		      int pos_matched_genele,
+		      int pos_matched_tauh,
+		      bool usePhysForLightAndUndefined) { 
     int hflav = abs(jet.hadronFlavour());
     int pflav = abs(jet.partonFlavour());
     int physflav = 0;
@@ -55,9 +58,15 @@ JetFlavor jet_flavour(const pat::Jet& jet,
         if (dr < 0.4) ++ncFromGSP;
     }
 
-    //std::cout << " jet pt = " << jet.pt() << " hfl = " << hflav << " pfl = " << pflav << " genpart = " << physflav
-            //  << " nbFromGSP = " << nbFromGSP << " ncFromGSP = " << ncFromGSP
-    //  << " nBhadrons " << nbs << " nCHadrons " << ncs << std::endl;
+    if(pos_matched_genmu >= 0){
+      return JetFlavor::MU;
+    }
+    if(pos_matched_genele >= 0){
+      return JetFlavor::ELE;
+    }
+    if(pos_matched_tauh >= 0){
+      return JetFlavor::TAU;
+    }
 
     if(hflav == 5) { //B jet
         if(nbs > 1) {
