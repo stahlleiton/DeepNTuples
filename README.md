@@ -2,17 +2,17 @@
 NTuple framework for DeepFlavour
 
 
-Installation (CMSSW 12_6_0)
+Installation (CMSSW 13_0_8)
 ============
 
 ```
-cmsrel CMSSW_12_6_0
-cd CMSSW_12_6_0/src/
+cmsrel CMSSW_13_0_8
+cd CMSSW_13_0_8/src/
 cmsenv
 git cms-init
 git clone https://github.com/AlexDeMoor/DeepNTuples
 cd DeepNTuples
-git checkout 12_6_0
+git checkout 13_0_8
 # Add JetToolBox
 git submodule init
 git submodule update
