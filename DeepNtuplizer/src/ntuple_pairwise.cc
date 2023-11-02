@@ -182,10 +182,10 @@ bool ntuple_pairwise::fillBranches(const pat::Jet & jet, const size_t& jetidx, c
 	
 	trkpairinfo.buildTrackPairInfo(it,tt,vertices()->at(0),jet);
 
-	const reco::Candidate * pruned_part_match1 = Part_i_.lastPrunedRef().get();
-        const reco::Candidate * pruned_part_match2 = Part_j_.lastPrunedRef().get();
-	float dist_vtx_12 = sqrt((pruned_part_match1->vertex()- pruned_part_match2->vertex()).mag2());
-
+	//const reco::Candidate * pruned_part_match1 = Part_i_.lastPrunedRef().get();
+        //const reco::Candidate * pruned_part_match2 = Part_j_.lastPrunedRef().get();
+	float dist_vtx_12 = -1.0; //sqrt((pruned_part_match1->vertex()- pruned_part_match2->vertex()).mag2());
+	      
 	pair_pca_distance_[counter] = trkpairinfo.pca_distance();
 	pair_pca_significance_[counter] = trkpairinfo.pca_significance();
 
