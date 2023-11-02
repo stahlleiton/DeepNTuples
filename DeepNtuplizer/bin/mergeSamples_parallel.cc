@@ -40,8 +40,8 @@
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_JetInfo.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_pfCands.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_SV.h"
-// AS #include "DeepNTuples/DeepNtuplizer/interface/ntuple_GraphB.h"
-// AS #include "DeepNTuples/DeepNtuplizer/interface/ntuple_pixelclusters.h"
+#include "DeepNTuples/DeepNtuplizer/interface/ntuple_LT.h"
+#include "DeepNTuples/DeepNtuplizer/interface/ntuple_pairwise.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_FatJetInfo.h"
 
 #include <dirent.h>
@@ -123,10 +123,10 @@ std::vector<TChain* > createChains(const std::vector<std::vector<TString> >& inf
 
     branchinfos.push_back(new ntuple_JetInfo());
     branchinfos.push_back(new ntuple_SV());
+    branchinfos.push_back(new ntuple_LT());
     branchinfos.push_back(new ntuple_bTagVars());
     branchinfos.push_back(new ntuple_pfCands());
-    // AS branchinfos.push_back(new ntuple_GraphB());
-    // AS branchinfos.push_back(new ntuple_pixelclusters());
+    branchinfos.push_back(new ntuple_pairwise());
     branchinfos.push_back(new ntuple_FatJetInfo());
 
     std::vector<TChain* > chains;
@@ -170,12 +170,6 @@ void prepareSplitting(const std::vector<std::vector<TString> >& infiles,
     std::vector<TChain* > chains = createChains(infiles,
             branchinfos,
             entriesperchain,totalentries);
-
-    //std::cout << "setting up trees... \nPlease ignore wrong branch type errors - they do no harm." <<std::endl;
-    //read in files
-
-
-
 
     //create "binning"
     fractions=std::vector<double>(chains.size());

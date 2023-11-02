@@ -53,6 +53,9 @@ private:
     static constexpr size_t max_pfcand_=50;
 
     float  Cpfcan_pt_[max_pfcand_];
+    float  Cpfcan_px_[max_pfcand_];
+    float  Cpfcan_py_[max_pfcand_];
+    float  Cpfcan_pz_[max_pfcand_];
     float  Cpfcan_eta_[max_pfcand_];
     float  Cpfcan_phi_[max_pfcand_];
     float  Cpfcan_ptrel_[max_pfcand_];
@@ -63,6 +66,7 @@ private:
     float  Cpfcan_deltaR_[max_pfcand_];
     float  Cpfcan_puppiw_[max_pfcand_];
     float  Cpfcan_VTX_ass_[max_pfcand_];
+    float  Cpfcan_firsthit_[max_pfcand_];
 
     float  Cpfcan_fromPV_[max_pfcand_];
 
@@ -195,6 +199,9 @@ private:
     //Neutral Pf candidates
     float  nNpfcand_;
     float  Npfcan_pt_[max_pfcand_];
+    float  Npfcan_px_[max_pfcand_];
+    float  Npfcan_py_[max_pfcand_];
+    float  Npfcan_pz_[max_pfcand_];
     float  Npfcan_eta_[max_pfcand_];
     float  Npfcan_phi_[max_pfcand_];
     float  Npfcan_ptrel_[max_pfcand_];

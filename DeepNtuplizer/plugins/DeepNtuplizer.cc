@@ -13,6 +13,8 @@
 #include "../interface/ntuple_pfCands.h"
 #include "../interface/ntuple_bTagVars.h"
 #include "../interface/ntuple_FatJetInfo.h"
+#include "../interface/ntuple_pairwise.h"
+#include "../interface/ntuple_LT.h"
 //ROOT includes
 #include "TTree.h"
 #include <TFile.h>
@@ -117,9 +119,10 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   pixHitsToken_(consumes< edm::View<reco::BaseTagInfo> > (iConfig.getParameter<edm::InputTag>("pixelhit"))),
   t_qgtagger(iConfig.getParameter<std::string>("qgtagger"))
 {
+
   /*
    *  Initialise the modules here
-   *  Everything else does not eed to be changed if
+   *  Everything else does not need to be changed if
    *  modules don't interact.
    */
 
@@ -141,34 +144,6 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
       esConsumes<TransientTrackBuilder, TransientTrackRecord>(
                           edm::ESInputTag("", "TransientTrackBuilder")));
   addModule(svmodule, "SVNtuple");
-
-  //Loose IVF vertices
-  //ntuple_SV* svmodule_LooseIVF=new ntuple_SV("LooseIVF_", jetR);
-  //svmodule_LooseIVF->setSVToken(
-  //        consumes<reco::VertexCompositePtrCandidateCollection>(
-  //                iConfig.getParameter<edm::InputTag>("LooseSVs")));
-  //removed LooseIVF module
-  //addModule(svmodule_LooseIVF);
-
-  // DeepVertex info
-  /*
-    if (runDeepVertex_){
-
-        ntuple_DeepVertex* deepvertexmodule=new ntuple_DeepVertex(jetR);
-	deepvertexmodule->setCandidatesToken(consumes<edm::View<pat::PackedCandidate> >(iConfig.getParameter<edm::InputTag>("candidates")));
-	addModule(deepvertexmodule);
-
-    }
-  */
-
-  // AS ntuple_GraphB* deepvertexmodule=new ntuple_GraphB(jetR);
-  // AS deepvertexmodule->setCandidatesToken(consumes<edm::View<pat::PackedCandidate> >(iConfig.getParameter<edm::InputTag>("candidates")));
-  // AS addModule(deepvertexmodule, "DeepVertextuple");
-
-  // AS ntuple_pixelclusters* pixelclustersmodule=new ntuple_pixelclusters(jetR);
-  //pixelclustersmodule->setPixelHits(consumes<edmNew::DetSetVector<SiPixelCluster> >(iConfig.getParameter<edm::InputTag>("pixelhit")));
-  // AS addModule(pixelclustersmodule, "pixelclusterstuple");
-
 
   ntuple_JetInfo* jetinfo=new ntuple_JetInfo();
   jetinfo->setQglToken(consumes<edm::ValueMap<float>>(edm::InputTag(t_qgtagger, "qgLikelihood")));
@@ -193,10 +168,25 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   pfcands->setTrackBuilderToken(
       esConsumes<TransientTrackBuilder, TransientTrackRecord>(
                           edm::ESInputTag("", "TransientTrackBuilder")));
-  // AS    track_builder_token_(
-  // AS         esConsumes<TransientTrackBuilder, TransientTrackRecord>(edm::ESInputTag("", "TransientTrackBuilder")));
 
   addModule(pfcands, "pfcands");
+
+  ntuple_LT * LT = new ntuple_LT();
+  LT->setJetRadius(jetR);
+  LT->setTrackBuilderToken(
+      esConsumes<TransientTrackBuilder, TransientTrackRecord>(
+                          edm::ESInputTag("", "TransientTrackBuilder")));
+  LT->setLTToken(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("losttracks")));
+
+  addModule(LT, "LT");
+
+  ntuple_pairwise * pairwise = new ntuple_pairwise();
+  pairwise->setJetRadius(jetR);
+  pairwise->setTrackBuilderToken(
+      esConsumes<TransientTrackBuilder, TransientTrackRecord>(
+                          edm::ESInputTag("", "TransientTrackBuilder")));
+
+  addModule(pairwise, "pairwise");
 
   addModule(new ntuple_bTagVars(), "bTagVars");
 
@@ -206,12 +196,14 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
     fatjetinfo->setFatJetToken(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjets")));
     addModule(fatjetinfo, "fatJets");
   }
+
   /*
    *
    * Modules initialized
    *
    * parse the input parameters (if any)
    */
+
   for(auto& m: modules_)
     m->getInput(iConfig);
 

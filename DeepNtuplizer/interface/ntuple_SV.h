@@ -47,6 +47,9 @@ private:
     static constexpr size_t max_sv=10;
 
     float sv_pt_[max_sv];
+    float sv_px_[max_sv];
+    float sv_py_[max_sv];
+    float sv_pz_[max_sv];
     float sv_eta_[max_sv];
     float sv_phi_[max_sv];
     float sv_e_[max_sv];

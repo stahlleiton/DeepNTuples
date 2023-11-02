@@ -168,6 +168,9 @@ void ntuple_SV::initBranches(TTree* tree){
     addBranch(tree,(prefix_+"n_sv").c_str()         ,&sv_num_         ,(prefix_+"sv_num_/I").c_str()     );
     addBranch(tree,(prefix_+"nsv").c_str()          ,&nsv_          ,(prefix_+"nsv_/F").c_str()         );
     addBranch(tree,(prefix_+"sv_pt").c_str()          ,&sv_pt_          ,(prefix_+"sv_pt_["+prefix_+"sv_num_]/F").c_str()        );
+    addBranch(tree,(prefix_+"sv_px").c_str()          ,&sv_px_          ,(prefix_+"sv_px_["+prefix_+"sv_num_]/F").c_str()        );
+    addBranch(tree,(prefix_+"sv_py").c_str()          ,&sv_py_          ,(prefix_+"sv_py_["+prefix_+"sv_num_]/F").c_str()        );
+    addBranch(tree,(prefix_+"sv_pz").c_str()          ,&sv_pz_          ,(prefix_+"sv_pz_["+prefix_+"sv_num_]/F").c_str()        );
     addBranch(tree,(prefix_+"sv_eta").c_str()          ,&sv_eta_          ,(prefix_+"sv_eta_["+prefix_+"sv_num_]/F").c_str()        );
     addBranch(tree,(prefix_+"sv_phi").c_str()          ,&sv_phi_          ,(prefix_+"sv_phi_["+prefix_+"sv_num_]/F").c_str()        );
     addBranch(tree,(prefix_+"sv_e").c_str()          ,&sv_e_          ,(prefix_+"sv_e_["+prefix_+"sv_num_]/F").c_str()        );
@@ -261,6 +264,9 @@ bool ntuple_SV::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  
 
 
             sv_pt_[sv_num_]           = sv.pt();
+            sv_px_[sv_num_]           = sv.px();
+            sv_py_[sv_num_]           = sv.py();
+            sv_pz_[sv_num_]           = sv.pz();
             sv_eta_[sv_num_]          = sv.eta();
             sv_phi_[sv_num_]          = sv.phi();
             sv_etarel_[sv_num_]       = catchInfsAndBound(fabs(sv.eta()-jet.eta())-0.5,0,-2,0);
