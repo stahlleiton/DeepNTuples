@@ -198,6 +198,9 @@ void ntuple_pfCands::initBranches(TTree* tree){
     addBranch(tree,"sjet_jetNTracksEtaRel", &sjet_jetNTracksEtaRel_,"sjet_jetNTracksEtaRel_/F");*/
 
     addBranch(tree,"Cpfcan_pt", &Cpfcan_pt_,"Cpfcan_pt_[n_Cpfcand_]/F");
+    addBranch(tree,"Cpfcan_px", &Cpfcan_px_,"Cpfcan_px_[n_Cpfcand_]/F");
+    addBranch(tree,"Cpfcan_py", &Cpfcan_py_,"Cpfcan_py_[n_Cpfcand_]/F");
+    addBranch(tree,"Cpfcan_pz", &Cpfcan_pz_,"Cpfcan_pz_[n_Cpfcand_]/F");
     addBranch(tree,"Cpfcan_eta", &Cpfcan_eta_,"Cpfcan_eta_[n_Cpfcand_]/F");
     addBranch(tree,"Cpfcan_phi", &Cpfcan_phi_,"Cpfcan_phi_[n_Cpfcand_]/F");
     addBranch(tree,"Cpfcan_ptrel", &Cpfcan_ptrel_,"Cpfcan_ptrel_[n_Cpfcand_]/F");
@@ -215,6 +218,7 @@ void ntuple_pfCands::initBranches(TTree* tree){
     addBranch(tree,"Cpfcan_dz",&Cpfcan_dz_,"Cpfcan_dz_[n_Cpfcand_]/F");
 
     addBranch(tree,"Cpfcan_VTX_ass",&Cpfcan_VTX_ass_,"Cpfcan_VTX_ass_[n_Cpfcand_]/F");
+    addBranch(tree,"Cpfcan_firsthit",&Cpfcan_firsthit_,"Cpfcan_firsthit_[n_Cpfcand_]/F");
 
     addBranch(tree,"Cpfcan_fromPV",&Cpfcan_fromPV_,"Cpfcan_fromPV_[n_Cpfcand_]/F");
 
@@ -329,6 +333,9 @@ void ntuple_pfCands::initBranches(TTree* tree){
     addBranch(tree,"nNpfcand", &nNpfcand_,"nNpfcand/F");
 
     addBranch(tree,"Npfcan_pt", &Npfcan_pt_,"Npfcan_pt_[n_Npfcand_]/F");
+    addBranch(tree,"Npfcan_px", &Npfcan_px_,"Npfcan_px_[n_Npfcand_]/F");
+    addBranch(tree,"Npfcan_py", &Npfcan_py_,"Npfcan_py_[n_Npfcand_]/F");
+    addBranch(tree,"Npfcan_pz", &Npfcan_pz_,"Npfcan_pz_[n_Npfcand_]/F");
     addBranch(tree,"Npfcan_eta", &Npfcan_eta_,"Npfcan_eta_[n_Npfcand_]/F");
     addBranch(tree,"Npfcan_phi", &Npfcan_phi_,"Npfcan_phi_[n_Npfcand_]/F");
     addBranch(tree,"Npfcan_ptrel", &Npfcan_ptrel_,"Npfcan_ptrel_[n_Npfcand_]/F");
@@ -448,6 +455,9 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 
             Cpfcan_pdgID_[fillntupleentry] = pdgid_;
             Cpfcan_pt_[fillntupleentry] = PackedCandidate_->pt();
+            Cpfcan_px_[fillntupleentry] = PackedCandidate_->px();
+            Cpfcan_py_[fillntupleentry] = PackedCandidate_->py();
+            Cpfcan_pz_[fillntupleentry] = PackedCandidate_->pz();
             Cpfcan_eta_[fillntupleentry] = PackedCandidate_->eta();
             Cpfcan_phi_[fillntupleentry] = PackedCandidate_->phi();
             Cpfcan_ptrel_[fillntupleentry] = catchInfsAndBound(PackedCandidate_->pt()/jet_uncorr_pt,0,-1,0,-1);
@@ -457,6 +467,7 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
             Cpfcan_etarel_[fillntupleentry] = catchInfsAndBound(fabs(PackedCandidate_->eta()-jet.eta()),0,-2,0,-0.5);
             Cpfcan_deltaR_[fillntupleentry] =catchInfsAndBound(reco::deltaR(*PackedCandidate_,jet),0,-0.6,0,-0.6);
             Cpfcan_dxy_[fillntupleentry] = catchInfsAndBound(fabs(PackedCandidate_->dxy()),0,-50,50);
+	    Cpfcan_firsthit_[fillntupleentry] = PackedCandidate_->firstHit();
 
             Cpfcan_dxyerrinv_[fillntupleentry]= PackedCandidate_->hasTrackDetails() ? catchInfsAndBound(1/PackedCandidate_->dxyError(),0,-1, 10000.) : -1;
 
@@ -818,6 +829,9 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
             if(fillntupleentry>=max_pfcand_) continue;
 
             Npfcan_pt_[fillntupleentry] = PackedCandidate_->pt();
+            Npfcan_px_[fillntupleentry] = PackedCandidate_->px();
+            Npfcan_py_[fillntupleentry] = PackedCandidate_->py();
+            Npfcan_pz_[fillntupleentry] = PackedCandidate_->pz();
             Npfcan_eta_[fillntupleentry] = PackedCandidate_->eta();
             Npfcan_phi_[fillntupleentry] = PackedCandidate_->phi();
             Npfcan_ptrel_[fillntupleentry] = catchInfsAndBound(PackedCandidate_->pt()/jet_uncorr_pt,0,-1,0,-1);

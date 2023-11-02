@@ -40,8 +40,8 @@
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_JetInfo.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_pfCands.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_SV.h"
-// AS #include "DeepNTuples/DeepNtuplizer/interface/ntuple_GraphB.h"
-// AS #include "DeepNTuples/DeepNtuplizer/interface/ntuple_pixelclusters.h"
+#include "DeepNTuples/DeepNtuplizer/interface/ntuple_LT.h"
+#include "DeepNTuples/DeepNtuplizer/interface/ntuple_pairwise.h"
  
 #include <dirent.h>
 #include <stdlib.h>
@@ -99,12 +99,10 @@ int main(int argc, char *argv[]){
     std::vector<ntuple_content*> branchinfos;
     branchinfos.push_back(new ntuple_JetInfo());
     branchinfos.push_back(new ntuple_SV());
+    branchinfos.push_back(new ntuple_LT());
     branchinfos.push_back(new ntuple_bTagVars());
     branchinfos.push_back(new ntuple_pfCands());
-    // AS branchinfos.push_back(new ntuple_GraphB());
-    // AS branchinfos.push_back(new ntuple_pixelclusters());
-
-
+    branchinfos.push_back(new ntuple_pairwise());
 
     //simple opt parsing
     TString helpmessage="\n\
