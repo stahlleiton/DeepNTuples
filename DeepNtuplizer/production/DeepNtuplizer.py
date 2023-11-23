@@ -117,7 +117,7 @@ if (int(releases[0])>8) or ( (int(releases[0])==8) and (int(releases[1]) >= 4) )
      'pfParticleTransformerAK4JetTags:probc',
      'pfParticleTransformerAK4JetTags:probuds',
      'pfParticleTransformerAK4JetTags:probg',
- ] + _pfParticleNetFromMiniAODAK4PuppiCentralJetTagsProbs #+ pfParticleNetAK4JetTagsAll
+ ] + _pfParticleNetFromMiniAODAK4PuppiCentralJetTagsProbs + pfParticleNetAK4JetTagsAll
 else :
   bTagDiscriminators = [
       'pfDeepCSVJetTags:probudsg', #to be fixed with new names
@@ -137,7 +137,7 @@ else :
       'pfParticleTransformerAK4JetTags:probc',
       'pfParticleTransformerAK4JetTags:probuds',
       'pfParticleTransformerAK4JetTags:probg',
- ] + _pfParticleNetFromMiniAODAK4PuppiCentralJetTagsProbs #+ pfParticleNetAK4JetTagsAll
+ ] + _pfParticleNetFromMiniAODAK4PuppiCentralJetTagsProbs + pfParticleNetAK4JetTagsAll
 
 jetCorrectionsAK4 = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 
