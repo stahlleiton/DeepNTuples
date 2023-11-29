@@ -12,7 +12,7 @@ cmsenv
 git cms-init
 git clone https://github.com/AlexDeMoor/DeepNTuples
 cd DeepNTuples
-git checkout 106X
+git checkout s_tagging_106X
 # Add JetToolBox
 git submodule init
 git submodule update
