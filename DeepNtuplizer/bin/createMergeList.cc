@@ -37,8 +37,6 @@
 #include "TCanvas.h"
 #include <ctime>
 
-
-
 #include <dirent.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -46,12 +44,6 @@
 #include "TROOT.h"
 #include <stdio.h>
 #include "../interface/mergeDescriptor.h"
-
-
-
-
-
-
 
 std::vector<TString> readSampleFile(const TString& file, const TString& addpath){
     std::string line;
@@ -67,8 +59,6 @@ std::vector<TString> readSampleFile(const TString& file, const TString& addpath)
         throw std::runtime_error("could not read file");
     return out;
 }
-
-
 
 mergeDescriptor prepareSplitting(const std::vector<std::vector<TString> >& infiles,
         const size_t entriesperfile,const TString& outpath){
@@ -86,9 +76,6 @@ mergeDescriptor prepareSplitting(const std::vector<std::vector<TString> >& infil
 
     //std::cout << "setting up trees... \nPlease ignore wrong branch type errors - they do no harm." <<std::endl;
     //read in files
-
-
-
 
     //create "binning"
     out.fractions=std::vector<double>(chains.size());

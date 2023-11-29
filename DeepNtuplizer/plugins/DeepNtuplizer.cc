@@ -8,6 +8,8 @@
 
 #include "../interface/ntuple_content.h"
 #include "../interface/ntuple_SV.h"
+#include "../interface/ntuple_V0Ks.h"
+#include "../interface/ntuple_V0lambda.h"
 #include "../interface/ntuple_LT.h"
 #include "../interface/ntuple_JetInfo.h"
 #include "../interface/ntuple_pfCands.h"
@@ -79,11 +81,12 @@ private:
     Measurement1D vertexD3d(const reco::VertexCompositePtrCandidate &sv, const reco::Vertex &pv) const ;
     float vertexDdotP(const reco::VertexCompositePtrCandidate &sv, const reco::Vertex &pv) const ;
 
-
     // ----------member data ---------------------------
     edm::EDGetTokenT<reco::VertexCollection> vtxToken_;
     edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> svToken_;
-    edm::EDGetTokenT<edm::View<pat::Jet> >      jetToken_;
+    edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> v0KsToken_;
+    edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> v0LambdaToken_;
+    edm::EDGetTokenT<edm::View<pat::Jet> > jetToken_;
     edm::EDGetTokenT<std::vector<PileupSummaryInfo>> puToken_;
     edm::EDGetTokenT<double> rhoToken_;
 
@@ -99,23 +102,24 @@ private:
 
 	ntuple_content * addModule(ntuple_content *m, std::string name = ""){
         modules_.push_back(m);
-				module_names_.push_back(name);
+	module_names_.push_back(name);
         return m;
     }
     std::vector<ntuple_content* > modules_;
-	std::vector<std::string> module_names_;
+    std::vector<std::string> module_names_;
 
     bool applySelection_;
 };
 
 DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
                             vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
-                            svToken_(consumes<reco::VertexCompositePtrCandidateCollection>(
-                                    iConfig.getParameter<edm::InputTag>("secVertices"))),
-                                    jetToken_(consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("jets"))),
-                                    puToken_(consumes<std::vector<PileupSummaryInfo >>(iConfig.getParameter<edm::InputTag>("pupInfo"))),
-                                    rhoToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("rhoInfo"))),
-                                    t_qgtagger(iConfig.getParameter<std::string>("qgtagger"))
+                            svToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getParameter<edm::InputTag>("secVertices"))),
+                            v0KsToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getParameter<edm::InputTag>("V0_ks"))),
+                            v0LambdaToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getParameter<edm::InputTag>("V0_lambda"))),
+			    jetToken_(consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("jets"))),
+			    puToken_(consumes<std::vector<PileupSummaryInfo >>(iConfig.getParameter<edm::InputTag>("pupInfo"))),
+			    rhoToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("rhoInfo"))),
+                            t_qgtagger(iConfig.getParameter<std::string>("qgtagger"))
 {
     /*
      *  Initialise the modules here
@@ -138,6 +142,12 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
 
     ntuple_SV* svmodule=new ntuple_SV("", jetR);
     addModule(svmodule, "SVNtuple");
+
+    ntuple_V0Ks* v0ksmodule=new ntuple_V0Ks("", jetR);
+    addModule(v0ksmodule, "V0KsNtuple");
+
+    ntuple_V0lambda* v0lambdamodule=new ntuple_V0lambda("", jetR);
+    addModule(v0lambdamodule, "V0lambdaNtuple");
 
     //Loose IVF vertices
     //ntuple_SV* svmodule_LooseIVF=new ntuple_SV("LooseIVF_", jetR);
@@ -253,6 +263,12 @@ DeepNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     edm::Handle<std::vector<reco::VertexCompositePtrCandidate> > secvertices;
     iEvent.getByToken(svToken_, secvertices);
 
+    edm::Handle<std::vector<reco::VertexCompositePtrCandidate> > v0_ks;
+    iEvent.getByToken(v0KsToken_, v0_ks);
+
+    edm::Handle<std::vector<reco::VertexCompositePtrCandidate> > v0_lambda;
+    iEvent.getByToken(v0LambdaToken_, v0_lambda);
+
     edm::Handle<std::vector<PileupSummaryInfo> > pupInfo;
     iEvent.getByToken(puToken_, pupInfo);
 
@@ -265,6 +281,8 @@ DeepNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     for(auto& m:modules_){
         m->setPrimaryVertices(vertices.product());
         m->setSecVertices(secvertices.product());
+        m->setV0ks(v0_ks.product());
+        m->setV0lambda(v0_lambda.product());
         m->setPuInfo(pupInfo.product());
         m->setRhoInfo(rhoInfo.product());
         m->readSetup(iSetup);

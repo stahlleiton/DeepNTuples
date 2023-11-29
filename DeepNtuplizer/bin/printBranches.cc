@@ -2,6 +2,8 @@
 
 #include "../interface/ntuple_JetInfo.h"
 #include "../interface/ntuple_SV.h"
+#include "../interface/ntuple_V0Ks.h"
+#include "../interface/ntuple_V0lambda.h"
 #include "../interface/ntuple_LT.h"
 #include "../interface/ntuple_bTagVars.h"
 #include "../interface/ntuple_pfCands.h"
@@ -23,6 +25,8 @@ int main(int argc, char *argv[]) {
     std::vector<ntuple_content*> branchinfos;
     branchinfos.push_back(new ntuple_JetInfo());
     branchinfos.push_back(new ntuple_SV());
+    branchinfos.push_back(new ntuple_V0Ks());
+    branchinfos.push_back(new ntuple_V0lambda());
     branchinfos.push_back(new ntuple_LT());
     branchinfos.push_back(new ntuple_bTagVars());
     branchinfos.push_back(new ntuple_pfCands());

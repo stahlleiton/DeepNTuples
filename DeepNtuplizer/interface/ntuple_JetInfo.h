@@ -153,7 +153,8 @@ public:
     int isC_;
     int isGCC_;
     int isCC_;
-    int isUD_;
+    int isD_;
+    int isU_;
     int isS_;
     int isG_;
     int isPU_;
@@ -170,7 +171,8 @@ public:
     int isPhysC_;
     int isPhysGCC_;
     int isPhysCC_;
-    int isPhysUD_;
+    int isPhysD_;
+    int isPhysU_;
     int isPhysS_;
     int isPhysG_;
     int isPhysUndefined_;

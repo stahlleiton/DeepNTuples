@@ -81,7 +81,8 @@ JetFlavor jet_flavour(const pat::Jet& jet,
             if(usePhysForLightAndUndefined){
                 if(physflav == 21) return JetFlavor::G;
                 else if(physflav == 3) return JetFlavor::S;
-                else if(physflav == 2 || physflav ==1) return JetFlavor::UD;
+                else if(physflav == 2) return JetFlavor::U;
+                else if(physflav == 1) return JetFlavor::D;
                 else return JetFlavor::UNDEFINED;
             }
             else return JetFlavor::UNDEFINED;
@@ -119,7 +120,8 @@ JetFlavor jet_flavour(const pat::Jet& jet,
             if(usePhysForLightAndUndefined){
                 if(physflav == 21) return JetFlavor::G;
                 else if(physflav == 3) return JetFlavor::S;
-                else if(physflav == 2 || physflav ==1) return JetFlavor::UD;
+                else if(physflav == 2) return JetFlavor::U;
+                else if(physflav == 1) return JetFlavor::D;
                 else return JetFlavor::UNDEFINED;
             }
             else return JetFlavor::UNDEFINED;
@@ -127,13 +129,15 @@ JetFlavor jet_flavour(const pat::Jet& jet,
         else if(usePhysForLightAndUndefined){
             if(physflav == 21) return JetFlavor::G;
             else if(physflav == 3) return JetFlavor::S;
-            else if(physflav == 2 || physflav ==1) return JetFlavor::UD;
+            else if(physflav == 2) return JetFlavor::U;
+            else if(physflav == 1) return JetFlavor::D;
             else return JetFlavor::UNDEFINED;
         }
         else {
             if(pflav == 21) return JetFlavor::G;
             else if(pflav == 3) return JetFlavor::S;
-            else if(pflav == 2 || pflav ==1) return JetFlavor::UD;
+            else if(pflav == 2) return JetFlavor::U;
+            else if(pflav == 1) return JetFlavor::D;
             else return JetFlavor::UNDEFINED;
         }
     }

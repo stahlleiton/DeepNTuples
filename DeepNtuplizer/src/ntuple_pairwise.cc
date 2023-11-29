@@ -55,6 +55,11 @@ private:
 
 };
 
+void ntuple_pairwise::readConfig(const edm::ParameterSet& iConfig, edm::ConsumesCollector&& cc) {
+  packedToken_ = cc.consumes<std::vector<pat::PackedGenParticle>>(iConfig.getParameter<edm::InputTag>("packed"));
+}
+
+
 void ntuple_pairwise::readSetup(const edm::EventSetup& iSetup){
 
     iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", builder);
@@ -111,6 +116,7 @@ void ntuple_pairwise::initBranches(TTree* tree){
 
 void ntuple_pairwise::readEvent(const edm::Event& iEvent){
 
+    iEvent.getByToken(packedToken_, packed);
     n_Npfcand2_=0;
     n_Cpfcand2_=0;
 
@@ -141,23 +147,37 @@ bool ntuple_pairwise::fillBranches(const pat::Jet & jet, const size_t& jetidx, c
                 (i, trackinfo.getTrackSip2dSig(),
                         -mindrsvpfcand(PackedCandidate), PackedCandidate->pt()/jet_uncorr_pt));
             }
-	    /*            else{
-                sortedneutrals.push_back(sorting::sortingClass<size_t>
-                (i, -1, -mindrsvpfcand(PackedCandidate), PackedCandidate->pt()/jet_uncorr_pt));
-		}*/
         }
     }
     std::sort(sortedcharged.begin(),sortedcharged.end(),sorting::sortingClass<size_t>::compareByABCInv);
     n_Cpfcand2_ = std::min(sortedcharged.size(),max_pfcand_);
 
-    //std::sort(sortedneutrals.begin(),sortedneutrals.end(),sorting::sortingClass<size_t>::compareByABCInv);
     std::vector<size_t> sortedchargedindices; //,sortedneutralsindices;
-    //n_Npfcand2_ = std::min(sortedneutrals.size(),max_pfcand_);
     sortedchargedindices=sorting::invertSortingVector(sortedcharged);
-    //sortedneutralsindices=sorting::invertSortingVector(sortedneutrals);
-    
+
+    std::vector<int> pf_packed_match;
+
     size_t counter = 0;
     int n_cpf_ = std::min((int)25, n_Cpfcand2_);
+
+    for (int k = 0; k <  n_cpf_; k++){
+      int ind = sortedcharged.at(k).get();
+      const pat::PackedCandidate* Part_  = dynamic_cast<const pat::PackedCandidate*>(jet.daughter(ind));
+
+      double dR_min=pow10(6);
+      int index=-1;
+      int i=0;
+
+      for (const auto &packed_part : *packed){
+	double dR = reco::deltaR(*Part_, packed_part);
+	double dpt = std::abs((Part_->pt()- packed_part.pt())/Part_->pt());
+	if(dR<0.01 && dpt<0.1 && Part_->charge()==packed_part.charge() && dR<dR_min){
+	  index=i;
+	}
+	i++;
+      }
+      pf_packed_match.push_back(index);
+    }
 
     for (int i = 0; i <  n_cpf_; i++){
       for (int j = 0; j < i; j++){
@@ -182,9 +202,15 @@ bool ntuple_pairwise::fillBranches(const pat::Jet & jet, const size_t& jetidx, c
 	
 	trkpairinfo.buildTrackPairInfo(it,tt,vertices()->at(0),jet);
 
-	const reco::Candidate * pruned_part_match1 = Part_i_.lastPrunedRef().get();
-        const reco::Candidate * pruned_part_match2 = Part_j_.lastPrunedRef().get();
-	float dist_vtx_12 = sqrt((pruned_part_match1->vertex()- pruned_part_match2->vertex()).mag2());
+	float dist_vtx_12 = -1;
+
+	int packed_index1 = pf_packed_match[i];
+	int packed_index2 = pf_packed_match[j];
+	if (packed_index1 != -1 && packed_index2 != -1){
+	  const reco::Candidate * pruned_part_match1 = (*packed)[packed_index1].lastPrunedRef().get();
+	  const reco::Candidate * pruned_part_match2 = (*packed)[packed_index2].lastPrunedRef().get();
+	  dist_vtx_12 = sqrt((pruned_part_match1->vertex()- pruned_part_match2->vertex()).mag2());
+	}
 
 	pair_pca_distance_[counter] = trkpairinfo.pca_distance();
 	pair_pca_significance_[counter] = trkpairinfo.pca_significance();
@@ -237,7 +263,6 @@ float ntuple_pairwise::mindrsvpfcand(const pat::PackedCandidate* pfcand) {
   float mindr_ = jetradius_;
   for (unsigned int i=0; i<secVertices()->size(); ++i) {
     if(!pfcand) continue;
-    //if(!svs.at(i)) continue;                                                                                                                                                                             
     float tempdr_ = reco::deltaR(secVertices()->at(i),*pfcand);
     if (tempdr_<mindr_) { mindr_ = tempdr_; }
 

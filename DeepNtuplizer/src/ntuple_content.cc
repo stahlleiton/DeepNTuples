@@ -13,12 +13,7 @@
 bool ntuple_content::useoffsets=true;
 
 ntuple_content::~ntuple_content(){
-
-
 }
-
-
-
 
 const reco::VertexCollection * ntuple_content::vertices()const{
     if(vertices_)
@@ -30,6 +25,18 @@ const std::vector<reco::VertexCompositePtrCandidate> * ntuple_content::secVertic
     if(secvertices_)
         return secvertices_;
     throw std::runtime_error("ntuple_content: secvertices_ not assigned");
+}
+
+const std::vector<reco::VertexCompositePtrCandidate> * ntuple_content::V0ks()const{
+    if(V0ks_)
+        return V0ks_;
+    throw std::runtime_error("ntuple_content: V0ks_ not assigned");
+}
+
+const std::vector<reco::VertexCompositePtrCandidate> * ntuple_content::V0lambda()const{
+    if(V0lambda_)
+        return V0lambda_;
+    throw std::runtime_error("ntuple_content: V0lambda_ not assigned");
 }
 
 const std::vector<PileupSummaryInfo> * ntuple_content::pupInfo()const{

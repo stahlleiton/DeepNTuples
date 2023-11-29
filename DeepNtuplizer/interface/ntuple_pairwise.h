@@ -13,6 +13,11 @@
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackPairInfoBuilder.h"
 
+#include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+
+
 class ntuple_pairwise: public ntuple_content{
 public:
 
@@ -22,6 +27,7 @@ public:
     void setJetRadius(const float& radius){jetradius_=radius;}
     void getInput(const edm::ParameterSet& iConfig);
     void initBranches(TTree* );
+    virtual void readConfig(const edm::ParameterSet& iConfig, edm::ConsumesCollector && cc) override;
     void readEvent(const edm::Event& iEvent);
     void readSetup(const edm::EventSetup& iSetup);
 
@@ -36,6 +42,9 @@ private:
     float min_candidate_pt_ = -1;
 
     edm::ESHandle<TransientTrackBuilder> builder;
+
+    edm::EDGetTokenT<std::vector<pat::PackedGenParticle>> packedToken_;
+    edm::Handle<std::vector<pat::PackedGenParticle>> packed;
 
     int n_Npfcand2_;
     int n_Cpfcand2_;

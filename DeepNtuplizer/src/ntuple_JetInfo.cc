@@ -52,7 +52,8 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"isGCC",&isGCC_, "isGCC_/i");
     addBranch(tree,"isCC",&isCC_, "isCC_/i");
 //    addBranch(tree,"isTau",&isTau_, "isTau_/i");
-    addBranch(tree,"isUD",&isUD_, "isUD_/i");
+    addBranch(tree,"isU",&isU_, "isU_/i");
+    addBranch(tree,"isD",&isD_, "isD_/i");
     addBranch(tree,"isS",&isS_, "isS_/i");
     addBranch(tree,"isG",&isG_, "isG_/i");
     addBranch(tree,"isPU",&isPU_, "isPU_/i");
@@ -314,7 +315,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 
     //std::vector<Ptr<pat::Jet> > p= coll->ptrs();
 
-    isB_=0; isGBB_=0; isBB_=0; isC_=0; isGCC_=0; isCC_=0; isUD_=0;isTau_=0;
+    isB_=0; isGBB_=0; isBB_=0; isC_=0; isGCC_=0; isCC_=0; isU_=0; isD_=0; isTau_=0;
     isS_=0; isG_=0, isPU_=0, isLeptonicB_=0, isLeptonicB_C_=0, isUndefined_=0;
     auto muIds = deep_ntuples::jet_muonsIds(jet,*muonsHandle);
     auto elecIds = deep_ntuples::jet_electronsIds(jet,*electronsHandle);
@@ -360,7 +361,8 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
         case deep_ntuples::JetFlavor::TAU: isTau_=1;break;
         case deep_ntuples::JetFlavor::G:  isG_=1; break;
         case deep_ntuples::JetFlavor::PU:  isPU_=1; break;
-        case deep_ntuples::JetFlavor::UD: isUD_=1; break;
+        case deep_ntuples::JetFlavor::D: isD_=1; break;
+        case deep_ntuples::JetFlavor::U: isU_=1; break;
         case deep_ntuples::JetFlavor::S:  isS_=1; break;
         default : isUndefined_=1; break;
         }
@@ -369,11 +371,12 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     //truth labeling with fallback to physics definition for light/gluon/undefined of standard flavor definition
     //// Note that jets with gluon->bb (cc) and x->bb (cc) are in the same categories
     isPhysB_=0; isPhysBB_=0; isPhysGBB_=0; isPhysC_=0; isPhysCC_=0;
-    isPhysGCC_=0; isPhysUD_=0; isPhysS_=0; isPhysG_=0, isPhysLeptonicB_=0, isPhysLeptonicB_C_=0, isPhysUndefined_=0;
+    isPhysGCC_=0; isPhysD_=0; isPhysU_=0; isPhysS_=0; isPhysG_=0, isPhysLeptonicB_=0, isPhysLeptonicB_C_=0, isPhysUndefined_=0;
     isPhysTau_=0, isPhysPU_=0;
     if(true){
         switch(deep_ntuples::jet_flavour(jet, gToBB, gToCC, neutrinosLepB, neutrinosLepB_C, alltaus_,true)) {
-        case deep_ntuples::JetFlavor::UD: isPhysUD_=1; break;
+        case deep_ntuples::JetFlavor::D: isPhysD_=1; break;
+        case deep_ntuples::JetFlavor::U: isPhysU_=1; break;
         case deep_ntuples::JetFlavor::S:  isPhysS_=1; break;
         case deep_ntuples::JetFlavor::B:  isPhysB_=1; break;
         case deep_ntuples::JetFlavor::BB: isPhysBB_=1; break;
