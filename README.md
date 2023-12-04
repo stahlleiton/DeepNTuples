@@ -12,7 +12,7 @@ cmsenv
 git cms-init
 git clone https://github.com/AlexDeMoor/DeepNTuples
 cd DeepNTuples
-git checkout 13_0_8
+git checkout CMSSW_13_0_8
 # Add JetToolBox
 git submodule init
 git submodule update
