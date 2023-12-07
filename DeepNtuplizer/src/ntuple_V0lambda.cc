@@ -95,7 +95,7 @@ bool ntuple_V0lambda::fillBranches(const pat::Jet & jet, const size_t& jetidx, c
 
     reco::VertexCompositePtrCandidateCollection cpvtx=*V0lambda();
     spvp_ =   & vertices()->at(0);
-    std::sort(cpvtx.begin(),cpvtx.end(),ntuple_V0lambda::compareDxyDxyErr);
+    //std::sort(cpvtx.begin(),cpvtx.end(),ntuple_V0lambda::compareDxyDxyErr);
 
     float etasign=1;
     etasign++; //avoid unused warning
