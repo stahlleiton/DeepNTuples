@@ -120,6 +120,23 @@ private:
     // track quality
     float Cpfcan_lostInnerHits_[max_pfcand_];
     float Cpfcan_numberOfPixelHits_[max_pfcand_];
+    float Cpfcan_numberOfPixelHitBL1_[max_pfcand_];
+    float Cpfcan_numberOfPixelHitBL2_[max_pfcand_];
+    float Cpfcan_numberOfPixelHitBL3_[max_pfcand_];
+    float Cpfcan_numberOfPixelHitBL4_[max_pfcand_];
+    float Cpfcan_numberOfPixelHitEL1_[max_pfcand_];
+    float Cpfcan_numberOfPixelHitEL2_[max_pfcand_];
+    float Cpfcan_numberOfStripHitTIBL1_[max_pfcand_];
+    float Cpfcan_numberOfStripHitTIBL2_[max_pfcand_];
+    float Cpfcan_numberOfStripHitTIBL3_[max_pfcand_];
+    float Cpfcan_numberOfStripHitTIBL4_[max_pfcand_];
+    float Cpfcan_numberOfStripHitTIDL1_[max_pfcand_];
+    float Cpfcan_numberOfStripHitTIDL2_[max_pfcand_];
+    float Cpfcan_numberOfStripHitTIDL3_[max_pfcand_];
+
+    float Cpfcan_dEdxPixel_[max_pfcand_];
+    float Cpfcan_dEdxStrip_[max_pfcand_];
+
     float Cpfcan_chi2_[max_pfcand_];
     float Cpfcan_quality_[max_pfcand_];
     float Cpfcan_drminsv_[max_pfcand_];
@@ -218,6 +235,7 @@ private:
 
     float  Npfcan_pdgID_[max_pfcand_];
     float  Cpfcan_pdgID_[max_pfcand_];
+    float  Cpfcan_pdg_[max_pfcand_];
 
     float  Cpfcan_HadFrac_[max_pfcand_];
     float  Cpfcan_CaloFrac_[max_pfcand_];

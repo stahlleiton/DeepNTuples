@@ -29,7 +29,7 @@
 class ntuple_content{
 public:
     ntuple_content():ntuple_content(0.4) {}
-    ntuple_content(double jetR):vertices_(0),secvertices_(0),jetR_(jetR),pupInfo_(0),rhoInfo_(0),read_(false){}
+    ntuple_content(double jetR):vertices_(0),secvertices_(0),V0ks_(0),jetR_(jetR),pupInfo_(0),rhoInfo_(0),read_(false){}
     virtual ~ntuple_content();
 
     virtual void getInput(const edm::ParameterSet& iConfig){}
@@ -46,7 +46,10 @@ public:
     void setSecVertices(const std::vector<reco::VertexCompositePtrCandidate> * v){
         secvertices_=v;
     }
-    void setPuInfo(const std::vector<PileupSummaryInfo> *v){
+    void setV0ks(const std::vector<reco::VertexCompositePtrCandidate> * ks){
+        V0ks_=ks;
+    }
+  void setPuInfo(const std::vector<PileupSummaryInfo> *v){
 	pupInfo_ =v;
     }
     void setRhoInfo(const double *v){
@@ -68,10 +71,11 @@ public:
     static bool useoffsets;
 
 protected:
-    const reco::VertexCollection * vertices()const;
-    const std::vector<reco::VertexCompositePtrCandidate> * secVertices()const;
-    const double* rhoInfo()const;
-    const std::vector<PileupSummaryInfo> * pupInfo()const;
+  const reco::VertexCollection * vertices()const;
+  const std::vector<reco::VertexCompositePtrCandidate> * secVertices()const;
+  const std::vector<reco::VertexCompositePtrCandidate> * V0ks()const;
+  const double* rhoInfo()const;
+  const std::vector<PileupSummaryInfo> * pupInfo()const;
 
 
     template <class T>
@@ -103,6 +107,7 @@ protected:
 private:
     const reco::VertexCollection* vertices_;
     const std::vector<reco::VertexCompositePtrCandidate>* secvertices_;
+    const std::vector<reco::VertexCompositePtrCandidate>* V0ks_;
     double jetR_;
     const std::vector<PileupSummaryInfo> * pupInfo_;
     const double* rhoInfo_;

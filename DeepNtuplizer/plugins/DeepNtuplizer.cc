@@ -9,6 +9,7 @@
 
 #include "../interface/ntuple_content.h"
 #include "../interface/ntuple_SV.h"
+#include "../interface/ntuple_V0Ks.h"
 #include "../interface/ntuple_JetInfo.h"
 #include "../interface/ntuple_pfCands.h"
 #include "../interface/ntuple_bTagVars.h"
@@ -85,6 +86,7 @@ private:
   // ----------member data ---------------------------
   edm::EDGetTokenT<reco::VertexCollection> vtxToken_;
   edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> svToken_;
+  edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> v0KsToken_;
   edm::EDGetTokenT<edm::View<pat::Jet> >      jetToken_;
   edm::EDGetTokenT<std::vector<PileupSummaryInfo> > puToken_;
   edm::EDGetTokenT<double> rhoToken_;
@@ -113,6 +115,7 @@ private:
 DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
   svToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getParameter<edm::InputTag>("secVertices"))),
+  v0KsToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getParameter<edm::InputTag>("V0_ks"))),
   jetToken_(consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("jets"))),
   puToken_(consumes<std::vector<PileupSummaryInfo >>(iConfig.getParameter<edm::InputTag>("pupInfo"))),
   rhoToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("rhoInfo"))),
@@ -144,6 +147,9 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
       esConsumes<TransientTrackBuilder, TransientTrackRecord>(
                           edm::ESInputTag("", "TransientTrackBuilder")));
   addModule(svmodule, "SVNtuple");
+
+  ntuple_V0Ks* v0ksmodule=new ntuple_V0Ks("", jetR);
+    addModule(v0ksmodule, "V0KsNtuple");
 
   ntuple_JetInfo* jetinfo=new ntuple_JetInfo();
   jetinfo->setQglToken(consumes<edm::ValueMap<float>>(edm::InputTag(t_qgtagger, "qgLikelihood")));
@@ -232,6 +238,9 @@ DeepNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<std::vector<reco::VertexCompositePtrCandidate> > secvertices;
   iEvent.getByToken(svToken_, secvertices);
 
+  edm::Handle<std::vector<reco::VertexCompositePtrCandidate> > v0_ks;
+  iEvent.getByToken(v0KsToken_, v0_ks);
+  
   edm::Handle<std::vector<PileupSummaryInfo> > pupInfo;
   iEvent.getByToken(puToken_, pupInfo);
 
@@ -247,6 +256,7 @@ DeepNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   for(auto& m:modules_){
     m->setPrimaryVertices(vertices.product());
     m->setSecVertices(secvertices.product());
+    m->setV0ks(v0_ks.product());
     m->setPuInfo(pupInfo.product());
     m->setRhoInfo(rhoInfo.product());
     m->readSetup(iSetup);

@@ -90,7 +90,8 @@ JetFlavor jet_flavour(const pat::Jet& jet,
             if(usePhysForLightAndUndefined){
                 if(physflav == 21) return JetFlavor::G;
                 else if(physflav == 3) return JetFlavor::S;
-                else if(physflav == 2 || physflav ==1) return JetFlavor::UD;
+                else if(physflav == 2) return JetFlavor::U;
+		else if(physflav == 1) return JetFlavor::D;
                 else return JetFlavor::UNDEFINED;
             }
             else return JetFlavor::UNDEFINED;
@@ -128,21 +129,24 @@ JetFlavor jet_flavour(const pat::Jet& jet,
             if(usePhysForLightAndUndefined){
                 if(physflav == 21) return JetFlavor::G;
                 else if(physflav == 3) return JetFlavor::S;
-                else if(physflav == 2 || physflav ==1) return JetFlavor::UD;
+                else if(physflav == 2) return JetFlavor::U;
+		else if(physflav == 1) return JetFlavor::D;
                 else return JetFlavor::UNDEFINED;
             }
             else return JetFlavor::UNDEFINED;
         }
         else if(usePhysForLightAndUndefined){
-            if(physflav == 21) return JetFlavor::G;
+           if(physflav == 21) return JetFlavor::G;
             else if(physflav == 3) return JetFlavor::S;
-            else if(physflav == 2 || physflav ==1) return JetFlavor::UD;
+	    else if(physflav == 2) return JetFlavor::U;
+	    else if(physflav == 1) return JetFlavor::D;
             else return JetFlavor::UNDEFINED;
         }
         else {
             if(pflav == 21) return JetFlavor::G;
             else if(pflav == 3) return JetFlavor::S;
-            else if(pflav == 2 || pflav ==1) return JetFlavor::UD;
+            else if(pflav == 2) return JetFlavor::U;
+	    else if(pflav == 1) return JetFlavor::D;
             else return JetFlavor::UNDEFINED;
         }
     }
@@ -160,20 +164,11 @@ std::tuple<int, int, int, float, float, float, float> calcVariables(const reco::
 
     bool useQC=false;
 
-    //  float sum_pt1 = 0;
-    //  float sum_pt2 = 0;
-
-    //  TVector3 _pull1(0, 0, 0);
-    //  TVector3 _pull2(0, 0, 0);
-
     //Loop over the jet constituents
     for (unsigned int i = 0; i <  jet->numberOfDaughters(); i++){
         const pat::PackedCandidate* daughter = dynamic_cast<const pat::PackedCandidate*>(jet->daughter(i));
         if(daughter){                                        //packed candidate situation
             auto part = static_cast<const pat::PackedCandidate*>(daughter);
-
-            //      std::cout << "daughter pdg Id = " << daughter->pdgId() << std::endl;
-            //      std::cout << "daughter pdg Id = " << daughter->particleId() << std::endl;
 
             if(part->charge()){
 
@@ -187,82 +182,17 @@ std::tuple<int, int, int, float, float, float, float> calcVariables(const reco::
                 } else{
                     ++multiplicity;
                     ++charged_multiplicity;
-
-                    //      Int_t pdg = abs(part->pdgId());
-                    //      std::cout << "charged : " << pdg << std::endl;
-                    //std::cout << "charged PDG = " << pdg << std::endl;
-
                 };
 
             } else {
                 if(part->pt() < 1.0) continue;
                 ++multiplicity;
                 ++neutral_multiplicity;
-
-                //  Int_t pdg = abs(part->pdgId());
-                //  std::cout << "neutral : " << pdg << std::endl;
-
-                //  if(pdg==211){;}
-                //  else if(pdg==310 || pdg==130){;}
-                //  else if(pdg==22){;}
-                //  else if(pdg<=9 || pdg==21){;}
-                //  else if(pdg>=11 && pdg<=16){;}
-                //  else{
-                //    //      std::cout << "neutral PDG = " << pdg << std::endl;
-                //    //      std::cout << "What !!!!!!!!!!!!!!!!!!!!!!!! " << pdg << std::endl;
-                //  }
-
-
-                //  if(pdg<=9 || pdg==21){std::cout << "NOT possible " << pdg << std::endl;}
-                //  else if(pdg>=11 && pdg<=16){std::cout << "NOT possible " << pdg << std::endl;}
-                //  else{
-                //    std::cout << "included :" << pdg << std::endl;
-                //    ++neutral_multiplicity;
-                //  }
-
-
             }
-
-            //      if(part->pt() > max_pt) max_pt = part->pt();
-            //      sum_pt1 += part->pt();
-            //      sum_pt2 += part->pt()*part->pt();
-
-            //      Int_t pdg = abs(part->pdgId());
-
-            //      if(part->pt() > 1.0){
-
-            //      if(pdg==211){ pion_multiplicity++;}
-            //      else if(pdg==310 || pdg==130){ kaon_multiplicity++;}
-            //      else if(pdg==22){photon_multiplicity++;}
-            //      else if(pdg<=9 || pdg==21){;}
-            //      else if(pdg>=11 && pdg<=16){;}
-            //      else std::cout << "What !!!!!!!!!!!!!!!!!!!!!!!! " << pdg << std::endl;
-            //      }
-
 
             float dr = reco::deltaR(*jet, *part);
 
-            //      pt_dr += (part->pt()/dr);
-            //      pt_dr2 += (part->pt()/(dr*dr));
-            pt_dr_log += std::log(part->pt()/dr);
-
-            //      TVector3 _jet(jet->px(), jet->py(), 0);
-            //      TVector3 _part(part->px(), part->py(), 0);
-
-            //      _pull1 += (_part - _jet);
-            //      _pull2 += (_part - _jet);
-            //
-            //      _pull1 *= part->pt()*dr;
-            //      _pull2 *= part->pt()*part->pt()*dr;
-
-            //      TVector3 _v = _jet.Unit().Cross(_part);
-
-            //      if(_v.Mag()!=0 && dr!=0){
-            //  ptrel += std::log(1/_v.Mag());
-            //  ptrel_dr += std::log(1/(_v.Mag()*dr));
-            //      }else{
-            //  std::cout << "Either ptrel = " << _v.Mag() << " or dR = " << dr << " is 0 !!!" << std::endl;
-            //      }
+	    pt_dr_log += std::log(part->pt()/dr);
         }
 
         float deta   = daughter->eta() - jet->eta();
@@ -295,9 +225,6 @@ std::tuple<int, int, int, float, float, float, float> calcVariables(const reco::
     float axis1 = (a+b+delta > 0 ?  sqrt(0.5*(a+b+delta)) : 0);
     float axis2 = (a+b-delta > 0 ?  sqrt(0.5*(a+b-delta)) : 0);
     float ptD   = (sum_weight > 0 ? sqrt(sum_weight)/sum_pt : 0);
-
-    //  float pull1 = _pull1.Mag()/sum_pt1;
-    //  float pull2 = _pull2.Mag()/sum_pt2;
 
     return std::make_tuple(multiplicity, charged_multiplicity, neutral_multiplicity, ptD, axis1, axis2, pt_dr_log);
 }
