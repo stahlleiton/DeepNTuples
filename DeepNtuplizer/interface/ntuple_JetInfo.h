@@ -192,7 +192,16 @@ public:
     float genDecay_;
     int isLeptonicB_;
     int isLeptonicB_C_;
-    int isTau_;
+    int isTaup1h0p_;
+    int isTaup1h1p_;
+    int isTaup1h2p_;
+    int isTaup3h0p_;
+    int isTaup3h1p_;
+    int isTaum1h0p_;
+    int isTaum1h1p_;
+    int isTaum1h2p_;
+    int isTaum3h0p_;
+    int isTaum3h1p_;
 
     //truth labeling with fallback to physics definition for light/gluon/undefined of standard flavor definition
     int isPhysB_;

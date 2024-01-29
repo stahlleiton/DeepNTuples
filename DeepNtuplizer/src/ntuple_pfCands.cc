@@ -255,22 +255,6 @@ void ntuple_pfCands::initBranches(TTree* tree){
     //in16 conversion broken
     addBranch(tree,"Cpfcan_lostInnerHits",&Cpfcan_lostInnerHits_,"Cpfcan_lostInnerHits_[n_Cpfcand_]/F");
     addBranch(tree,"Cpfcan_numberOfPixelHits",&Cpfcan_numberOfPixelHits_,"Cpfcan_numberOfPixelHits_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_numberOfPixelHitBL1",&Cpfcan_numberOfPixelHitBL1_,"Cpfcan_numberOfPixelHitBL1_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_numberOfPixelHitBL2",&Cpfcan_numberOfPixelHitBL2_,"Cpfcan_numberOfPixelHitBL2_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_numberOfPixelHitBL3",&Cpfcan_numberOfPixelHitBL3_,"Cpfcan_numberOfPixelHitBL3_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_numberOfPixelHitBL4",&Cpfcan_numberOfPixelHitBL4_,"Cpfcan_numberOfPixelHitBL4_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_numberOfPixelHitEL1",&Cpfcan_numberOfPixelHitEL1_,"Cpfcan_numberOfPixelHitEL1_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_numberOfPixelHitEL2",&Cpfcan_numberOfPixelHitEL2_,"Cpfcan_numberOfPixelHitEL2_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_numberOfStripHitTIBL1",&Cpfcan_numberOfStripHitTIBL1_,"Cpfcan_numberOfStripHitTIBL1_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_numberOfStripHitTIBL2",&Cpfcan_numberOfStripHitTIBL2_,"Cpfcan_numberOfStripHitTIBL2_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_numberOfStripHitTIBL3",&Cpfcan_numberOfStripHitTIBL3_,"Cpfcan_numberOfStripHitTIBL3_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_numberOfStripHitTIBL4",&Cpfcan_numberOfStripHitTIBL4_,"Cpfcan_numberOfStripHitTIBL4_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_numberOfStripHitTIDL1",&Cpfcan_numberOfStripHitTIDL1_,"Cpfcan_numberOfStripHitTIDL1_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_numberOfStripHitTIDL2",&Cpfcan_numberOfStripHitTIDL2_,"Cpfcan_numberOfStripHitTIDL2_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_numberOfStripHitTIDL3",&Cpfcan_numberOfStripHitTIDL3_,"Cpfcan_numberOfStripHitTIDL3_[n_Cpfcand_]/F");
-
-    addBranch(tree,"Cpfcan_dEdxPixel",&Cpfcan_dEdxPixel_,"Cpfcan_dEdxPixel_[n_Cpfcand_]/F");
-    addBranch(tree,"Cpfcan_dEdxStrip",&Cpfcan_dEdxStrip_,"Cpfcan_dEdxStrip_[n_Cpfcand_]/F");
 
     addBranch(tree,"Cpfcan_chi2",&Cpfcan_chi2_,"Cpfcan_chi2_[n_Cpfcand_]/F");
     addBranch(tree,"Cpfcan_quality",&Cpfcan_quality_,"Cpfcan_quality_[n_Cpfcand_]/F");
@@ -385,8 +369,6 @@ void ntuple_pfCands::readEvent(const edm::Event& iEvent){
     n_Cpfcand_=0;
 
 }
-
-
 
 //use either of these functions
 
@@ -572,33 +554,17 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
             }
 	    float cand_charge_ = PackedCandidate_->charge();
             Cpfcan_charge_[fillntupleentry] = cand_charge_;
-            Cpfcan_dEdxPixel_[fillntupleentry] = PackedCandidate_->dEdxPixel();
-            Cpfcan_dEdxStrip_[fillntupleentry] = PackedCandidate_->dEdxStrip();
             Cpfcan_lostInnerHits_[fillntupleentry] = catchInfs(PackedCandidate_->lostInnerHits(),2);
 	    Cpfcan_numberOfPixelHits_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfPixelHits(),-1);
-	    Cpfcan_numberOfPixelHitBL1_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfPixelHitsBarrelLayer1(),-1);
-	    Cpfcan_numberOfPixelHitBL2_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfPixelHitsBarrelLayer2(),-1);
-	    Cpfcan_numberOfPixelHitBL3_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfPixelHitsBarrelLayer3(),-1);
-	    Cpfcan_numberOfPixelHitBL4_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfPixelHitsBarrelLayer4(),-1);
-	    Cpfcan_numberOfPixelHitEL1_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfPixelHitsEndcapLayer1(),-1);
-	    Cpfcan_numberOfPixelHitEL2_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfPixelHitsEndcapLayer2(),-1);
-
-	    Cpfcan_numberOfStripHitTIBL1_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfStripHitsTIBLayer1(),-1);
-	    Cpfcan_numberOfStripHitTIBL2_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfStripHitsTIBLayer2(),-1);
-	    Cpfcan_numberOfStripHitTIBL3_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfStripHitsTIBLayer3(),-1);
-	    Cpfcan_numberOfStripHitTIBL4_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfStripHitsTIBLayer4(),-1);
-	    Cpfcan_numberOfStripHitTIDL1_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfStripHitsTIDLayer1(),-1);
-	    Cpfcan_numberOfStripHitTIDL2_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfStripHitsTIDLayer2(),-1);
-	    Cpfcan_numberOfStripHitTIDL3_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfStripHitsTIDLayer3(),-1);
 
 	    //std::cout << PackedCandidate_->lostInnerHits()<< " inner hits " <<std::endl;
 	    //std::cout << PackedCandidate_->numberOfPixelHits()<< " Pixel hits + masked " <<std::endl;
 	    //std::cout <<PackedCandidate_->pixelLayersWithMeasurement()<< " Pixel hits " <<std::endl;
-			Cpfcan_chi2_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? \
-				catchInfsAndBound(PackedCandidate_->pseudoTrack().normalizedChi2(),300,-1,300) : -1;
+	    Cpfcan_chi2_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? \
+	      catchInfsAndBound(PackedCandidate_->pseudoTrack().normalizedChi2(),300,-1,300) : -1;
 			//for some reason this returns the quality enum not a mask.
-			Cpfcan_quality_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? 
-				PackedCandidate_->pseudoTrack().qualityMask() : (1 << reco::TrackBase::loose);
+	    Cpfcan_quality_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? 
+	      PackedCandidate_->pseudoTrack().qualityMask() : (1 << reco::TrackBase::loose);
             Cpfcan_drminsv_[fillntupleentry] = catchInfsAndBound(drminpfcandsv_,0,-0.4,0,-0.4);
             //hit pattern variables, as defined here https://github.com/cms-sw/cmssw/blob/master/DataFormats/TrackReco/interface/HitPattern.h
             //get track associated to a jet constituent

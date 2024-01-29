@@ -245,10 +245,10 @@ bool ntuple_LT::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  
 
     for (size_t i = 0; i < LTs->size(); ++i) {
       auto cand = LTs->ptrAt(i);
-      if (reco::deltaR(*cand, jet) < jetradius_) {
+      if ((reco::deltaR(*cand, jet) < 0.2)) {
 	const auto *PackedCandidate = dynamic_cast<const pat::PackedCandidate*>(&(*cand));
 	if(PackedCandidate){
-	  if(PackedCandidate->pt() < min_candidate_pt_) continue; 
+	  if(PackedCandidate->pt() < 1.0) continue; 
 	  trackinfo.buildTrackInfo(PackedCandidate,jetDir,jetRefTrackDir,pv);
 	  sortedcharged.push_back(sorting::sortingClass<size_t>
 				  (i, trackinfo.getTrackSip2dSig(),

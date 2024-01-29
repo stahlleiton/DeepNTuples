@@ -30,10 +30,13 @@ JetFlavor jet_flavour(const pat::Jet& jet,
 		      int pos_matched_genmu,
 		      int pos_matched_genele,
 		      int pos_matched_tauh,
+		      int gentau_decaymode,
+		      const std::vector<int> tau_gen_charge,
 		      bool usePhysForLightAndUndefined) { 
     int hflav = abs(jet.hadronFlavour());
     int pflav = abs(jet.partonFlavour());
     int physflav = 0;
+    int jet_tauflav_b, jet_muflav_b, jet_elflav_b, jet_taudecaymode_b, jet_taucharge_b;
     if( !( jet.genJet() ) ){
       if(pflav == 0){
 	return JetFlavor::PU;
@@ -59,14 +62,42 @@ JetFlavor jet_flavour(const pat::Jet& jet,
     }
 
     if(pos_matched_genmu >= 0){
-      return JetFlavor::MU;
+      jet_muflav_b  = 1;
+    }
+    else{
+      jet_muflav_b  = 0;
     }
     if(pos_matched_genele >= 0){
-      return JetFlavor::ELE;
+      jet_elflav_b  = 1;
+    }
+    else{
+      jet_elflav_b  = 0;
     }
     if(pos_matched_tauh >= 0){
-      return JetFlavor::TAU;
+      jet_tauflav_b  = 1;
+      jet_taudecaymode_b = gentau_decaymode;
+      jet_taucharge_b = tau_gen_charge.at(pos_matched_tauh);
     }
+    else{
+      jet_tauflav_b  = 0;
+      jet_taudecaymode_b = -1;
+      jet_taucharge_b = 0;
+    }
+
+    if((jet_muflav_b==1) & (jet_elflav_b==0) & (jet_tauflav_b==0)){return JetFlavor::MU;}
+    if((jet_muflav_b==0) & (jet_elflav_b==1) & (jet_tauflav_b==0)){return JetFlavor::ELE;}
+
+    if((jet_muflav_b==0) & (jet_elflav_b==0) & (jet_tauflav_b==1) & (jet_taudecaymode_b==0) & (jet_taucharge_b>0)){return JetFlavor::TAUP1H0P;}
+    if((jet_muflav_b==0) & (jet_elflav_b==0) & (jet_tauflav_b==1) & (jet_taudecaymode_b==1) & (jet_taucharge_b>0)){return JetFlavor::TAUP1H1P;}
+    if((jet_muflav_b==0) & (jet_elflav_b==0) & (jet_tauflav_b==1) & (jet_taudecaymode_b==2) & (jet_taucharge_b>0)){return JetFlavor::TAUP1H2P;}
+    if((jet_muflav_b==0) & (jet_elflav_b==0) & (jet_tauflav_b==1) & (jet_taudecaymode_b==10) & (jet_taucharge_b>0)){return JetFlavor::TAUP3H0P;}
+    if((jet_muflav_b==0) & (jet_elflav_b==0) & (jet_tauflav_b==1) & (jet_taudecaymode_b==11) & (jet_taucharge_b>0)){return JetFlavor::TAUP3H1P;}
+
+    if((jet_muflav_b==0) & (jet_elflav_b==0) & (jet_tauflav_b==1) & (jet_taudecaymode_b==0) & (jet_taucharge_b<0)){return JetFlavor::TAUM1H0P;}
+    if((jet_muflav_b==0) & (jet_elflav_b==0) & (jet_tauflav_b==1) & (jet_taudecaymode_b==1) & (jet_taucharge_b<0)){return JetFlavor::TAUM1H1P;}
+    if((jet_muflav_b==0) & (jet_elflav_b==0) & (jet_tauflav_b==1) & (jet_taudecaymode_b==2) & (jet_taucharge_b<0)){return JetFlavor::TAUM1H2P;}
+    if((jet_muflav_b==0) & (jet_elflav_b==0) & (jet_tauflav_b==1) & (jet_taudecaymode_b==10) & (jet_taucharge_b<0)){return JetFlavor::TAUM3H0P;}
+    if((jet_muflav_b==0) & (jet_elflav_b==0) & (jet_tauflav_b==1) & (jet_taudecaymode_b==11) & (jet_taucharge_b<0)){return JetFlavor::TAUM3H1P;}
 
     if(hflav == 5) { //B jet
         if(nbs > 1) {
