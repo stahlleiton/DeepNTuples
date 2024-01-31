@@ -280,6 +280,26 @@ public:
     float Delta_gen_pt_Recluster_;
     float Delta_gen_pt_WithNu_;
     std::map<std::string, float> discriminators_;
+
+    //Gen info for ele/mu/tau
+    static constexpr std::size_t max_num_gen_ = 50;
+    int gen_number_;
+
+    float gen_particle_pt_[max_num_gen_];
+  float gen_particle_eta_[max_num_gen_];
+  float gen_particle_phi_[max_num_gen_];
+  float gen_particle_mass_[max_num_gen_];
+  float gen_particle_id_[max_num_gen_];
+  float gen_particle_status_[max_num_gen_];
+  float gen_particle_daughters_id_[max_num_gen_];
+  float gen_particle_daughters_igen_[max_num_gen_];
+  float gen_particle_daughters_pt_[max_num_gen_];
+  float gen_particle_daughters_eta_[max_num_gen_];
+  float gen_particle_daughters_phi_[max_num_gen_];
+  float gen_particle_daughters_mass_[max_num_gen_];
+  float gen_particle_daughters_status_[max_num_gen_];
+  float gen_particle_daughters_charge_[max_num_gen_];
+
 };
 
 

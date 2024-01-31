@@ -94,6 +94,23 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"Delta_gen_pt_Recluster"    ,&Delta_gen_pt_Recluster_    ,"Delta_gen_pt_Recluster_/F"    );
     addBranch(tree,"Delta_gen_pt_WithNu"    ,&Delta_gen_pt_WithNu_    ,"Delta_gen_pt_WithNu_/F"    );
 
+    // Ele/Mu/Tau gen
+    addBranch(tree,"gen_number", &gen_number_, "gen_number_/I");
+    addBranch(tree,"gen_particle_pt", &gen_particle_pt_, "gen_particle_pt_[gen_number_]/F");
+    addBranch(tree,"gen_particle_eta", &gen_particle_eta_, "gen_particle_eta_[gen_number_]/F");
+    addBranch(tree,"gen_particle_phi", &gen_particle_phi_, "gen_particle_phi_[gen_number_]/F");
+    addBranch(tree,"gen_particle_mass", &gen_particle_mass_, "gen_particle_mass_[gen_number_]/F");
+    addBranch(tree,"gen_particle_id", &gen_particle_id_, "gen_particle_id_[gen_number_]/F");
+    addBranch(tree,"gen_particle_status", &gen_particle_status_, "gen_particle_status_[gen_number_]/F");
+    addBranch(tree,"gen_particle_daughters_id", &gen_particle_daughters_id_, "gen_particle_daughters_id_[gen_number_]/F");
+    addBranch(tree,"gen_particle_daughters_igen", &gen_particle_daughters_igen_, "gen_particle_daughters_igen_[gen_number_]/F");
+    addBranch(tree,"gen_particle_daughters_pt", &gen_particle_daughters_pt_, "gen_particle_daughters_pt_[gen_number_]/F");
+    addBranch(tree,"gen_particle_daughters_eta", &gen_particle_daughters_eta_, "gen_particle_daughters_eta_[gen_number_]/F");
+    addBranch(tree,"gen_particle_daughters_phi", &gen_particle_daughters_phi_, "gen_particle_daughters_phi_[gen_number_]/F");
+    addBranch(tree,"gen_particle_daughters_mass", &gen_particle_daughters_mass_, "gen_particle_daughters_mass_[gen_number_]/F");
+    addBranch(tree,"gen_particle_daughters_status", &gen_particle_daughters_status_, "gen_particle_daughters_status_[gen_number_]/F");
+    addBranch(tree,"gen_particle_daughters_charge", &gen_particle_daughters_charge_, "gen_particle_daughters_charge_[gen_number_]/F");
+
     if(1) // discriminators might need to be filled differently. FIXME
         for(auto& entry : discriminators_) {
             string better_name(entry.first);
@@ -518,6 +535,25 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
             electrons_relPhi_[i] = reco::deltaPhi(electron.phi(),jet.phi());
             electrons_energy_[i] = electron.energy()/jet.energy();
         }
+    }
+
+    gen_number_ = std::min(gen_particle_pt.size(),max_num_gen_);
+
+    for(size_t i=0; i< (size_t)gen_number_; i++) {
+      gen_particle_pt_[i] = gen_particle_pt.at(i);
+      gen_particle_eta_[i] = gen_particle_eta.at(i);
+      gen_particle_phi_[i] = gen_particle_phi.at(i);
+      gen_particle_mass_[i] = gen_particle_mass.at(i);
+      gen_particle_id_[i] = gen_particle_id.at(i);
+      gen_particle_status_[i] = gen_particle_status.at(i);
+      gen_particle_daughters_id_[i] = gen_particle_daughters_id.at(i);
+      gen_particle_daughters_igen_[i] = gen_particle_daughters_igen.at(i);
+      gen_particle_daughters_pt_[i] = gen_particle_daughters_pt.at(i);
+      gen_particle_daughters_eta_[i] = gen_particle_daughters_eta.at(i);
+      gen_particle_daughters_phi_[i] = gen_particle_daughters_phi.at(i);
+      gen_particle_daughters_mass_[i] = gen_particle_daughters_mass.at(i);
+      gen_particle_daughters_status_[i] = gen_particle_daughters_status.at(i);
+      gen_particle_daughters_charge_[i] = gen_particle_daughters_charge.at(i);
     }
 
     //// Note that jets with gluon->bb (cc) and x->bb (cc) are in the same categories
