@@ -85,19 +85,9 @@ class ntuple_LT: public ntuple_content{
   float LT_distminsv_[max_pfcand_];
   float LT_distminsv2_[max_pfcand_];
 
-  float LT_nhitpixelBarrelLayer1_[max_pfcand_];
-  float LT_nhitpixelBarrelLayer2_[max_pfcand_];
-  float LT_nhitpixelBarrelLayer3_[max_pfcand_];
-  float LT_nhitpixelBarrelLayer4_[max_pfcand_];
-  float LT_nhitpixelEndcapLayer1_[max_pfcand_];
-  float LT_nhitpixelEndcapLayer2_[max_pfcand_];
-  float LT_numberOfValidHits_[max_pfcand_];
-  float LT_numberOfValidPixelHits_[max_pfcand_];
-  float LT_numberOfValidStripHits_[max_pfcand_];
-  float LT_numberOfValidStripTIBHits_[max_pfcand_];
-  float LT_numberOfValidStripTIDHits_[max_pfcand_];
-  float LT_numberOfValidStripTOBHits_[max_pfcand_];
-  float LT_numberOfValidStripTECHits_[max_pfcand_];
+  float LT_lostInnerHits_[max_pfcand_];
+  float LT_numberOfPixelHits_[max_pfcand_];
+  float LT_numberOfStripHits_[max_pfcand_];
 
   float LT_pdgID_[max_pfcand_];
   float LT_HadFrac_[max_pfcand_];

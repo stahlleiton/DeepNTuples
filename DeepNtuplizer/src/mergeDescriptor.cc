@@ -5,12 +5,8 @@
  *      Author: jkiesele
  */
 
-
-
-
 #include "../interface/mergeDescriptor.h"
 #include <fstream>
-
 
 #include <dirent.h>
 #include <stdlib.h>
@@ -19,13 +15,11 @@
 #include "TROOT.h"
 #include <stdio.h>
 
-
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_bTagVars.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_JetInfo.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_pfCands.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_SV.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_LT.h"
-#include "DeepNTuples/DeepNtuplizer/interface/ntuple_pairwise.h"
 
 static bool debug=true;
 
@@ -133,7 +127,6 @@ std::vector<TChain* > mergeDescriptor::createChains(
     branchinfos.push_back(new ntuple_LT());
     branchinfos.push_back(new ntuple_bTagVars());
     branchinfos.push_back(new ntuple_pfCands());
-    branchinfos.push_back(new ntuple_pairwise());
 
     std::vector<TChain* > chains;
     for(size_t i=0;i<infiles.size();i++){

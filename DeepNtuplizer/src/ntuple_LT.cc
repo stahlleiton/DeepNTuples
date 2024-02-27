@@ -196,21 +196,9 @@ void ntuple_LT::initBranches(TTree* tree){
   addBranch(tree,"LT_chi2",&LT_chi2_,"LT_chi2_[n_Cpfcand_]/F");
   addBranch(tree,"LT_quality",&LT_quality_,"LT_quality_[n_Cpfcand_]/F");
   
-  addBranch(tree,"LT_nhitpixelBarrelLayer1",&LT_nhitpixelBarrelLayer1_,"LT_nhitpixelBarrelLayer1_[n_Cpfcand_]/F");
-  addBranch(tree,"LT_nhitpixelBarrelLayer2",&LT_nhitpixelBarrelLayer2_,"LT_nhitpixelBarrelLayer2_[n_Cpfcand_]/F");
-  addBranch(tree,"LT_nhitpixelBarrelLayer3",&LT_nhitpixelBarrelLayer3_,"LT_nhitpixelBarrelLayer3_[n_Cpfcand_]/F");
-  addBranch(tree,"LT_nhitpixelBarrelLayer4",&LT_nhitpixelBarrelLayer4_,"LT_nhitpixelBarrelLayer4_[n_Cpfcand_]/F");
-  
-  addBranch(tree,"LT_nhitpixelEndcapLayer1",&LT_nhitpixelEndcapLayer1_,"LT_nhitpixelEndcapLayer1_[n_Cpfcand_]/F");
-  addBranch(tree,"LT_nhitpixelEndcapLayer2",&LT_nhitpixelEndcapLayer2_,"LT_nhitpixelEndcapLayer2_[n_Cpfcand_]/F");
-  
-  addBranch(tree,"LT_numberOfValidHits",&LT_numberOfValidHits_,"LT_numberOfValidHits_[n_Cpfcand_]/F");
-  addBranch(tree,"LT_numberOfValidPixelHits",&LT_numberOfValidPixelHits_,"LT_numberOfValidPixelHits_[n_Cpfcand_]/F");
-  addBranch(tree,"LT_numberOfValidStripHits",&LT_numberOfValidStripHits_,"LT_numberOfValidStripHits_[n_Cpfcand_]/F");
-  addBranch(tree,"LT_numberOfValidStripTIBHits",&LT_numberOfValidStripTIBHits_,"LT_numberOfValidStripTIBHits_[n_Cpfcand_]/F");
-  addBranch(tree,"LT_numberOfValidStripTIDHits",&LT_numberOfValidStripTIDHits_,"LT_numberOfValidStripTIDHits_[n_Cpfcand_]/F");
-  addBranch(tree,"LT_numberOfValidStripTOBHits",&LT_numberOfValidStripTOBHits_,"LT_numberOfValidStripTOBHits_[n_Cpfcand_]/F");
-  addBranch(tree,"LT_numberOfValidStripTECHits",&LT_numberOfValidStripTECHits_,"LT_numberOfValidStripTECHits_[n_Cpfcand_]/F");
+  addBranch(tree,"LT_lostInnerHits",&LT_lostInnerHits_,"LT_lostInnerHits_[n_Cpfcand_]/F");
+  addBranch(tree,"LT_numberOfPixelHits",&LT_numberOfPixelHits_,"LT_numberOfPixelHits_[n_Cpfcand_]/F");
+  addBranch(tree,"LT_numberOfStripHits",&LT_numberOfStripHits_,"LT_numberOfStripHits_[n_Cpfcand_]/F");
   
   addBranch(tree,"LT_pdgID",&LT_pdgID_,"LT_pdgID_[n_Cpfcand_]/F");
   addBranch(tree,"LT_HadFrac",&LT_HadFrac_,"LT_HadFrac_[n_Cpfcand_]/F");
@@ -356,84 +344,9 @@ bool ntuple_LT::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  
 
 	LT_drminsv_[fillntupleentry] = catchInfsAndBound(drminpfcandsv_,0,-0.4,0,-0.4);
 
-	//hit pattern variables, as defined here https://github.com/cms-sw/cmssw/blob/master/DataFormats/TrackReco/interface/HitPattern.h
-	//get track associated to a jet constituent
-	const reco::Track *track_ptr = nullptr;
-	auto pf_candidate = dynamic_cast<const reco::PFCandidate *>(PackedCandidate_);
-	auto packed_candidate = dynamic_cast<const pat::PackedCandidate *>(PackedCandidate_);
-	if(pf_candidate){
-	  track_ptr = pf_candidate->bestTrack(); //trackRef was sometimes null
-	}else if(packed_candidate && packed_candidate->hasTrackDetails()){//if PackedCandidate does not have TrackDetails this gives an Exception because unpackCovariance might be called for pseudoTrack/bestTrack
-	  track_ptr = &(packed_candidate->pseudoTrack());
-	}
-	//get hit pattern information
-	if(track_ptr){
-	  const reco::HitPattern &p = track_ptr->hitPattern();
-	  //Tracker per layer
-	  //Pixel barrel 
-	  int Cpfcan_nhitpixelBarrelLayer1 = 0;
-	  int Cpfcan_nhitpixelBarrelLayer2 = 0;
-	  int Cpfcan_nhitpixelBarrelLayer3 = 0;
-	  int Cpfcan_nhitpixelBarrelLayer4 = 0;
-	  //Pixel Endcap 
-	  int Cpfcan_nhitpixelEndcapLayer1 = 0;
-	  int Cpfcan_nhitpixelEndcapLayer2 = 0;
-	  // loop over the hits of the track.
-	  for(int nh = 0; nh < p.numberOfAllHits(reco::HitPattern::TRACK_HITS); nh++){
-	    uint32_t hit = p.getHitPattern(reco::HitPattern::TRACK_HITS, nh);
-	    if(p.validHitFilter(hit)){// if the hit is valid
-	      //Pixel Barrel // it is in pixel barrel
-	      if(p.pixelBarrelHitFilter(hit)){
-                if(p.getLayer(hit)==1) Cpfcan_nhitpixelBarrelLayer1 = Cpfcan_nhitpixelBarrelLayer1+1;
-                if(p.getLayer(hit)==2) Cpfcan_nhitpixelBarrelLayer2 = Cpfcan_nhitpixelBarrelLayer2+1;
-                if(p.getLayer(hit)==3) Cpfcan_nhitpixelBarrelLayer3 = Cpfcan_nhitpixelBarrelLayer3+1;
-                if(p.getLayer(hit)==4) Cpfcan_nhitpixelBarrelLayer4 = Cpfcan_nhitpixelBarrelLayer4+1;
-	      } 
-	      //Pixel Endcap
-	      if(p.pixelEndcapHitFilter(hit)){
-                //std::cout << "valid hit found in pixel Endcap layer " << p.getLayer(hit) << std::endl;
-                if(p.getLayer(hit)==1) Cpfcan_nhitpixelEndcapLayer1 = Cpfcan_nhitpixelEndcapLayer1+1;
-                if(p.getLayer(hit)==2) Cpfcan_nhitpixelEndcapLayer2 = Cpfcan_nhitpixelEndcapLayer2+1;
-	      } 
-	    }
-	  }
-	  //Pixel Barrel 
-	  LT_nhitpixelBarrelLayer1_[fillntupleentry] = (track_ptr->hitPattern().numberOfValidPixelBarrelHits()) ? catchInfsAndBound(Cpfcan_nhitpixelBarrelLayer1,-1,0,100,0) : -1;
-	  LT_nhitpixelBarrelLayer2_[fillntupleentry] = (track_ptr->hitPattern().numberOfValidPixelBarrelHits()) ? catchInfsAndBound(Cpfcan_nhitpixelBarrelLayer2,-1,0,100,0) : -1;
-	  LT_nhitpixelBarrelLayer3_[fillntupleentry] = (track_ptr->hitPattern().numberOfValidPixelBarrelHits()) ? catchInfsAndBound(Cpfcan_nhitpixelBarrelLayer3,-1,0,100,0) : -1;
-	  LT_nhitpixelBarrelLayer4_[fillntupleentry] = (track_ptr->hitPattern().numberOfValidPixelBarrelHits()) ? catchInfsAndBound(Cpfcan_nhitpixelBarrelLayer4,-1,0,100,0) : -1;
-             
-	  LT_nhitpixelEndcapLayer1_[fillntupleentry] = (track_ptr->hitPattern().numberOfValidPixelEndcapHits()) ? catchInfsAndBound(Cpfcan_nhitpixelEndcapLayer1,-1,0,100,0) : -1;
-	  LT_nhitpixelEndcapLayer2_[fillntupleentry] = (track_ptr->hitPattern().numberOfValidPixelEndcapHits()) ? catchInfsAndBound(Cpfcan_nhitpixelEndcapLayer2,-1,0,100,0) : -1;
-	  //Tracker all layers together   
-	  //Valid hits
-	  LT_numberOfValidHits_[fillntupleentry] = (track_ptr->hitPattern().numberOfValidHits()) ? catchInfsAndBound(track_ptr->hitPattern().numberOfValidHits(),-1,0,100,0) : -1;
-	  LT_numberOfValidPixelHits_[fillntupleentry] = (track_ptr->hitPattern().numberOfValidPixelHits()) ? catchInfsAndBound(track_ptr->hitPattern().numberOfValidPixelHits(),-1,0,100,0) : -1;
-	  LT_numberOfValidStripHits_[fillntupleentry] = (track_ptr->hitPattern().numberOfValidStripHits()) ? catchInfsAndBound(track_ptr->hitPattern().numberOfValidStripHits(),-1,0,100,0) : -1;
-	  LT_numberOfValidStripTIBHits_[fillntupleentry] = (track_ptr->hitPattern().numberOfValidStripTIBHits()) ? catchInfsAndBound(track_ptr->hitPattern().numberOfValidStripTIBHits(),-1,0,100,0) : -1;
-	  LT_numberOfValidStripTIDHits_[fillntupleentry] = (track_ptr->hitPattern().numberOfValidStripTIDHits()) ? catchInfsAndBound(track_ptr->hitPattern().numberOfValidStripTIDHits(),-1,0,100,0) : -1;
-	  LT_numberOfValidStripTOBHits_[fillntupleentry] = (track_ptr->hitPattern().numberOfValidStripTOBHits()) ? catchInfsAndBound(track_ptr->hitPattern().numberOfValidStripTOBHits(),-1,0,100,0) : -1;
-	  LT_numberOfValidStripTECHits_[fillntupleentry] = (track_ptr->hitPattern().numberOfValidStripTECHits()) ? catchInfsAndBound(track_ptr->hitPattern().numberOfValidStripTECHits(),-1,0,100,0) : -1;
-	}
-	else{
-	  //Tracker per layer
-	  //Pixel barrel 
-	  LT_nhitpixelBarrelLayer1_[fillntupleentry] = -1;
-	  LT_nhitpixelBarrelLayer2_[fillntupleentry] = -1;
-	  LT_nhitpixelBarrelLayer3_[fillntupleentry] = -1;
-	  LT_nhitpixelBarrelLayer4_[fillntupleentry] = -1;
-	  //Pixel Endcap 
-	  LT_nhitpixelEndcapLayer1_[fillntupleentry] = -1;
-	  LT_nhitpixelEndcapLayer2_[fillntupleentry] = -1;
-
-	  LT_numberOfValidHits_[fillntupleentry] = -1; 
-	  LT_numberOfValidPixelHits_[fillntupleentry] = -1; 
-	  LT_numberOfValidStripHits_[fillntupleentry] = -1; 
-	  LT_numberOfValidStripTIBHits_[fillntupleentry] = -1; 
-	  LT_numberOfValidStripTIDHits_[fillntupleentry] = -1; 
-	  LT_numberOfValidStripTOBHits_[fillntupleentry] = -1; 
-	  LT_numberOfValidStripTECHits_[fillntupleentry] = -1; 
-	}
+	LT_lostInnerHits_[fillntupleentry] = catchInfs(PackedCandidate_->lostInnerHits(),2);
+	LT_numberOfPixelHits_[fillntupleentry] = catchInfs(PackedCandidate_->numberOfPixelHits(),-1);
+	LT_numberOfStripHits_[fillntupleentry] = catchInfs(PackedCandidate_->stripLayersWithMeasurement(),-1);
       }
     }
 

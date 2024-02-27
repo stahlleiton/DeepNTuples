@@ -6,7 +6,6 @@
 #include "../interface/ntuple_pfCands.h"
 #include "../interface/ntuple_FatJetInfo.h"
 #include "../interface/ntuple_LT.h"
-#include "../interface/ntuple_pairwise.h"
 #include "TFile.h"
 #include <vector>
 #include "TH1F.h"
@@ -25,7 +24,6 @@ int main(int argc, char *argv[]) {
     branchinfos.push_back(new ntuple_LT());
     branchinfos.push_back(new ntuple_bTagVars());
     branchinfos.push_back(new ntuple_pfCands());
-    branchinfos.push_back(new ntuple_pairwise());
 
     if (argc < 3)
         return -1;

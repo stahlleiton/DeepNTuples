@@ -9,12 +9,10 @@
 
 #include "../interface/ntuple_content.h"
 #include "../interface/ntuple_SV.h"
-#include "../interface/ntuple_V0Ks.h"
 #include "../interface/ntuple_JetInfo.h"
 #include "../interface/ntuple_pfCands.h"
 #include "../interface/ntuple_bTagVars.h"
 #include "../interface/ntuple_FatJetInfo.h"
-#include "../interface/ntuple_pairwise.h"
 #include "../interface/ntuple_LT.h"
 //ROOT includes
 #include "TTree.h"
@@ -148,9 +146,6 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
                           edm::ESInputTag("", "TransientTrackBuilder")));
   addModule(svmodule, "SVNtuple");
 
-  ntuple_V0Ks* v0ksmodule=new ntuple_V0Ks("", jetR);
-    addModule(v0ksmodule, "V0KsNtuple");
-
   ntuple_JetInfo* jetinfo=new ntuple_JetInfo();
   jetinfo->setQglToken(consumes<edm::ValueMap<float>>(edm::InputTag(t_qgtagger, "qgLikelihood")));
   jetinfo->setPtDToken(consumes<edm::ValueMap<float>>(edm::InputTag(t_qgtagger, "ptD")));
@@ -186,14 +181,6 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
 
   addModule(LT, "LT");
 
-  ntuple_pairwise * pairwise = new ntuple_pairwise();
-  pairwise->setJetRadius(jetR);
-  pairwise->setTrackBuilderToken(
-      esConsumes<TransientTrackBuilder, TransientTrackRecord>(
-                          edm::ESInputTag("", "TransientTrackBuilder")));
-
-  addModule(pairwise, "pairwise");
-
   addModule(new ntuple_bTagVars(), "bTagVars");
 
   if(runFatJets_){
@@ -202,13 +189,6 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
     fatjetinfo->setFatJetToken(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjets")));
     addModule(fatjetinfo, "fatJets");
   }
-
-  /*
-   *
-   * Modules initialized
-   *
-   * parse the input parameters (if any)
-   */
 
   for(auto& m: modules_)
     m->getInput(iConfig);
@@ -270,26 +250,8 @@ DeepNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   if(applySelection_)
     std::random_shuffle (indices.begin(),indices.end());
 
-  /*for (size_t i_j = 0; i_j < jets->size(); ++i_j) {
-    pat::Jet jet = jets->at(i_j);
-    edm::RefToBase<pat::Jet> jetRef = jets->refAt(i_j);
-    std::vector<std::string> labels = jet.tagInfoLabels();
-    for(unsigned int k = 0; k < labels.size(); k++) {
-      //std::cout << labels[k] << " "  << std::endl;
-    }
-    if(jet.hasTagInfo("pixelCluster")){
-      std::cout << jetRef.get() << " | " << jetRef << " : ";
-      const reco::PixelClusterTagInfo *test = static_cast<const reco::PixelClusterTagInfo*>( jet.tagInfo("pixelCluster") );
-      reco::PixelClusterData pcd =test->data();
-      for(size_t i = 0; i < pcd.r004.size(); i++){
-	std::cout << "\tL1 004: " << (int)pcd.r004[i] << std::endl;
-      }
-    }
-    }*/
-
   edm::View<pat::Jet>::const_iterator jetIter;
   // loop over the jets
-  //for (edm::View<pat::Jet>::const_iterator jetIter = jets->begin(); jetIter != jets->end(); ++jetIter) {
   for(size_t j=0;j<indices.size();j++){
     njetstotal_++;
     size_t jetidx=indices.at(j);
@@ -302,14 +264,12 @@ DeepNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     bool writejet=true;
     size_t idx = 0;
     for(auto& m:modules_){
-      //std::cout << module_names_[idx] << std::endl;
       if(! m->fillBranches(jet, jetidx, jets.product())){
 	writejet=false;
 	if(applySelection_) break;
       }
       idx++;
     }
-    //std::cout << "Jet done" << std::endl;
     if( (writejet&&applySelection_) || !applySelection_ ){
       tree_->Fill();
       njetsselected_++;
@@ -319,7 +279,6 @@ DeepNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   } // end of looping over the jets
 }
-
 
 // ------------ method called once each job just before starting event loop  ------------
 void
