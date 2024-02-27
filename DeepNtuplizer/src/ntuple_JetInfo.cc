@@ -106,20 +106,21 @@ void ntuple_JetInfo::initBranches(TTree* tree){
 
     // Ele/Mu/Tau gen
     addBranch(tree,"gen_number", &gen_number_, "gen_number_/I");
+    addBranch(tree,"gend_number", &gend_number_, "gend_number_/I");
     addBranch(tree,"gen_particle_pt", &gen_particle_pt_, "gen_particle_pt_[gen_number_]/F");
     addBranch(tree,"gen_particle_eta", &gen_particle_eta_, "gen_particle_eta_[gen_number_]/F");
     addBranch(tree,"gen_particle_phi", &gen_particle_phi_, "gen_particle_phi_[gen_number_]/F");
     addBranch(tree,"gen_particle_mass", &gen_particle_mass_, "gen_particle_mass_[gen_number_]/F");
     addBranch(tree,"gen_particle_id", &gen_particle_id_, "gen_particle_id_[gen_number_]/F");
     addBranch(tree,"gen_particle_status", &gen_particle_status_, "gen_particle_status_[gen_number_]/F");
-    addBranch(tree,"gen_particle_daughters_id", &gen_particle_daughters_id_, "gen_particle_daughters_id_[gen_number_]/F");
-    addBranch(tree,"gen_particle_daughters_igen", &gen_particle_daughters_igen_, "gen_particle_daughters_igen_[gen_number_]/F");
-    addBranch(tree,"gen_particle_daughters_pt", &gen_particle_daughters_pt_, "gen_particle_daughters_pt_[gen_number_]/F");
-    addBranch(tree,"gen_particle_daughters_eta", &gen_particle_daughters_eta_, "gen_particle_daughters_eta_[gen_number_]/F");
-    addBranch(tree,"gen_particle_daughters_phi", &gen_particle_daughters_phi_, "gen_particle_daughters_phi_[gen_number_]/F");
-    addBranch(tree,"gen_particle_daughters_mass", &gen_particle_daughters_mass_, "gen_particle_daughters_mass_[gen_number_]/F");
-    addBranch(tree,"gen_particle_daughters_status", &gen_particle_daughters_status_, "gen_particle_daughters_status_[gen_number_]/F");
-    addBranch(tree,"gen_particle_daughters_charge", &gen_particle_daughters_charge_, "gen_particle_daughters_charge_[gen_number_]/F");
+    addBranch(tree,"gen_particle_daughters_id", &gen_particle_daughters_id_, "gen_particle_daughters_id_[gend_number_]/F");
+    addBranch(tree,"gen_particle_daughters_igen", &gen_particle_daughters_igen_, "gen_particle_daughters_igen_[gend_number_]/F");
+    addBranch(tree,"gen_particle_daughters_pt", &gen_particle_daughters_pt_, "gen_particle_daughters_pt_[gend_number_]/F");
+    addBranch(tree,"gen_particle_daughters_eta", &gen_particle_daughters_eta_, "gen_particle_daughters_eta_[gend_number_]/F");
+    addBranch(tree,"gen_particle_daughters_phi", &gen_particle_daughters_phi_, "gen_particle_daughters_phi_[gend_number_]/F");
+    addBranch(tree,"gen_particle_daughters_mass", &gen_particle_daughters_mass_, "gen_particle_daughters_mass_[gend_number_]/F");
+    addBranch(tree,"gen_particle_daughters_status", &gen_particle_daughters_status_, "gen_particle_daughters_status_[gend_number_]/F");
+    addBranch(tree,"gen_particle_daughters_charge", &gen_particle_daughters_charge_, "gen_particle_daughters_charge_[gend_number_]/F");
 
     if(1) // discriminators might need to be filled differently. FIXME
         for(auto& entry : discriminators_) {
@@ -200,8 +201,7 @@ void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
 	jetv_gen_wnu.push_back(jref);                                                                                                                                                              
       }
       sort(jetv_gen_wnu.begin(), jetv_gen_wnu.end(), genJetRefSorter);
-    }
-
+      }
 
  for (const reco::Candidate &genC : *genParticlesHandle)
    {
@@ -528,7 +528,6 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     }
     rho_ = rhoInfo()[0];
 
-
     jet_no_=jetidx;
 
     const auto jetRef = reco::CandidatePtr(coll->ptrs().at( jetidx));
@@ -571,9 +570,8 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
             electrons_energy_[i] = electron.energy()/jet.energy();
         }
     }
-
     gen_number_ = std::min(gen_particle_pt.size(),max_num_gen_);
-
+    gend_number_ = std::min(gen_particle_daughters_pt.size(),max_num_gen_);
     for(size_t i=0; i< (size_t)gen_number_; i++) {
       gen_particle_pt_[i] = gen_particle_pt.at(i);
       gen_particle_eta_[i] = gen_particle_eta.at(i);
@@ -581,6 +579,8 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
       gen_particle_mass_[i] = gen_particle_mass.at(i);
       gen_particle_id_[i] = gen_particle_id.at(i);
       gen_particle_status_[i] = gen_particle_status.at(i);
+    }
+    for(size_t i=0; i< (size_t)gend_number_; i++) {
       gen_particle_daughters_id_[i] = gen_particle_daughters_id.at(i);
       gen_particle_daughters_igen_[i] = gen_particle_daughters_igen.at(i);
       gen_particle_daughters_pt_[i] = gen_particle_daughters_pt.at(i);

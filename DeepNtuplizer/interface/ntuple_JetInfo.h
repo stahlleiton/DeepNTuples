@@ -305,6 +305,7 @@ public:
     //Gen info for ele/mu/tau
     static constexpr std::size_t max_num_gen_ = 50;
     int gen_number_;
+    int gend_number_;
 
     float gen_particle_pt_[max_num_gen_];
   float gen_particle_eta_[max_num_gen_];

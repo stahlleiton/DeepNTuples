@@ -126,7 +126,6 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
    *  Everything else does not need to be changed if
    *  modules don't interact.
    */
-
   // read configuration parameters
   const double jetR = iConfig.getParameter<double>("jetR");
   const bool  runFatJets_ = iConfig.getParameter<bool>("runFatJet");
@@ -291,10 +290,8 @@ DeepNtuplizer::beginJob()
 			  "TFile Service is not registered in cfg file" );
   }
   tree_=(fs->make<TTree>("tree" ,"tree" ));
-
   for(auto& m:modules_)
     m->initBranches(tree_);
-
   njetstotal_=0;
   njetswithgenjet_=0;
   njetsselected_=0;
