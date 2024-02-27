@@ -13,6 +13,14 @@
 
 using namespace std;
 
+template<typename T>
+class PatRefPtSorter {
+public:
+  bool operator()(const T& i, const T& j) const {
+    return (i->pt() > j->pt());
+  }
+};
+
 void ntuple_JetInfo::getInput(const edm::ParameterSet& iConfig){
 
     gluonReduction_=(iConfig.getParameter<double>("gluonReduction"));
@@ -72,6 +80,8 @@ void ntuple_JetInfo::initBranches(TTree* tree){
 
     // jet variables
     addBranch(tree,"jet_pt", &jet_pt_);
+    addBranch(tree,"jet_genmatch_pt", &jet_genmatch_pt_);
+    addBranch(tree,"jet_genmatch_wnu_pt", &jet_genmatch_wnu_pt_);
     addBranch(tree,"jet_corr_pt", &jet_corr_pt_);
     addBranch(tree,"jet_eta", &jet_eta_);
     addBranch(tree,"jet_phi", &jet_phi_);
@@ -131,7 +141,8 @@ void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
     iEvent.getByToken(genJetMatchAllowDuplicatesToken_, genJetMatchAllowDuplicates);
 
     iEvent.getByToken(genParticlesToken_, genParticlesHandle);
-
+    iEvent.getByToken(genJetsWnuToken_, genJetsWnuH);
+    iEvent.getByToken(genJetsToken_, genJetsH);
 
     iEvent.getByToken(muonsToken_, muonsHandle);
     iEvent.getByToken(electronsToken_, electronsHandle);
@@ -167,7 +178,31 @@ void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
     genElectronsFromResonance4V_.clear();
     tau_gen_visible_.clear();
     tau_gen_.clear();
+
+    jetv_gen_wnu.clear();
+    jetv_gen.clear();
+
+    PatRefPtSorter<reco::GenJetRef> genJetRefSorter;
+
+    // Standard gen-jets excluding the neutrinos
+    if(genJetsH.isValid()){
+      for (auto jets_iter = genJetsH->begin(); jets_iter != genJetsH->end(); ++jets_iter) {                                                                                                   
+	reco::GenJetRef jref (genJetsH,jets_iter-genJetsH->begin());                                                                                                                      
+	jetv_gen.push_back(jref);                                                                                                                                                              
+      }
+      sort(jetv_gen.begin(), jetv_gen.end(), genJetRefSorter);
+    }
     
+    // GEN jets with neutrinos
+    if(genJetsWnuH.isValid()){
+      for (auto jets_iter = genJetsWnuH->begin(); jets_iter != genJetsWnuH->end(); ++jets_iter) {                                                                                           
+	reco::GenJetRef jref  (genJetsWnuH, jets_iter-genJetsWnuH->begin());                                                                                                                 
+	jetv_gen_wnu.push_back(jref);                                                                                                                                                              
+      }
+      sort(jetv_gen_wnu.begin(), jetv_gen_wnu.end(), genJetRefSorter);
+    }
+
+
  for (const reco::Candidate &genC : *genParticlesHandle)
    {
      const reco::GenParticle &gen = static_cast< const reco::GenParticle &>(genC);
@@ -623,8 +658,38 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     jet_mass_ = jet.mass();
     jet_energy_ = jet.energy();
 
-    genDecay_ = -1.;
+    // Matching with gen-jets                                                                                                                                                                               
+    int genjet_pos_matched = -1;
+    float gen_minDR = 0.4;
+    for(size_t igen = 0; igen < jetv_gen.size(); igen++){
+      if(reco::deltaR(jetv_gen[igen]->p4(),jet.p4()) < gen_minDR){
+        genjet_pos_matched = igen;
+        gen_minDR = reco::deltaR(jetv_gen[igen]->p4(),jet.p4());
+      }
+    }
 
+    int genjet_wnu_pos_matched = -1;
+    float gen_minDR_wnu = 0.4;
+    for(size_t igen = 0; igen < jetv_gen_wnu.size(); igen++){
+      if(reco::deltaR(jetv_gen_wnu[igen]->p4(),jet.p4()) < gen_minDR_wnu){
+        genjet_wnu_pos_matched = igen;
+        gen_minDR_wnu = reco::deltaR(jetv_gen_wnu[igen]->p4(),jet.p4());
+      }
+    }
+
+    jet_genmatch_pt_ = -1.0;
+    jet_genmatch_wnu_pt_ = -1.0;
+    
+    if(genjet_pos_matched >= 0){
+      jet_genmatch_pt_ = jetv_gen[genjet_pos_matched]->pt();
+    }
+
+    if(genjet_wnu_pos_matched >= 0){
+      jet_genmatch_wnu_pt_ = jetv_gen_wnu[genjet_wnu_pos_matched]->pt();
+    }
+
+    genDecay_ = -1.;
+    
     try {
         reco::GenParticleRefVector Bhadrons_in_jet = jet.jetFlavourInfo().getbHadrons();
 

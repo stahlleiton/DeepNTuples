@@ -156,6 +156,8 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   jetinfo->setIsHerwig(isHerwig);
 
   jetinfo->setGenJetMatchReclusterToken(consumes<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchRecluster" )));
+  jetinfo->setGenJetsToken(consumes<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("genJets")));
+  jetinfo->setGenJetsWnuToken(mayConsume<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("genJetsWnu")));
   jetinfo->setGenJetMatchWithNuToken(consumes<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchWithNu" )));
   jetinfo->setGenJetMatchAllowDuplicatesToken(consumes<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchAllowDuplicates" ))); 
   jetinfo->setGenParticlesToken(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("pruned")));

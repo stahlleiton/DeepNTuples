@@ -54,6 +54,16 @@ public:
         genJetMatchReclusterToken_ = genJetMatchReclusterToken;
     }
 
+    void setGenJetsToken(
+            edm::EDGetTokenT<reco::GenJetCollection > genJetsToken) {
+        genJetsToken_ = genJetsToken;
+    }
+
+    void setGenJetsWnuToken(
+            edm::EDGetTokenT<reco::GenJetCollection > genJetsWnuToken) {
+        genJetsWnuToken_ = genJetsWnuToken;
+    }
+
     void setGenJetMatchWithNuToken(
             edm::EDGetTokenT<edm::Association<reco::GenJetCollection> > genJetMatchWithNuToken) {
         genJetMatchWithNuToken_ = genJetMatchWithNuToken;
@@ -106,6 +116,8 @@ public:
     edm::EDGetTokenT<edm::Association<reco::GenJetCollection> > genJetMatchReclusterToken_;
     edm::EDGetTokenT<edm::Association<reco::GenJetCollection> > genJetMatchWithNuToken_;
     edm::EDGetTokenT<edm::Association<reco::GenJetCollection> > genJetMatchAllowDuplicatesToken_;
+    edm::EDGetTokenT<reco::GenJetCollection > genJetsWnuToken_;
+    edm::EDGetTokenT<reco::GenJetCollection > genJetsToken_;
 
     edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken_;
 
@@ -116,6 +128,9 @@ public:
     edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatchWithNu;
     edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatchAllowDuplicates;
 
+    edm::Handle<reco::GenJetCollection> genJetsWnuH;
+    edm::Handle<reco::GenJetCollection> genJetsH;  
+
     edm::Handle<reco::GenParticleCollection> genParticlesHandle;
 
     edm::Handle<pat::MuonCollection> muonsHandle;
@@ -125,6 +140,10 @@ public:
     TRandom3 TRandom_;
     float gluonReduction_;
 
+    // GenJet with and without nu
+    std::vector<reco::GenJetRef> jetv_gen;
+    std::vector<reco::GenJetRef> jetv_gen_wnu;   
+  
     // Generator-level information (GEN particles)
     std::vector<float>  gen_particle_pt;
     std::vector<float>  gen_particle_eta;
@@ -229,6 +248,8 @@ public:
 
     // jet variables
     float jet_pt_;
+    float jet_genmatch_pt_;
+    float jet_genmatch_wnu_pt_;
     float jet_corr_pt_;
     float  jet_eta_;
     float  jet_phi_;
