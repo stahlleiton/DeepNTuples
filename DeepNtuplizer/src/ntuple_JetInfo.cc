@@ -46,6 +46,7 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     // truth labels
     addBranch(tree,"gen_pt"    ,&gen_pt_    ,"gen_pt_/F"    );
     addBranch(tree,"Delta_gen_pt"    ,&Delta_gen_pt_,"Delta_gen_pt_/F"    );
+    addBranch(tree,"isMC",&isMC_, "isMC_/I");
     addBranch(tree,"isB",&isB_, "isB_/I");
     addBranch(tree,"isGBB",&isGBB_, "isGBB_/I");
     addBranch(tree,"isBB",&isBB_, "isBB_/I");
@@ -368,6 +369,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     if(!coll)
         throw std::runtime_error("ntuple_JetInfo::fillBranches: no jet collection");
 
+    isMC_ = -1;
     /// thresholds for matching
     static float dRCone        = 0.2;
     static float dRMatchingPF  = 0.1;

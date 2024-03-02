@@ -194,6 +194,7 @@ public:
    
     float Delta_gen_pt_;
     //classification
+    int isMC_;
     int isB_;
     int isGBB_;
     int isBB_;
