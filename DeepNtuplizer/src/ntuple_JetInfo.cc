@@ -28,12 +28,14 @@ void ntuple_JetInfo::getInput(const edm::ParameterSet& iConfig){
     jetPtMax_=(iConfig.getParameter<double>("jetPtMax"));
     jetAbsEtaMin_=(iConfig.getParameter<double>("jetAbsEtaMin"));
     jetAbsEtaMax_=(iConfig.getParameter<double>("jetAbsEtaMax"));
-    
+
+    MC_=(iConfig.getParameter<bool>("MC"));
     vector<string> disc_names = iConfig.getParameter<vector<string> >("bDiscriminators");
     for(auto& name : disc_names) {
         discriminators_[name] = 0.;
     }
 }
+
 void ntuple_JetInfo::initBranches(TTree* tree){
 
     //more general event info, here applied per jet
@@ -44,8 +46,9 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"jet_no"    ,&jet_no_    ,"jet_no/I"    );
 
     // truth labels
-    addBranch(tree,"gen_pt"    ,&gen_pt_    ,"gen_pt_/F"    );
-    addBranch(tree,"Delta_gen_pt"    ,&Delta_gen_pt_,"Delta_gen_pt_/F"    );
+    //addBranch(tree,"gen_pt"    ,&gen_pt_    ,"gen_pt_/F"    );
+    //addBranch(tree,"Delta_gen_pt"    ,&Delta_gen_pt_,"Delta_gen_pt_/F"    );
+    addBranch(tree,"isMC",&isMC_, "isMC_/I");
     addBranch(tree,"isB",&isB_, "isB_/I");
     addBranch(tree,"isGBB",&isGBB_, "isGBB_/I");
     addBranch(tree,"isBB",&isBB_, "isBB_/I");
@@ -72,7 +75,7 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"isTaum3h1p_",&isTaum3h1p_, "isTaum3h1p_/I");
     addBranch(tree,"isPU",&isPU_, "isPU_/I");
     addBranch(tree,"isUndefined",&isUndefined_, "isUndefined_/I");
-    addBranch(tree,"genDecay",&genDecay_, "genDecay_/F"); //dxy corresponds to the distance the Bhadron traveled
+    //addBranch(tree,"genDecay",&genDecay_, "genDecay_/F"); //dxy corresponds to the distance the Bhadron traveled
     
     addBranch(tree,"jet_hflav", &jet_hflav_);
     addBranch(tree,"jet_pflav", &jet_pflav_);
@@ -80,8 +83,8 @@ void ntuple_JetInfo::initBranches(TTree* tree){
 
     // jet variables
     addBranch(tree,"jet_pt", &jet_pt_);
-    addBranch(tree,"jet_genmatch_pt", &jet_genmatch_pt_);
-    addBranch(tree,"jet_genmatch_wnu_pt", &jet_genmatch_wnu_pt_);
+    //addBranch(tree,"jet_genmatch_pt", &jet_genmatch_pt_);
+    //addBranch(tree,"jet_genmatch_wnu_pt", &jet_genmatch_wnu_pt_);
     addBranch(tree,"jet_corr_pt", &jet_corr_pt_);
     addBranch(tree,"jet_eta", &jet_eta_);
     addBranch(tree,"jet_phi", &jet_phi_);
@@ -99,7 +102,7 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"QG_axis2", &QG_axis2_); // jet shape i.e. gluon are wider than quarks
     addBranch(tree,"QG_mult",  &QG_mult_);  // multiplicity i.e. total num of PFcands reconstructed
 
-    addBranch(tree,"gen_pt_Recluster"    ,&gen_pt_Recluster_    ,"gen_pt_Recluster_/F"    );
+    /*addBranch(tree,"gen_pt_Recluster"    ,&gen_pt_Recluster_    ,"gen_pt_Recluster_/F"    );
     addBranch(tree,"gen_pt_WithNu"    ,&gen_pt_WithNu_    ,"gen_pt_WithNu_/F"    );
     addBranch(tree,"Delta_gen_pt_Recluster"    ,&Delta_gen_pt_Recluster_    ,"Delta_gen_pt_Recluster_/F"    );
     addBranch(tree,"Delta_gen_pt_WithNu"    ,&Delta_gen_pt_WithNu_    ,"Delta_gen_pt_WithNu_/F"    );
@@ -120,7 +123,7 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"gen_particle_daughters_phi", &gen_particle_daughters_phi_, "gen_particle_daughters_phi_[gend_number_]/F");
     addBranch(tree,"gen_particle_daughters_mass", &gen_particle_daughters_mass_, "gen_particle_daughters_mass_[gend_number_]/F");
     addBranch(tree,"gen_particle_daughters_status", &gen_particle_daughters_status_, "gen_particle_daughters_status_[gend_number_]/F");
-    addBranch(tree,"gen_particle_daughters_charge", &gen_particle_daughters_charge_, "gen_particle_daughters_charge_[gend_number_]/F");
+    addBranch(tree,"gen_particle_daughters_charge", &gen_particle_daughters_charge_, "gen_particle_daughters_charge_[gend_number_]/F");*/
 
     if(1) // discriminators might need to be filled differently. FIXME
         for(auto& entry : discriminators_) {
@@ -137,13 +140,13 @@ void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
     iEvent.getByToken(axis2Token_, axis2Handle);
     iEvent.getByToken(multToken_, multHandle);
 
-    iEvent.getByToken(genJetMatchReclusterToken_, genJetMatchRecluster);
+    /*iEvent.getByToken(genJetMatchReclusterToken_, genJetMatchRecluster);
     iEvent.getByToken(genJetMatchWithNuToken_, genJetMatchWithNu);
     iEvent.getByToken(genJetMatchAllowDuplicatesToken_, genJetMatchAllowDuplicates);
 
     iEvent.getByToken(genParticlesToken_, genParticlesHandle);
     iEvent.getByToken(genJetsWnuToken_, genJetsWnuH);
-    iEvent.getByToken(genJetsToken_, genJetsH);
+    iEvent.getByToken(genJetsToken_, genJetsH);*/
 
     iEvent.getByToken(muonsToken_, muonsHandle);
     iEvent.getByToken(electronsToken_, electronsHandle);
@@ -152,7 +155,7 @@ void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
 
     //presumably this whole part can be removed!
 
-    neutrinosLepB.clear();
+    /*neutrinosLepB.clear();
     neutrinosLepB_C.clear();
     gToBB.clear();
     gToCC.clear();
@@ -358,7 +361,7 @@ void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
        igen++;
      }  
    }
- }
+   }*/
 
 }
 
@@ -368,14 +371,20 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     if(!coll)
         throw std::runtime_error("ntuple_JetInfo::fillBranches: no jet collection");
 
+    if(MC_){
+      isMC_ = 1;  
+    }
+    else{
+      isMC_ = 0;
+    }
     /// thresholds for matching
-    static float dRCone        = 0.2;
+    /*static float dRCone        = 0.2;
     static float dRMatchingPF  = 0.1;
     static float ptGenLeptonMin = 8;
-    static float ptGenTauVisibleMin = 15;
+    static float ptGenTauVisibleMin = 15;*/
 
     // Gen leptons from resonance decay 
-    std::vector<TLorentzVector> genLepFromResonance4V;
+    /*std::vector<TLorentzVector> genLepFromResonance4V;
     std::vector<TLorentzVector> genMuonsFromResonance4V;
     std::vector<TLorentzVector> genElectronsFromResonance4V;
     std::vector<int> genMuonsFromResonanceCharge;
@@ -499,7 +508,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 	genLepton4V = tau_gen.at(itau);
 	genLeptonVis4V = tau_gen_visible.at(itau);
       }
-    }
+      }*/
 
     /// cuts ///
     bool returnval=true;
@@ -510,8 +519,8 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 
 
     // often we have way to many gluons that we do not need. This randomply reduces the gluons
-    if (gluonReduction_>0 && jet.partonFlavour()==21)
-        if(TRandom_.Uniform()>gluonReduction_) returnval=false;
+    //if (gluonReduction_>0 && jet.partonFlavour()==21)
+    //  if(TRandom_.Uniform()>gluonReduction_) returnval=false;
 
     //branch fills
     for(auto& entry : discriminators_) {
@@ -521,10 +530,10 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     npv_ = vertices()->size();
 
     for (auto const& v : *pupInfo()) {
-        int bx = v.getBunchCrossing();
-        if (bx == 0) {
-            ntrueInt_ = v.getTrueNumInteractions();
-        }
+      int bx = 0; //v.getBunchCrossing();
+      if (bx == 0) {
+	ntrueInt_ = 0;//v.getTrueNumInteractions();
+      }
     }
     rho_ = rhoInfo()[0];
 
@@ -570,7 +579,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
             electrons_energy_[i] = electron.energy()/jet.energy();
         }
     }
-    gen_number_ = std::min(gen_particle_pt.size(),max_num_gen_);
+    /*gen_number_ = std::min(gen_particle_pt.size(),max_num_gen_);
     gend_number_ = std::min(gen_particle_daughters_pt.size(),max_num_gen_);
     for(size_t i=0; i< (size_t)gen_number_; i++) {
       gen_particle_pt_[i] = gen_particle_pt.at(i);
@@ -589,7 +598,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
       gen_particle_daughters_mass_[i] = gen_particle_daughters_mass.at(i);
       gen_particle_daughters_status_[i] = gen_particle_daughters_status.at(i);
       gen_particle_daughters_charge_[i] = gen_particle_daughters_charge.at(i);
-    }
+      }
 
     //// Note that jets with gluon->bb (cc) and x->bb (cc) are in the same categories
     if(true){
@@ -621,14 +630,14 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
         case deep_ntuples::JetFlavor::D: isD_=1; break;
         default : isUndefined_=1; break;
         }
-    }
+	}*/
 
     //truth labeling with fallback to physics definition for light/gluon/undefined of standard flavor definition
     //// Note that jets with gluon->bb (cc) and x->bb (cc) are in the same categories
     isPhysB_=0; isPhysBB_=0; isPhysGBB_=0; isPhysC_=0; isPhysCC_=0;
     isPhysGCC_=0; isPhysD_=0; isPhysU_=0; isPhysS_=0; isPhysG_=0, isPhysLeptonicB_=0, isPhysLeptonicB_C_=0, isPhysUndefined_=0;
     isPhysTau_=0, isPhysPU_=0;
-    if(true){
+    /*if(true){
       switch(deep_ntuples::jet_flavour(jet, gToBB, gToCC, neutrinosLepB, neutrinosLepB_C, alltaus_, pos_matched_genmu, pos_matched_genele, pos_matched_tauh, gentau_decaymode, tau_gen_charge, true)) {
         case deep_ntuples::JetFlavor::S:  isPhysS_=1; break;
         case deep_ntuples::JetFlavor::U: isPhysU_=1; break;
@@ -646,7 +655,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 	case deep_ntuples::JetFlavor::PU: isPhysPU_=1; break;
         default : isPhysUndefined_=1; break;
         }
-    }
+	}*/
 
     if(isUndefined_) returnval=false;
     pat::JetCollection h;
@@ -659,7 +668,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     jet_energy_ = jet.energy();
 
     // Matching with gen-jets                                                                                                                                                                               
-    int genjet_pos_matched = -1;
+    /*int genjet_pos_matched = -1;
     float gen_minDR = 0.4;
     for(size_t igen = 0; igen < jetv_gen.size(); igen++){
       if(reco::deltaR(jetv_gen[igen]->p4(),jet.p4()) < gen_minDR){
@@ -686,11 +695,11 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 
     if(genjet_wnu_pos_matched >= 0){
       jet_genmatch_wnu_pt_ = jetv_gen_wnu[genjet_wnu_pos_matched]->pt();
-    }
+      }
 
-    genDecay_ = -1.;
+    genDecay_ = -1.;*/
     
-    try {
+    /*try {
         reco::GenParticleRefVector Bhadrons_in_jet = jet.jetFlavourInfo().getbHadrons();
 
         if (Bhadrons_in_jet.size() > 0){ 
@@ -727,7 +736,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     }
     catch (const cms::Exception &e){
         genDecay_ = -1.;
-    }
+	}*/
 
     try{
         float NHF  = jet.neutralHadronEnergyFraction();
@@ -752,7 +761,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
         jet_jetId_=-1;
     }
     
-    jet_puId_= 0;
+    /*jet_puId_= 0;
     jet_hflav_=abs(jet.hadronFlavour());
     jet_pflav_=abs(jet.partonFlavour());
     jet_phflav_=0;
@@ -798,7 +807,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 
         Delta_gen_pt_Recluster_=gen_pt_Recluster_-jet.pt();
         Delta_gen_pt_WithNu_=gen_pt_WithNu_-jet.pt();
-    }
+    }*/
 
     auto qgtuple=yuta::calcVariables(&jet);
     //(multiplicity, charged_multiplicity, neutral_multiplicity, ptD, axis1, axis2, pt_dr_log);

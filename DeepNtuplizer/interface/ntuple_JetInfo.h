@@ -49,7 +49,7 @@ public:
         qglToken_ = qglToken;
     }
 
-    void setGenJetMatchReclusterToken(
+  /*void setGenJetMatchReclusterToken(
             edm::EDGetTokenT<edm::Association<reco::GenJetCollection> > genJetMatchReclusterToken) {
         genJetMatchReclusterToken_ = genJetMatchReclusterToken;
     }
@@ -77,7 +77,7 @@ public:
 
     void setGenParticlesToken(edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken) {
         genParticlesToken_ = genParticlesToken;
-    }
+	}*/
 
     void setMuonsToken(edm::EDGetTokenT<pat::MuonCollection> muonsToken) {
         muonsToken_ = muonsToken;
@@ -113,25 +113,25 @@ public:
     edm::Handle<edm::ValueMap<int>> multHandle;
 
 
-    edm::EDGetTokenT<edm::Association<reco::GenJetCollection> > genJetMatchReclusterToken_;
+  /*edm::EDGetTokenT<edm::Association<reco::GenJetCollection> > genJetMatchReclusterToken_;
     edm::EDGetTokenT<edm::Association<reco::GenJetCollection> > genJetMatchWithNuToken_;
     edm::EDGetTokenT<edm::Association<reco::GenJetCollection> > genJetMatchAllowDuplicatesToken_;
     edm::EDGetTokenT<reco::GenJetCollection > genJetsWnuToken_;
     edm::EDGetTokenT<reco::GenJetCollection > genJetsToken_;
 
-    edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken_;
+    edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken_;*/
 
     edm::EDGetTokenT<pat::MuonCollection> muonsToken_;       
     edm::EDGetTokenT<pat::ElectronCollection> electronsToken_;
 
-    edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatchRecluster;
+  /*edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatchRecluster;
     edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatchWithNu;
     edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatchAllowDuplicates;
 
     edm::Handle<reco::GenJetCollection> genJetsWnuH;
     edm::Handle<reco::GenJetCollection> genJetsH;  
 
-    edm::Handle<reco::GenParticleCollection> genParticlesHandle;
+    edm::Handle<reco::GenParticleCollection> genParticlesHandle;*/
 
     edm::Handle<pat::MuonCollection> muonsHandle;
     edm::Handle<pat::ElectronCollection> electronsHandle;
@@ -141,7 +141,7 @@ public:
     float gluonReduction_;
 
     // GenJet with and without nu
-    std::vector<reco::GenJetRef> jetv_gen;
+    /*std::vector<reco::GenJetRef> jetv_gen;
     std::vector<reco::GenJetRef> jetv_gen_wnu;   
   
     // Generator-level information (GEN particles)
@@ -179,9 +179,7 @@ public:
     std::vector<reco::GenParticle> alltaus_;
 
     std::vector<reco::GenParticle> Bhadron_;
-    std::vector<reco::GenParticle> Bhadron_daughter_;
-
-
+    std::vector<reco::GenParticle> Bhadron_daughter_;*/
 
     bool useherwcompat_matching_;
     bool isherwig_;
@@ -190,10 +188,12 @@ public:
 
     // labels (MC truth)
     // regressions pt, Deta, Dphi
-    float gen_pt_;
+    //float gen_pt_;
+    //float genDecay_;
    
-    float Delta_gen_pt_;
+    //float Delta_gen_pt_;
     //classification
+    int isMC_;
     int isB_;
     int isGBB_;
     int isBB_;
@@ -208,7 +208,6 @@ public:
     int isELE_;
     int isPU_;
     int isUndefined_;
-    float genDecay_;
     int isLeptonicB_;
     int isLeptonicB_C_;
     int isTaup1h0p_;
@@ -248,8 +247,8 @@ public:
 
     // jet variables
     float jet_pt_;
-    float jet_genmatch_pt_;
-    float jet_genmatch_wnu_pt_;
+  //float jet_genmatch_pt_;
+  //float jet_genmatch_wnu_pt_;
     float jet_corr_pt_;
     float  jet_eta_;
     float  jet_phi_;
@@ -296,14 +295,15 @@ public:
     int muons_number_ = 0;
     int electrons_number_ = 0;
 
-    float gen_pt_Recluster_;
+  /*float gen_pt_Recluster_;
     float gen_pt_WithNu_;
     float Delta_gen_pt_Recluster_;
-    float Delta_gen_pt_WithNu_;
+    float Delta_gen_pt_WithNu_;*/
+    bool MC_;
     std::map<std::string, float> discriminators_;
 
     //Gen info for ele/mu/tau
-    static constexpr std::size_t max_num_gen_ = 50;
+    /*static constexpr std::size_t max_num_gen_ = 50;
     int gen_number_;
     int gend_number_;
 
@@ -320,7 +320,7 @@ public:
   float gen_particle_daughters_phi_[max_num_gen_];
   float gen_particle_daughters_mass_[max_num_gen_];
   float gen_particle_daughters_status_[max_num_gen_];
-  float gen_particle_daughters_charge_[max_num_gen_];
+  float gen_particle_daughters_charge_[max_num_gen_];*/
 
 };
 

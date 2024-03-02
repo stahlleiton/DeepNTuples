@@ -264,6 +264,8 @@ process.deepntuplizer.applySelection = cms.bool(options.selectJets)
 if ( int(releases[0]) > 8 ) or ( (int(releases[0])==8) and (int(releases[1]) >= 4) ):
    process.deepntuplizer.tagInfoName = cms.string('pfDeepCSV')
 
+if options.isMC:
+    process.deepntuplizer.MC = cms.bool(True)
 if options.eta :
     process.deepntuplizer.jetAbsEtaMax = cms.double(5.0)
     process.deepntuplizer.jetPtMin = cms.double(10.0)
