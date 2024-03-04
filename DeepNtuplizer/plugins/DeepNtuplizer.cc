@@ -115,7 +115,7 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   svToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getParameter<edm::InputTag>("secVertices"))),
   v0KsToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getParameter<edm::InputTag>("V0_ks"))),
   jetToken_(consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("jets"))),
-  puToken_(consumes<std::vector<PileupSummaryInfo >>(iConfig.getParameter<edm::InputTag>("pupInfo"))),
+  puToken_(mayConsume<std::vector<PileupSummaryInfo >>(iConfig.getParameter<edm::InputTag>("pupInfo"))),
   rhoToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("rhoInfo"))),
   pixHitsToken_(consumes< edm::View<reco::BaseTagInfo> > (iConfig.getParameter<edm::InputTag>("pixelhit"))),
   t_qgtagger(iConfig.getParameter<std::string>("qgtagger"))
@@ -222,8 +222,8 @@ DeepNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<std::vector<reco::VertexCompositePtrCandidate> > v0_ks;
   iEvent.getByToken(v0KsToken_, v0_ks);
   
-  edm::Handle<std::vector<PileupSummaryInfo> > pupInfo;
-  iEvent.getByToken(puToken_, pupInfo);
+  //edm::Handle<std::vector<PileupSummaryInfo> > pupInfo;
+  //iEvent.getByToken(puToken_, pupInfo);
 
   edm::Handle<double> rhoInfo;
   iEvent.getByToken(rhoToken_,rhoInfo);
@@ -238,7 +238,7 @@ DeepNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     m->setPrimaryVertices(vertices.product());
     m->setSecVertices(secvertices.product());
     m->setV0ks(v0_ks.product());
-    m->setPuInfo(pupInfo.product());
+    //m->setPuInfo(pupInfo.product());
     m->setRhoInfo(rhoInfo.product());
     m->readSetup(iSetup);
     m->readEvent(iEvent);
