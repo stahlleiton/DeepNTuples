@@ -19,8 +19,8 @@ options.register('selectJets', True, VarParsing.VarParsing.multiplicity.singleto
 options.register('phase2', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "apply jet selection for phase 2. Currently sets JetEtaMax to 3.0 and picks slimmedJetsPuppi as jet collection.")
 options.register('puppi', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use puppi jets")
 options.register('eta', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use eta up to 5.0")
-options.register('roccorData', 'DeepNTuples/DeepNtuplizer/data/RochesterCorrections/RoccoR2018UL.txt', VarParsing.VarParsing.multiplicity.singleton,
-                 VarParsing.VarParsing.varType.string,'location of rochester correction files via edm::FilePath')
+#options.register('roccorData', 'DeepNTuples/DeepNtuplizer/data/RochesterCorrections/RoccoR2018UL.txt', VarParsing.VarParsing.multiplicity.singleton,
+ #                VarParsing.VarParsing.varType.string,'location of rochester correction files via edm::FilePath')
 options.register('isMC', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use MC info (gen) or not")
 
 import os
@@ -279,20 +279,20 @@ if options.phase2 :
 process.deepntuplizer.gluonReduction  = cms.double(options.gluonReduction)
 
 ### Rochester corrections for muons
-process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
-    correctedMuons = cms.PSet(
-        initialSeed = cms.untracked.uint32(1),
-        engineName  = cms.untracked.string('TRandom3')
-    )
-)
+#process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
+ #   correctedMuons = cms.PSet(
+  #      initialSeed = cms.untracked.uint32(1),
+   #     engineName  = cms.untracked.string('TRandom3')
+    #)
+#)
 
 ######## Correct muons with the Rochester corrections                                                                                                                                                 
-process.correctedMuons = cms.EDProducer("RochesterCorrectedMuonProducer",
-    src     = cms.InputTag("slimmedMuons"),
-    gens    = cms.InputTag("prunedGenParticles"),
-    data    = cms.FileInPath(options.roccorData),
-    isMC    = cms.bool(options.isMC),
-)
+#process.correctedMuons = cms.EDProducer("RochesterCorrectedMuonProducer",
+ #   src     = cms.InputTag("slimmedMuons"),
+  #  gens    = cms.InputTag("prunedGenParticles"),
+   # data    = cms.FileInPath(options.roccorData),
+    #isMC    = cms.bool(options.isMC),
+#)
 
 #Domain region
 from DeepNTuples.DeepNtuplizer.emu_skim_cff import emuSelection

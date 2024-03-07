@@ -11,7 +11,7 @@ triggerResultFilter = cms.EDFilter('TriggerResultsFilter',
 
 ## dimuon selection
 tagMuons = cms.EDFilter("PATMuonSelector",
-        src = cms.InputTag("correctedMuons"),
+        src = cms.InputTag("slimmedMuons"),
         cut = cms.string("pt > 26 && abs(eta) < 2.4 && passed('CutBasedIdTight') && passed('PFIsoTight')"),
         filter = cms.bool(False)
 );
@@ -23,7 +23,7 @@ filterTagMuons = cms.EDFilter("PATCandViewCountFilter",
 );
 
 probeMuons = cms.EDFilter("PATMuonSelector",
-        src = cms.InputTag("correctedMuons"),
+        src = cms.InputTag("slimmedMuons"),
         cut = cms.string("pt > 20 && abs(eta) < 2.4 && passed('CutBasedIdMedium') && passed('PFIsoLoose')"),
         filter = cms.bool(False)
 );

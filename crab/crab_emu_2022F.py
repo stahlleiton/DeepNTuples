@@ -3,7 +3,7 @@ from CRABClient.UserUtilities import config
 
 config = config()
 
-config.General.requestName = 'emu_muon_2022F'
+config.General.requestName = 'emu_muon_2022F_v2'
 config.General.workArea = 'crab_projects'
 config.General.transferLogs = True
 
@@ -23,11 +23,6 @@ config.Data.publishDBS = "phys03"
 config.Data.splitting = "LumiBased"
 config.Data.publication = True
 config.Data.ignoreLocality = False
-config.Data.unitsPerJob = 50
-config.JobType.maxJobRuntimeMin = 2750
-config.Data.lumiMask = 'jsons/Cert_Collisions2022_355100_362760_Golden.json'
-
-config.Site.storageSite = 'T2_BE_IIHE'
 config.Data.unitsPerJob = 50
 config.JobType.maxJobRuntimeMin = 2750
 config.Data.lumiMask = '../json/Cert_Collisions2022_355100_362760_Golden.json'

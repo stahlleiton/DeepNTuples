@@ -13,7 +13,7 @@ def mutauSelection (process,scoreLabel='pfParticleNetAK4base'):
 
     ## muons selection
     process.tagMuons = cms.EDFilter("PATMuonSelector",
-        src = cms.InputTag("correctedMuons"),
+        src = cms.InputTag("slimmedMuons"),
         cut = cms.string("pt > 26 && abs(eta) < 2.4 && passed('CutBasedIdTight') && passed('PFIsoTight')"),
         filter = cms.bool(False)
     );
@@ -26,7 +26,7 @@ def mutauSelection (process,scoreLabel='pfParticleNetAK4base'):
 
     ## lepton veto
     process.vetoMuons = cms.EDFilter("PATMuonSelector",
-        src = cms.InputTag("correctedMuons"),
+        src = cms.InputTag("slimmedMuons"),
         cut = cms.string("pt > 15 && abs(eta) < 2.4 && passed('CutBasedIdLoose') && passed('PFIsoLoose')"),
         filter = cms.bool(False)
     );
