@@ -28,7 +28,7 @@ def emuSelection(process,scoreLabel="pfParticleNetAK4base"):
     ## electron selection
     process.tagElectrons = cms.EDFilter("PATElectronSelector",
         src = cms.InputTag("slimmedElectrons"),
-        cut = cms.string("pt*(userFloat('ecalTrkEnergyPostCorr')/energy) > 20 && abs(eta) < 2.5 && electronID('mvaEleID-Fall17-iso-V2-wp80')"),
+        cut = cms.string("pt > 20 && abs(eta) < 2.5 && electronID('mvaEleID-RunIIIWinter22-iso-V1-wp80')"),
         filter = cms.bool(False)
     );
 
@@ -53,7 +53,7 @@ def emuSelection(process,scoreLabel="pfParticleNetAK4base"):
 
     process.vetoElectrons = cms.EDFilter("PATElectronSelector",
         src = cms.InputTag("slimmedElectrons"),
-        cut = cms.string("pt*(userFloat('ecalTrkEnergyPostCorr')/energy) > 15 && abs(eta) < 2.5 && electronID('mvaEleID-Fall17-iso-V2-wp90')"),
+        cut = cms.string("pt > 15 && abs(eta) < 2.5 && electronID('mvaEleID-RunIIIWinter22-iso-V1-wp90')"),
         filter = cms.bool(False)
     );
 
