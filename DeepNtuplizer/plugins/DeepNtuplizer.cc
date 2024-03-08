@@ -89,7 +89,7 @@ private:
   edm::EDGetTokenT<std::vector<PileupSummaryInfo> > puToken_;
   edm::EDGetTokenT<double> rhoToken_;
   edm::EDGetTokenT< edm::View<reco::BaseTagInfo> > pixHitsToken_;
-  std::string t_qgtagger;
+  //std::string t_qgtagger;
 
   edm::Service<TFileService> fs;
   TTree *tree_;
@@ -117,8 +117,8 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   jetToken_(consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("jets"))),
   puToken_(mayConsume<std::vector<PileupSummaryInfo >>(iConfig.getParameter<edm::InputTag>("pupInfo"))),
   rhoToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("rhoInfo"))),
-  pixHitsToken_(consumes< edm::View<reco::BaseTagInfo> > (iConfig.getParameter<edm::InputTag>("pixelhit"))),
-  t_qgtagger(iConfig.getParameter<std::string>("qgtagger"))
+  pixHitsToken_(consumes< edm::View<reco::BaseTagInfo> > (iConfig.getParameter<edm::InputTag>("pixelhit")))
+//t_qgtagger(iConfig.getParameter<std::string>("qgtagger"))
 {
 
   /*
@@ -146,10 +146,10 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   addModule(svmodule, "SVNtuple");
 
   ntuple_JetInfo* jetinfo=new ntuple_JetInfo();
-  jetinfo->setQglToken(consumes<edm::ValueMap<float>>(edm::InputTag(t_qgtagger, "qgLikelihood")));
+  /*jetinfo->setQglToken(consumes<edm::ValueMap<float>>(edm::InputTag(t_qgtagger, "qgLikelihood")));
   jetinfo->setPtDToken(consumes<edm::ValueMap<float>>(edm::InputTag(t_qgtagger, "ptD")));
   jetinfo->setAxis2Token(consumes<edm::ValueMap<float>>(edm::InputTag(t_qgtagger, "axis2")));
-  jetinfo->setMultToken(consumes<edm::ValueMap<int>>(edm::InputTag(t_qgtagger, "mult")));
+  jetinfo->setMultToken(consumes<edm::ValueMap<int>>(edm::InputTag(t_qgtagger, "mult")));*/
 
   jetinfo->setUseHerwigCompatibleMatching(useHerwigCompatibleMatching);
   jetinfo->setIsHerwig(isHerwig);

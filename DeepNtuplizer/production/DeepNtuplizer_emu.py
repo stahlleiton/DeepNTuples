@@ -19,8 +19,6 @@ options.register('selectJets', True, VarParsing.VarParsing.multiplicity.singleto
 options.register('phase2', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "apply jet selection for phase 2. Currently sets JetEtaMax to 3.0 and picks slimmedJetsPuppi as jet collection.")
 options.register('puppi', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use puppi jets")
 options.register('eta', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use eta up to 5.0")
-#options.register('roccorData', 'DeepNTuples/DeepNtuplizer/data/RochesterCorrections/RoccoR2018UL.txt', VarParsing.VarParsing.multiplicity.singleton,
- #                VarParsing.VarParsing.varType.string,'location of rochester correction files via edm::FilePath')
 options.register('isMC', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use MC info (gen) or not")
 
 import os
@@ -29,11 +27,11 @@ print("Using release "+release)
 
 
 options.register(
-	'inputFiles','',
-	VarParsing.VarParsing.multiplicity.list,
-	VarParsing.VarParsing.varType.string,
-	"input files (default is the tt RelVal)"
-	)
+    'inputFiles','',
+    VarParsing.VarParsing.multiplicity.list,
+    VarParsing.VarParsing.varType.string,
+    "input files (default is the tt RelVal)"
+    )
 
 if hasattr(sys, "argv"):
     options.parseArguments()
@@ -72,7 +70,7 @@ process.load('DeepNTuples.DeepNtuplizer.samples.TTJetsPhase1_cfg') #default inpu
 
 
 if options.inputFiles:
-	process.source.fileNames = options.inputFiles
+    process.source.fileNames = options.inputFiles
 
 if options.inputScript != '' and options.inputScript != 'DeepNTuples.DeepNtuplizer.samples.TTJetsPhase1_cfg':
     process.load(options.inputScript)
@@ -120,7 +118,8 @@ if (int(releases[0])>8) or ( (int(releases[0])==8) and (int(releases[1]) >= 4) )
      'pfParticleTransformerAK4JetTags:probuds',
      'pfParticleTransformerAK4JetTags:probg',
  ] + _pfParticleNetFromMiniAODAK4PuppiCentralJetTagsProbs + pfParticleNetAK4JetTagsAll
-else :
+
+else:
   bTagDiscriminators = [
       'pfDeepCSVJetTags:probudsg', #to be fixed with new names
       'pfDeepCSVJetTags:probb',
@@ -144,13 +143,77 @@ else :
 jetCorrectionsAK4 = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
 
 from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+
 if options.phase2:
     usePuppi = True
 
 if usePuppi:
-    jet_collection = 'slimmedJetsPuppi'
+    jetCorrectionsAK4 = ('AK4PFPuppi', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
+    
+###########################################################################
+#
+# Setup puppi modules and set them to recalculate weights
+#
+###########################################################################
+from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
+makePuppiesFromMiniAOD(process, False)
+process.puppi.useExistingWeights = False
+process.puppiNoLep.useExistingWeights = False
+
+###########################################################################
+#
+# Make function wrapper around PatAlgos helper functions
+#
+###########################################################################
+from PhysicsTools.PatAlgos.tools.helpers import getPatAlgosToolsTask, addToProcessAndTask
+def addProcessAndTask(proc, label, module):
+  task = getPatAlgosToolsTask(proc)
+  addToProcessAndTask(label, module, proc, task)
+
+###########################################################################
+#
+# Recluster AK4 Puppi jets
+#
+###########################################################################
+from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsPuppi
+jetCollectionRecluster = "ak4PFJetsPuppiRecluster"
+#addToProcessAndTask(process, jetCollectionRecluster, ak4PFJetsPuppi.clone(
+addProcessAndTask(process, jetCollectionRecluster, ak4PFJetsPuppi.clone(
+      src = "packedPFCandidates",
+      srcWeights = "puppi"
+    )
+)
+
+###########################################################################
+#
+# Patify reclustered AK4 Puppi jets
+#
+###########################################################################
+from PhysicsTools.PatAlgos.tools.jetTools import addJetCollection
+addJetCollection(
+  process,
+  postfix            = "Recluster",
+  labelName          = "AK4Puppi",
+  jetSource          = cms.InputTag(jetCollectionRecluster),
+  algo               = "ak", #name of algo must be in this format
+  rParam             = 0.4,
+  pvSource           = cms.InputTag("offlineSlimmedPrimaryVertices"),
+  pfCandidates       = cms.InputTag("packedPFCandidates"),
+  svSource           = cms.InputTag("slimmedSecondaryVertices"),
+  muSource           = cms.InputTag("slimmedMuons"),
+  elSource           = cms.InputTag("slimmedElectrons"),
+  jetCorrections     = jetCorrectionsAK4,
+)
+
+process.patJetsAK4PuppiRecluster.addGenPartonMatch = cms.bool(options.isMC)
+process.patJetsAK4PuppiRecluster.addGenJetMatch = cms.bool(options.isMC)
+getattr(process, "patJetFlavourAssociationAK4PuppiRecluster").weights = cms.InputTag("puppi")
+
+if usePuppi:
+    jet_collection = 'patJetsAK4PuppiRecluster'
 else:
     jet_collection = 'slimmedJets'
+
 
 updateJetCollection(
         process,
@@ -168,18 +231,11 @@ updateJetCollection(
 )
 
 if hasattr(process,'updatedPatJetsTransientCorrectedDeepFlavour'):
-	process.updatedPatJetsTransientCorrectedDeepFlavour.addTagInfos = cms.bool(True) 
-	process.updatedPatJetsTransientCorrectedDeepFlavour.addBTagInfo = cms.bool(True)
+    process.updatedPatJetsTransientCorrectedDeepFlavour.addTagInfos = cms.bool(True) 
+    process.updatedPatJetsTransientCorrectedDeepFlavour.addBTagInfo = cms.bool(True)
 else:
-	raise ValueError('I could not find updatedPatJetsTransientCorrectedDeepFlavour to embed the tagInfos, please check the cfg')
+    raise ValueError('I could not find updatedPatJetsTransientCorrectedDeepFlavour to embed the tagInfos, please check the cfg')
 
-
-# QGLikelihood
-#process.load("DeepNTuples.DeepNtuplizer.QGLikelihood_cfi")
-#process.es_prefer_jec = cms.ESPrefer("PoolDBESSource", "QGPoolDBESSource")
-#process.load('RecoJets.JetProducers.QGTagger_cfi')
-#process.QGTagger.srcJets   = cms.InputTag("selectedUpdatedPatJetsDeepFlavour")
-#process.QGTagger.jetsLabel = cms.string('QGL_AK4PFchs')
 
 # Very Loose IVF SV collection
 from PhysicsTools.PatAlgos.tools.helpers import loadWithPrefix
@@ -194,6 +250,7 @@ process.looseIVFcandidateVertexArbitrator.primaryVertices = cms.InputTag("offlin
 process.looseIVFcandidateVertexArbitrator.tracks = cms.InputTag("packedPFCandidates")
 process.looseIVFcandidateVertexArbitrator.secondaryVertices = cms.InputTag("looseIVFcandidateVertexMerger")
 process.looseIVFcandidateVertexArbitrator.fitterSigmacut = 20
+
 
 outFileName = options.outputFile + '_' + str(options.job) +  '.root'
 print ('Using output file ' + outFileName)
@@ -248,10 +305,8 @@ for mod in process.filters_().values(): #.itervalues():
     process.tsk.add(mod)
 
 process.p = cms.Path(
-#	process.QGTagger +
-#        process.genJetSequence *
         process.leptonSelection *
         process.jetSelection *
-	process.deepntuplizer,
-	process.tsk
-	)
+    process.deepntuplizer,
+    process.tsk
+    )

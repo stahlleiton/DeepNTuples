@@ -98,10 +98,10 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"jet_puId", &jet_puId_); 
 
     // quark gluon
-    addBranch(tree,"jet_qgl",   &jet_qgl_);  // qg tagger from jmar
+    /*addBranch(tree,"jet_qgl",   &jet_qgl_);  // qg tagger from jmar
     addBranch(tree,"QG_ptD",   &QG_ptD_);   // momentum fraction per jet constituent
     addBranch(tree,"QG_axis2", &QG_axis2_); // jet shape i.e. gluon are wider than quarks
-    addBranch(tree,"QG_mult",  &QG_mult_);  // multiplicity i.e. total num of PFcands reconstructed
+    addBranch(tree,"QG_mult",  &QG_mult_);*/  // multiplicity i.e. total num of PFcands reconstructed
 
     /*addBranch(tree,"gen_pt_Recluster"    ,&gen_pt_Recluster_    ,"gen_pt_Recluster_/F"    );
     addBranch(tree,"gen_pt_WithNu"    ,&gen_pt_WithNu_    ,"gen_pt_WithNu_/F"    );
@@ -136,10 +136,10 @@ void ntuple_JetInfo::initBranches(TTree* tree){
 
 void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
 
-    iEvent.getByToken(qglToken_, qglHandle);
+  /*iEvent.getByToken(qglToken_, qglHandle);
     iEvent.getByToken(ptDToken_, ptDHandle);
     iEvent.getByToken(axis2Token_, axis2Handle);
-    iEvent.getByToken(multToken_, multHandle);
+    iEvent.getByToken(multToken_, multHandle);*/
 
     /*iEvent.getByToken(genJetMatchReclusterToken_, genJetMatchRecluster);
     iEvent.getByToken(genJetMatchWithNuToken_, genJetMatchWithNu);
@@ -543,10 +543,10 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 
     const auto jetRef = reco::CandidatePtr(coll->ptrs().at( jetidx));
 
-    jet_qgl_ = (*qglHandle)[jetRef];
+    /*jet_qgl_ = (*qglHandle)[jetRef];
     QG_ptD_ = (*ptDHandle)[jetRef];
     QG_axis2_ = (*axis2Handle)[jetRef];
-    QG_mult_ = (*multHandle)[jetRef];
+    QG_mult_ = (*multHandle)[jetRef];*/
 
     isB_=0; isGBB_=0; isBB_=0; isC_=0; isGCC_=0; isCC_=0; isU_=0; isD_=0; isMU_=0; isELE_=0;
     isS_=0; isG_=0, isPU_=0, isLeptonicB_=0, isLeptonicB_C_=0, isUndefined_=0;
