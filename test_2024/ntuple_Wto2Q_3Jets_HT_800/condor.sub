@@ -1,0 +1,13 @@
+executable            = /afs/cern.ch/work/a/ademoor/New_Tagger_Dev/MC_ParT_2024/CMSSW_14_1_0_pre0/src/DeepNTuples/test_2024/ntuple_Wto2Q_3Jets_HT_800/batchscript.sh
+arguments             = /afs/cern.ch/work/a/ademoor/New_Tagger_Dev/MC_ParT_2024/CMSSW_14_1_0_pre0/src/DeepNTuples/test_2024/DeepNtuplizer.py inputScript=Wto2Q3JetsHT800TuneCP513p6TeVmadgraphMLMpythia8Run3Summer23BPixMiniAODv4130XmcRun32023realisticpostBPixv2v2MINIAODSIM nJobs=5 job=$(ProcId) 
+log                   = /afs/cern.ch/work/a/ademoor/New_Tagger_Dev/MC_ParT_2024/CMSSW_14_1_0_pre0/src/DeepNTuples/test_2024/ntuple_Wto2Q_3Jets_HT_800/batch/con_out.$(ProcId).log
+getenv = True
+environment = "NTUPLEOUTFILEPATH=/eos/cms/store/group/phys_btag/ParT_2024/Sun_180550_test_2024/ntuple_Wto2Q_3Jets_HT_800/output/ntuple_Wto2Q_3Jets_HT_800_$(ProcId).root"
+use_x509userproxy = True
++MaxRuntime = 28800
+max_transfer_output_mb = 15000
+RequestCpus = 2
+transfer_output_remaps = "stdout.txt=/afs/cern.ch/work/a/ademoor/New_Tagger_Dev/MC_ParT_2024/CMSSW_14_1_0_pre0/src/DeepNTuples/test_2024/ntuple_Wto2Q_3Jets_HT_800/batch/con_out.$(ProcId).out"
+max_retries = 20
+queue 5
+    

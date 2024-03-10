@@ -1,0 +1,13 @@
+executable            = /afs/cern.ch/work/a/ademoor/New_Tagger_Dev/MC_ParT_2024/CMSSW_14_1_0_pre0/src/DeepNTuples/test_2024/ntuple_GluGlutoHHto2B2Tau_2/batchscript.sh
+arguments = /afs/cern.ch/work/a/ademoor/New_Tagger_Dev/MC_ParT_2024/CMSSW_14_1_0_pre0/src/DeepNTuples/test_2024/DeepNtuplizer.py inputScript=GluGlutoHHto2B2Taukl0p00kt1p00c21p00TuneCP513p6TeVpowhegpythia8Run3Summer23BPixMiniAODv4130XmcRun32023realisticpostBPixv5v2MINIAODSIM nJobs=5 job=3 
+log   = /afs/cern.ch/work/a/ademoor/New_Tagger_Dev/MC_ParT_2024/CMSSW_14_1_0_pre0/src/DeepNTuples/test_2024/ntuple_GluGlutoHHto2B2Tau_2/batch/con_out.3.log
+getenv = True
+environment = "NTUPLEOUTFILEPATH=/eos/cms/store/group/phys_btag/ParT_2024/Sun_180550_test_2024/ntuple_GluGlutoHHto2B2Tau_2/output/ntuple_GluGlutoHHto2B2Tau_2_3.root"
+use_x509userproxy = True
++MaxRuntime= 28800
+RequestCpus = 2
+max_transfer_output_mb = 15000
+transfer_output_remaps = "stdout.txt=/afs/cern.ch/work/a/ademoor/New_Tagger_Dev/MC_ParT_2024/CMSSW_14_1_0_pre0/src/DeepNTuples/test_2024/ntuple_GluGlutoHHto2B2Tau_2/batch/con_out.3.out"
+max_retries = 3
+queue 1
+             
