@@ -193,7 +193,12 @@ public:
    
     //float Delta_gen_pt_;
     //classification
+
     int isMC_;
+    int isemu_;
+    int isdimu_;
+    int ismutau_;
+
     int isDomain_;
     int isB_;
     int isGBB_;
@@ -248,8 +253,8 @@ public:
 
     // jet variables
     float jet_pt_;
-  //float jet_genmatch_pt_;
-  //float jet_genmatch_wnu_pt_;
+    float jet_genmatch_pt_;
+    float jet_genmatch_wnu_pt_;
     float jet_corr_pt_;
     float  jet_eta_;
     float  jet_phi_;
@@ -301,6 +306,9 @@ public:
     float Delta_gen_pt_Recluster_;
     float Delta_gen_pt_WithNu_;*/
     bool MC_;
+    bool emu_;
+    bool dimu_;
+    bool mutau_;
     std::map<std::string, float> discriminators_;
 
     //Gen info for ele/mu/tau

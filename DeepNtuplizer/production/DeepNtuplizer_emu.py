@@ -20,6 +20,9 @@ options.register('phase2', False, VarParsing.VarParsing.multiplicity.singleton, 
 options.register('puppi', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use puppi jets")
 options.register('eta', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use eta up to 5.0")
 options.register('isMC', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use MC info (gen) or not")
+options.register('isemu', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use emu info (gen) or not")
+options.register('ismutau', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use mutau info (gen) or not")
+options.register('isdimu', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use dimu info (gen) or not")
 
 import os
 release=os.environ['CMSSW_VERSION'][6:]
@@ -272,6 +275,12 @@ if ( int(releases[0]) > 8 ) or ( (int(releases[0])==8) and (int(releases[1]) >= 
 
 if options.isMC:
     process.deepntuplizer.MC = cms.bool(True)
+if options.isemu:
+    process.deepntuplizer.emu = cms.bool(True)
+if options.isdimu:
+    process.deepntuplizer.dimu = cms.bool(True)
+if options.ismutau:
+    process.deepntuplizer.mutau = cms.bool(True)
 if options.eta :
     process.deepntuplizer.jetAbsEtaMax = cms.double(5.0)
     process.deepntuplizer.jetPtMin = cms.double(10.0)
@@ -307,6 +316,6 @@ for mod in process.filters_().values(): #.itervalues():
 process.p = cms.Path(
         process.leptonSelection *
         process.jetSelection *
-    process.deepntuplizer,
-    process.tsk
-    )
+        process.deepntuplizer,
+        process.tsk
+)

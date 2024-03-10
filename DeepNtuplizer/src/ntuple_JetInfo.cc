@@ -30,6 +30,10 @@ void ntuple_JetInfo::getInput(const edm::ParameterSet& iConfig){
     jetAbsEtaMax_=(iConfig.getParameter<double>("jetAbsEtaMax"));
 
     MC_=(iConfig.getParameter<bool>("MC"));
+    emu_=(iConfig.getParameter<bool>("emu"));
+    dimu_=(iConfig.getParameter<bool>("dimu"));
+    mutau_=(iConfig.getParameter<bool>("mutau"));
+
     vector<string> disc_names = iConfig.getParameter<vector<string> >("bDiscriminators");
     for(auto& name : disc_names) {
         discriminators_[name] = 0.;
@@ -48,7 +52,12 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     // truth labels
     //addBranch(tree,"gen_pt"    ,&gen_pt_    ,"gen_pt_/F"    );
     //addBranch(tree,"Delta_gen_pt"    ,&Delta_gen_pt_,"Delta_gen_pt_/F"    );
+
     addBranch(tree,"isMC",&isMC_, "isMC_/I");
+    addBranch(tree,"isemu",&isemu_, "isemu_/I");
+    addBranch(tree,"isdimu",&isdimu_, "isdimu_/I");
+    addBranch(tree,"ismutau",&ismutau_, "ismutau_/I");
+
     addBranch(tree,"isDomain",&isDomain_, "isDomain_/I");
     addBranch(tree,"isB",&isB_, "isB_/I");
     addBranch(tree,"isGBB",&isGBB_, "isGBB_/I");
@@ -84,8 +93,8 @@ void ntuple_JetInfo::initBranches(TTree* tree){
 
     // jet variables
     addBranch(tree,"jet_pt", &jet_pt_);
-    //addBranch(tree,"jet_genmatch_pt", &jet_genmatch_pt_);
-    //addBranch(tree,"jet_genmatch_wnu_pt", &jet_genmatch_wnu_pt_);
+    addBranch(tree,"jet_genmatch_pt", &jet_genmatch_pt_);
+    addBranch(tree,"jet_genmatch_wnu_pt", &jet_genmatch_wnu_pt_);
     addBranch(tree,"jet_corr_pt", &jet_corr_pt_);
     addBranch(tree,"jet_eta", &jet_eta_);
     addBranch(tree,"jet_phi", &jet_phi_);
@@ -372,13 +381,20 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     if(!coll)
         throw std::runtime_error("ntuple_JetInfo::fillBranches: no jet collection");
 
-    if(MC_){
-      isMC_ = 1;  
-    }
-    else{
-      isMC_ = 0;
-    }
+    jet_genmatch_pt_ = -1.0;
+    jet_genmatch_wnu_pt_ = -1.0;
+
+    isMC_ = 0;
+    isemu_ = 0;
+    ismutau_ = 0;
+    isdimu_ = 0;
+    if(MC_) isMC_ = 1;
+    if(emu_) isemu_ = 1;
+    if(mutau_) ismutau_ = 1;
+    if(dimu_) isdimu_ = 1;
+
     isDomain_ = 1;
+
     /// thresholds for matching
     /*static float dRCone        = 0.2;
     static float dRMatchingPF  = 0.1;
