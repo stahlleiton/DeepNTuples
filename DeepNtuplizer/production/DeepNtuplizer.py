@@ -36,8 +36,6 @@ options.register(
 if hasattr(sys, "argv"):
     options.parseArguments()
 
-
-
 if options.puppi:
     usePuppi = True
 else:
@@ -64,7 +62,6 @@ process.options = cms.untracked.PSet(
    allowUnscheduled = cms.untracked.bool(True),  
    wantSummary=cms.untracked.bool(False)
 )
-
 
 process.load('DeepNTuples.DeepNtuplizer.samples.TTJetsPhase1_cfg') #default input
 
@@ -146,14 +143,76 @@ if options.phase2:
     usePuppi = True
 
 if usePuppi:
-    jet_collection = 'slimmedJetsPuppi'
+    jetCorrectionsAK4 = ('AK4PFPuppi', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
+    
+###########################################################################
+#
+# Setup puppi modules and set them to recalculate weights
+#
+###########################################################################
+from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
+makePuppiesFromMiniAOD(process, False)
+process.puppi.useExistingWeights = False
+process.puppiNoLep.useExistingWeights = False
+
+###########################################################################
+#
+# Make function wrapper around PatAlgos helper functions
+#
+###########################################################################
+from PhysicsTools.PatAlgos.tools.helpers import getPatAlgosToolsTask, addToProcessAndTask
+def addProcessAndTask(proc, label, module):
+  task = getPatAlgosToolsTask(proc)
+  addToProcessAndTask(label, module, proc, task)
+
+###########################################################################
+#
+# Recluster AK4 Puppi jets
+#
+###########################################################################
+from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsPuppi
+jetCollectionRecluster = "ak4PFJetsPuppiRecluster"
+#addToProcessAndTask(process, jetCollectionRecluster, ak4PFJetsPuppi.clone(
+addProcessAndTask(process, jetCollectionRecluster, ak4PFJetsPuppi.clone(
+      src = "packedPFCandidates",
+      srcWeights = "puppi"
+    )
+)
+
+###########################################################################
+#
+# Patify reclustered AK4 Puppi jets
+#
+###########################################################################
+from PhysicsTools.PatAlgos.tools.jetTools import addJetCollection
+addJetCollection(
+  process,
+  postfix            = "Recluster",
+  labelName          = "AK4Puppi",
+  jetSource          = cms.InputTag(jetCollectionRecluster),
+  algo               = "ak", #name of algo must be in this format
+  rParam             = 0.4,
+  pvSource           = cms.InputTag("offlineSlimmedPrimaryVertices"),
+  pfCandidates       = cms.InputTag("packedPFCandidates"),
+  svSource           = cms.InputTag("slimmedSecondaryVertices"),
+  muSource           = cms.InputTag("slimmedMuons"),
+  elSource           = cms.InputTag("slimmedElectrons"),
+  genJetCollection   = cms.InputTag("ak4GenJetsRecluster"), # This is setup below
+  genParticles       = cms.InputTag("prunedGenParticles"),
+  jetCorrections     = jetCorrectionsAK4,
+)
+
+process.patJetsAK4PuppiRecluster.getJetMCFlavour = True
+getattr(process, "patJetFlavourAssociationAK4PuppiRecluster").weights = cms.InputTag("puppi")
+
+if usePuppi:
+    jet_collection = 'patJetsAK4PuppiRecluster'
 else:
     jet_collection = 'slimmedJets'
 
 updateJetCollection(
         process,
         labelName = "DeepFlavour",
-#         jetSource=cms.InputTag('slimmedJetsAK8PFPuppiSoftDropPacked', 'SubJets'),  # 'subjets from AK8'
         jetSource = cms.InputTag(jet_collection),  # 'ak4Jets'
         jetCorrections = jetCorrectionsAK4,
         pfCandidates = cms.InputTag('packedPFCandidates'),
@@ -167,11 +226,10 @@ updateJetCollection(
 )
 
 if hasattr(process,'updatedPatJetsTransientCorrectedDeepFlavour'):
-	process.updatedPatJetsTransientCorrectedDeepFlavour.addTagInfos = cms.bool(True) 
-	process.updatedPatJetsTransientCorrectedDeepFlavour.addBTagInfo = cms.bool(True)
+  process.updatedPatJetsTransientCorrectedDeepFlavour.addTagInfos = cms.bool(True) 
+  process.updatedPatJetsTransientCorrectedDeepFlavour.addBTagInfo = cms.bool(True)
 else:
-	raise ValueError('I could not find updatedPatJetsTransientCorrectedDeepFlavour to embed the tagInfos, please check the cfg')
-
+  raise ValueError('I could not find updatedPatJetsTransientCorrectedDeepFlavour to embed the tagInfos, please check the cfg')
 
 # QGLikelihood
 process.load("DeepNTuples.DeepNtuplizer.QGLikelihood_cfi")
@@ -182,7 +240,7 @@ process.QGTagger.jetsLabel = cms.string('QGL_AK4PFchs')
 
 
 from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
-process.ak4GenJetsWithNu = ak4GenJets.clone(src = 'packedGenParticles')
+process.ak4GenJetsWithNu = ak4GenJets.clone(src ='packedGenParticles')
  
  ## Filter out neutrinos from packed GenParticles
 process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedGenParticles"), cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16"))
@@ -226,8 +284,8 @@ process.patGenJetMatchRecluster = cms.EDProducer("GenJetMatcher",  # cut on delt
     resolveByMatchQuality = cms.bool(False),         # False = just match input in order; True = pick lowest deltaR pair first          
 )
 
-process.genJetSequence = cms.Sequence(process.packedGenParticlesForJetsNoNu*process.ak4GenJetsWithNu*process.ak4GenJetsRecluster*process.patGenJetMatchAllowDuplicates*process.patGenJetMatchWithNu*process.patGenJetMatchRecluster)
-
+process.genJetReclusterTask = cms.Task(process.packedGenParticlesForJetsNoNu,process.ak4GenJetsWithNu,process.ak4GenJetsRecluster) 
+process.genJetMatchTask = cms.Task(process.patGenJetMatchAllowDuplicates,process.patGenJetMatchWithNu,process.patGenJetMatchRecluster)
 
 # Very Loose IVF SV collection
 from PhysicsTools.PatAlgos.tools.helpers import loadWithPrefix
@@ -265,7 +323,7 @@ if ( int(releases[0]) > 8 ) or ( (int(releases[0])==8) and (int(releases[1]) >= 
 if options.eta :
     process.deepntuplizer.jetAbsEtaMax = cms.double(5.0)
     process.deepntuplizer.jetPtMin = cms.double(10.0)
-else :
+else:
     process.deepntuplizer.jetAbsEtaMax = cms.double(2.5)
     process.deepntuplizer.jetPtMin = cms.double(15.0)
 
@@ -289,8 +347,16 @@ for mod in process.producers_().values(): #.itervalues():
 for mod in process.filters_().values(): #.itervalues():
     process.tsk.add(mod)
 
+process.patAlgosToolsTask = getPatAlgosToolsTask(process)
+# process.pathApplyPatAlgos = cms.Path(process.patAlgosToolsTask)
+# process.deepnutplizer_path = cms.Path(process.QGTagger + process.deepntuplizer)
+
 process.p = cms.Path(
-	process.QGTagger + process.genJetSequence*  
-	process.deepntuplizer,
-	process.tsk
-	)
+    process.QGTagger + process.deepntuplizer,
+    process.tsk, 
+    process.patAlgosToolsTask, 
+    process.genJetReclusterTask, 
+    process.genJetMatchTask
+)
+
+
