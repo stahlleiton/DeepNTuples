@@ -61,7 +61,7 @@ leptonSelection = cms.Sequence(
 ## require dR between jets and the muons
 from PhysicsTools.PatAlgos.cleaningLayer1.jetCleaner_cfi import cleanPatJets
 cleanJets = cms.EDProducer("PATJetCleaner",
-    src = cms.InputTag("slimmedJetsUpdated"),
+    src = cms.InputTag("selectedUpdatedPatJetsDeepFlavour"),
     preselection = cms.string(''),
     checkOverlaps = cms.PSet(
         muons = cms.PSet(

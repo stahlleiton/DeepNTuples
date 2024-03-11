@@ -9,7 +9,7 @@ options = VarParsing.VarParsing()
 
 options.register('inputScript','',VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.string,"input Script")
 options.register('outputFile','output',VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.string,"output File (w/o .root)")
-options.register('maxEvents', -1,VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.int,"maximum events")
+options.register('maxEvents', 50001,VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.int,"maximum events")
 options.register('skipEvents', 0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "skip N events")
 options.register('job', 0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "job number")
 options.register('nJobs', 1, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "total jobs")
@@ -19,9 +19,9 @@ options.register('selectJets', True, VarParsing.VarParsing.multiplicity.singleto
 options.register('phase2', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "apply jet selection for phase 2. Currently sets JetEtaMax to 3.0 and picks slimmedJetsPuppi as jet collection.")
 options.register('puppi', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use puppi jets")
 options.register('eta', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use eta up to 5.0")
-options.register('isMC', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use MC info (gen) or not")
-options.register('isemu', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use emu info (gen) or not")
-options.register('ismutau', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use mutau info (gen) or not")
+options.register('isMC', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use MC info (gen) or not")
+options.register('isemu', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use emu info (gen) or not")
+options.register('ismutau', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use mutau info (gen) or not")
 options.register('isdimu', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use dimu info (gen) or not")
 
 import os
@@ -294,14 +294,13 @@ if options.phase2 :
 process.deepntuplizer.gluonReduction  = cms.double(options.gluonReduction)
 
 #Domain region
-from DeepNTuples.DeepNtuplizer.emu_skim_cff import emuSelection
-print ("add emu process selection")
-process = emuSelection(process,"pfParticleNetFromMiniAODAK4PuppiCentralJetTags");
-process.deepntuplizer.leptonPairs = cms.InputTag("emuPairs")
+from DeepNTuples.DeepNtuplizer.mutau_skim_cff import mutauSelection
+print ("add mutau process selection")
+process = mutauSelection(process,"pfParticleNetFromMiniAODAK4PuppiCentralJetTags");
+process.deepntuplizer.leptonPairs = cms.InputTag("mutauPairs")
 
 from PhysicsTools.PatAlgos.tools.coreTools import runOnData
-if not(options.isMC):
-    runOnData(process, names=["Jets","METs"], outputModules = [])
+runOnData(process, names=["Jets","METs"], outputModules = [])
 
 #1631
 process.ProfilerService = cms.Service (

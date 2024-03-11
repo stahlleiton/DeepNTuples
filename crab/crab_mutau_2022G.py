@@ -3,19 +3,19 @@ from CRABClient.UserUtilities import config
 
 config = config()
 
-config.General.requestName = 'emu_muon_2022F'
+config.General.requestName = 'mutau_muon_2022G'
 config.General.workArea = 'crab_projects'
 config.General.transferLogs = True
 
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = '../DeepNtuplizer/production/DeepNtuplizer_emu.py'
+config.JobType.psetName = '../DeepNtuplizer/production/DeepNtuplizer_mutau.py'
 config.JobType.allowUndistributedCMSSW = True
 config.JobType.maxMemoryMB = 2500
 config.JobType.numCores    = 1
 
 config.Debug.extraJDL = ['+CMS_ALLOW_OVERFLOW=False']
 
-config.Data.inputDataset = "/Muon/Run2022F-22Sep2023-v2/MINIAOD"
+config.Data.inputDataset = "/Muon/Run2022G-22Sep2023-v1/MINIAOD"
 config.Data.outLFNDirBase = "/store/group/phys_btag/ParT_2024/MC_samples"
 config.Data.outputDatasetTag = "part_2024"
 config.Data.inputDBS = "global"

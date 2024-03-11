@@ -3,12 +3,12 @@ from CRABClient.UserUtilities import config
 
 config = config()
 
-config.General.requestName = 'emu_muon_2022F'
+config.General.requestName = 'dimu_muon_2022F'
 config.General.workArea = 'crab_projects'
 config.General.transferLogs = True
 
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = '../DeepNtuplizer/production/DeepNtuplizer_emu.py'
+config.JobType.psetName = '../DeepNtuplizer/production/DeepNtuplizer_dimu.py'
 config.JobType.allowUndistributedCMSSW = True
 config.JobType.maxMemoryMB = 2500
 config.JobType.numCores    = 1

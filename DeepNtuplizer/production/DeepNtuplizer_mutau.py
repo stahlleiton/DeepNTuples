@@ -20,8 +20,8 @@ options.register('phase2', False, VarParsing.VarParsing.multiplicity.singleton, 
 options.register('puppi', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use puppi jets")
 options.register('eta', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use eta up to 5.0")
 options.register('isMC', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use MC info (gen) or not")
-options.register('isemu', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use emu info (gen) or not")
-options.register('ismutau', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use mutau info (gen) or not")
+options.register('isemu', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use emu info (gen) or not")
+options.register('ismutau', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use mutau info (gen) or not")
 options.register('isdimu', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use dimu info (gen) or not")
 
 import os
@@ -294,10 +294,10 @@ if options.phase2 :
 process.deepntuplizer.gluonReduction  = cms.double(options.gluonReduction)
 
 #Domain region
-from DeepNTuples.DeepNtuplizer.emu_skim_cff import emuSelection
-print ("add emu process selection")
-process = emuSelection(process,"pfParticleNetFromMiniAODAK4PuppiCentralJetTags");
-process.deepntuplizer.leptonPairs = cms.InputTag("emuPairs")
+from DeepNTuples.DeepNtuplizer.mutau_skim_cff import mutauSelection
+print ("add mutau process selection")
+process = mutauSelection(process,"pfParticleNetFromMiniAODAK4PuppiCentralJetTags");
+process.deepntuplizer.leptonPairs = cms.InputTag("mutauPairs")
 
 from PhysicsTools.PatAlgos.tools.coreTools import runOnData
 if not(options.isMC):
