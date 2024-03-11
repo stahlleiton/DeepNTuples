@@ -9,7 +9,7 @@ options = VarParsing.VarParsing()
 
 options.register('inputScript','',VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.string,"input Script")
 options.register('outputFile','output',VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.string,"output File (w/o .root)")
-options.register('maxEvents', 5001,VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.int,"maximum events")
+options.register('maxEvents', 50001,VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.int,"maximum events")
 options.register('skipEvents', 0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "skip N events")
 options.register('job', 0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "job number")
 options.register('nJobs', 1, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "total jobs")
@@ -64,7 +64,6 @@ process.options = cms.untracked.PSet(
 )
 
 process.load('DeepNTuples.DeepNtuplizer.samples.TTJetsPhase1_cfg') #default input
-
 
 if options.inputFiles:
 	process.source.fileNames = options.inputFiles
@@ -348,8 +347,6 @@ for mod in process.filters_().values(): #.itervalues():
     process.tsk.add(mod)
 
 process.patAlgosToolsTask = getPatAlgosToolsTask(process)
-# process.pathApplyPatAlgos = cms.Path(process.patAlgosToolsTask)
-# process.deepnutplizer_path = cms.Path(process.QGTagger + process.deepntuplizer)
 
 process.p = cms.Path(
     process.QGTagger + process.deepntuplizer,
