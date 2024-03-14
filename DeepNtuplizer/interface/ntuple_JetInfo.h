@@ -87,6 +87,10 @@ public:
         electronsToken_ = electronsToken;
     }
 
+    void setTausToken(edm::EDGetTokenT<pat::TauCollection> tausToken) {
+        tausToken_ = tausToken;
+    }
+
     void setUseHerwigCompatibleMatching(const bool use){
         useherwcompat_matching_=use;
     }
@@ -123,6 +127,7 @@ public:
 
     edm::EDGetTokenT<pat::MuonCollection> muonsToken_;       
     edm::EDGetTokenT<pat::ElectronCollection> electronsToken_;
+    edm::EDGetTokenT<pat::TauCollection> tausToken_;
 
     edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatchRecluster;
     edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatchWithNu;
@@ -135,7 +140,7 @@ public:
 
     edm::Handle<pat::MuonCollection> muonsHandle;
     edm::Handle<pat::ElectronCollection> electronsHandle;
-
+    edm::Handle<pat::TauCollection> tausH;
 
     TRandom3 TRandom_;
     float gluonReduction_;
@@ -190,6 +195,7 @@ public:
 
     // labels (MC truth)
     // regressions pt, Deta, Dphi
+    float min_candidate_pt_;
     float gen_pt_;
    
     float Delta_gen_pt_;
@@ -251,10 +257,16 @@ public:
     int event_no_;
     int jet_no_;
 
-    // jet variables
-    float jet_pt_;
+    // jet regression targets
     float jet_genmatch_pt_;
     float jet_genmatch_wnu_pt_;
+    float jet_genmatch_lep_vis_pt_;
+    float jet_mumatch_pt_;
+    float jet_elematch_pt_;
+    float jet_taumatch_pt_;
+  
+    // jet variables
+    float jet_pt_;
     float jet_corr_pt_;
     float  jet_eta_;
     float  jet_phi_;

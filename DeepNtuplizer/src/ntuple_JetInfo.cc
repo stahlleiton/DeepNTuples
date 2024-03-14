@@ -13,6 +13,15 @@
 
 using namespace std;
 
+template<typename T> 
+class PatPtSorter {
+public:
+  bool operator()(const T& i, const T& j) const {
+    return (i.pt() > j.pt());
+  }
+};
+
+
 template<typename T>
 class PatRefPtSorter {
 public:
@@ -28,6 +37,7 @@ void ntuple_JetInfo::getInput(const edm::ParameterSet& iConfig){
     jetPtMax_=(iConfig.getParameter<double>("jetPtMax"));
     jetAbsEtaMin_=(iConfig.getParameter<double>("jetAbsEtaMin"));
     jetAbsEtaMax_=(iConfig.getParameter<double>("jetAbsEtaMax"));
+    min_candidate_pt_ = (iConfig.getParameter<double>("minCandidatePt"));
     
     vector<string> disc_names = iConfig.getParameter<vector<string> >("bDiscriminators");
     for(auto& name : disc_names) {
@@ -84,10 +94,16 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"jet_pflav", &jet_pflav_);
     addBranch(tree,"jet_phflav", &jet_phflav_);
 
-    // jet variables
-    addBranch(tree,"jet_pt", &jet_pt_);
+    // jet regression
     addBranch(tree,"jet_genmatch_pt", &jet_genmatch_pt_);
     addBranch(tree,"jet_genmatch_wnu_pt", &jet_genmatch_wnu_pt_);
+    addBranch(tree,"&jet_genmatch_lep_vis_pt", &jet_genmatch_lep_vis_pt_);
+    addBranch(tree,"jet_mumatch_pt", &jet_mumatch_pt_);
+    addBranch(tree,"jet_elematch_pt", &jet_elematch_pt_);
+    addBranch(tree,"jet_taumatch_pt", &jet_taumatch_pt_);
+
+    // jet variables
+    addBranch(tree,"jet_pt", &jet_pt_);
     addBranch(tree,"jet_corr_pt", &jet_corr_pt_);
     addBranch(tree,"jet_eta", &jet_eta_);
     addBranch(tree,"jet_phi", &jet_phi_);
@@ -153,6 +169,7 @@ void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
 
     iEvent.getByToken(muonsToken_, muonsHandle);
     iEvent.getByToken(electronsToken_, electronsHandle);
+    iEvent.getByToken(tausToken_,tausH);
 
     event_no_=iEvent.id().event();
 
@@ -509,6 +526,127 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 	genLepton4V = tau_gen.at(itau);
 	genLeptonVis4V = tau_gen_visible.at(itau);
       }
+    }
+    
+    jet_genmatch_lep_vis_pt_ = genLeptonVis4V.Pt();
+
+    PatPtSorter<pat::Tau>      tauSorter;  
+    pat::TauCollection tausColl = *tausH;
+    
+    // Sorting taus based on pT
+    sort(tausColl.begin(),tausColl.end(),tauSorter);
+    std::vector<math::XYZTLorentzVector> tau_pfcandidates;  // in order to match PF and HPS candidates
+
+    for (size_t i = 0; i < tausColl.size(); i++) {
+      for(unsigned ipart = 0; ipart < tausColl[i].signalCands().size(); ipart++){
+	const pat::PackedCandidate* pfcand = dynamic_cast<const pat::PackedCandidate*> (tausColl[i].signalCands()[ipart].get());      
+	tau_pfcandidates.push_back(pfcand->p4());
+      }
+    }
+    
+    TLorentzVector tau4V_fromPF;
+    std::vector<TLorentzVector> muon4V_fromPF;
+    std::vector<TLorentzVector> electron4V_fromPF;
+
+    for (unsigned int i = 0; i <  jet.numberOfDaughters(); i++){
+      const pat::PackedCandidate* PackedCandidate_ = dynamic_cast<const pat::PackedCandidate*>(jet.daughter(i));
+      if(!PackedCandidate_) continue;
+      if(PackedCandidate_->pt() < min_candidate_pt_) continue; 
+      
+      if (abs(PackedCandidate_->pdgId()) == 11){
+	TLorentzVector tmp4V;
+	tmp4V.SetPtEtaPhiM(PackedCandidate_->pt(),PackedCandidate_->eta(),PackedCandidate_->phi(),PackedCandidate_->mass());
+	electron4V_fromPF.push_back(tmp4V);
+      }
+      if (abs(PackedCandidate_->pdgId()) == 13){
+	TLorentzVector tmp4V;
+	tmp4V.SetPtEtaPhiM(PackedCandidate_->pt(),PackedCandidate_->eta(),PackedCandidate_->phi(),PackedCandidate_->mass());
+	muon4V_fromPF.push_back(tmp4V);
+      }
+      if(std::find(tau_pfcandidates.begin(),tau_pfcandidates.end(),PackedCandidate_->p4()) != tau_pfcandidates.end()){
+	TLorentzVector tmp4V;
+	tmp4V.SetPtEtaPhiM(PackedCandidate_->pt(),PackedCandidate_->eta(),PackedCandidate_->phi(),PackedCandidate_->mass());
+	tau4V_fromPF += tmp4V;
+      }
+    }
+    
+    // Matching with muon by considering only the highest pt one
+    std::sort(muon4V_fromPF.begin(),muon4V_fromPF.end(),
+	      [&](const TLorentzVector & a, const TLorentzVector & b){
+		return a.Pt() > b.Pt();
+	      });
+    
+    minDR = 1000;
+    int pos_matched_reco_mu = -1;
+    if(not muon4V_fromPF.empty()){
+      for(size_t imu = 0; imu < muon4V_fromPF.size(); imu++){
+	TLorentzVector tmp4V;
+	tmp4V = muon4V_fromPF.at(imu);
+	float dR = tmp4V.DeltaR(jet4V);
+	float dRm = muon4V_fromPF.front().DeltaR(tmp4V);
+	if(dR < dRCone and dRm < dRMatchingPF and dRm < minDR){
+	  pos_matched_reco_mu = imu;
+	  minDR = dRm;	      
+	}
+      }
+    }
+    if(pos_matched_reco_mu >= 0){
+      jet_mumatch_pt_ = muon4V_fromPF.at(pos_matched_reco_mu).Pt();
+    }
+    else if(not muon4V_fromPF.empty()){
+      jet_mumatch_pt_ = muon4V_fromPF.front().Pt();
+    }
+    else{
+      jet_mumatch_pt_ = -1;
+    }
+
+    std::sort(electron4V_fromPF.begin(),electron4V_fromPF.end(),
+	      [&](const TLorentzVector & a, const TLorentzVector & b){
+		return a.Pt() > b.Pt();
+	      });
+    
+    minDR = 1000;
+    int pos_matched_reco_ele = -1;
+    if(not electron4V_fromPF.empty()){
+      for(size_t imu = 0; imu < electron4V_fromPF.size(); imu++){
+	TLorentzVector tmp4V;
+	tmp4V = electron4V_fromPF.at(imu);
+	float dR = tmp4V.DeltaR(jet4V);
+	float dRm = electron4V_fromPF.front().DeltaR(tmp4V);
+	if(dR < dRCone and dRm < dRMatchingPF and dRm < minDR){
+	  pos_matched_reco_ele = imu;
+	  minDR = dRm;	      
+	}
+      }
+    }
+    if(pos_matched_reco_ele >= 0){
+      jet_elematch_pt_ = electron4V_fromPF.at(pos_matched_reco_ele).Pt();
+    }
+    else if(not electron4V_fromPF.empty()){
+      jet_elematch_pt_ = electron4V_fromPF.front().Pt();
+    }
+    else{
+      jet_elematch_pt_ = -1;
+    }
+
+    // Matching with reco tau
+    minDR = 1000;
+    int pos_matched_reco_tauh = -1;
+    for (size_t itau = 0; itau < tausColl.size(); itau++) {
+      TLorentzVector tmp4V;
+      tmp4V.SetPtEtaPhiM(tausColl[itau].pt(),tausColl[itau].eta(),tausColl[itau].phi(),tausColl[itau].mass());
+      float dR = tmp4V.DeltaR(jet4V);
+      float dRt = tmp4V.DeltaR(tau4V_fromPF);	      
+      if (dR < dRCone and dRt < dRMatchingPF and dRt < minDR){ // small numerical roundoff due to float to double approximation
+	pos_matched_reco_tauh = itau;
+	minDR = dR;
+      }
+    }
+    if(pos_matched_reco_tauh >= 0){
+      jet_taumatch_pt_ = tausColl[pos_matched_reco_tauh].pt();
+    }
+    else{
+      jet_taumatch_pt_ = -1;
     }
 
     /// cuts ///
