@@ -251,10 +251,16 @@ public:
     int event_no_;
     int jet_no_;
 
-    // jet variables
-    float jet_pt_;
+    // jet regression targets
     float jet_genmatch_pt_;
     float jet_genmatch_wnu_pt_;
+    float jet_genmatch_lep_vis_pt_;
+    float jet_mumatch_pt_;
+    float jet_elematch_pt_;
+    float jet_taumatch_pt_;
+
+    // jet variables
+    float jet_pt_;
     float jet_corr_pt_;
     float  jet_eta_;
     float  jet_phi_;

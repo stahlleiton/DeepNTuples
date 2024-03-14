@@ -91,10 +91,16 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"jet_pflav", &jet_pflav_);
     addBranch(tree,"jet_phflav", &jet_phflav_);
 
-    // jet variables
-    addBranch(tree,"jet_pt", &jet_pt_);
+    // jet regression
     addBranch(tree,"jet_genmatch_pt", &jet_genmatch_pt_);
     addBranch(tree,"jet_genmatch_wnu_pt", &jet_genmatch_wnu_pt_);
+    addBranch(tree,"&jet_genmatch_lep_vis_pt", &jet_genmatch_lep_vis_pt_);
+    addBranch(tree,"jet_mumatch_pt", &jet_mumatch_pt_);
+    addBranch(tree,"jet_elematch_pt", &jet_elematch_pt_);
+    addBranch(tree,"jet_taumatch_pt", &jet_taumatch_pt_);
+
+    // jet variables
+    addBranch(tree,"jet_pt", &jet_pt_);
     addBranch(tree,"jet_corr_pt", &jet_corr_pt_);
     addBranch(tree,"jet_eta", &jet_eta_);
     addBranch(tree,"jet_phi", &jet_phi_);
@@ -383,7 +389,11 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 
     jet_genmatch_pt_ = -1.0;
     jet_genmatch_wnu_pt_ = -1.0;
-
+    jet_genmatch_lep_vis_pt_ = -1.0;
+    jet_mumatch_pt_ = -1.0;
+    jet_elematch_pt_ = -1.0;
+    jet_taumatch_pt_ = -1.0;
+    
     isMC_ = 0;
     isemu_ = 0;
     ismutau_ = 0;
