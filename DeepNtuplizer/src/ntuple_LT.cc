@@ -294,8 +294,9 @@ bool ntuple_LT::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  
       /// Split to charged and neutral candidates
       if(PackedCandidate_->charge()!=0 ){
 
-	size_t fillntupleentry= sortedchargedindices.at(i);
-	if(fillntupleentry>=max_ltcand_) continue;
+	int fillntupleentry= (int)i;
+	//	size_t fillntupleentry= sortedchargedindices.at(i);
+	if(fillntupleentry>=(int)max_ltcand_) continue;
 
 	LT_pt_[fillntupleentry] = PackedCandidate_->pt();
 	LT_eta_[fillntupleentry] = PackedCandidate_->eta();
