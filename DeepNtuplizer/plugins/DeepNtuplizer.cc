@@ -9,6 +9,8 @@
 
 #include "../interface/ntuple_content.h"
 #include "../interface/ntuple_SV.h"
+#include "../interface/ntuple_V0Ks.h"
+#include "../interface/ntuple_pairwise.h"
 #include "../interface/ntuple_JetInfo.h"
 #include "../interface/ntuple_pfCands.h"
 #include "../interface/ntuple_bTagVars.h"
@@ -145,6 +147,9 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
                           edm::ESInputTag("", "TransientTrackBuilder")));
   addModule(svmodule, "SVNtuple");
 
+  ntuple_V0Ks* v0ksmodule=new ntuple_V0Ks("", jetR);
+  addModule(v0ksmodule, "V0KsNtuple");
+
   ntuple_JetInfo* jetinfo=new ntuple_JetInfo();
   jetinfo->setQglToken(consumes<edm::ValueMap<float>>(edm::InputTag(t_qgtagger, "qgLikelihood")));
   jetinfo->setPtDToken(consumes<edm::ValueMap<float>>(edm::InputTag(t_qgtagger, "ptD")));
@@ -182,6 +187,12 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   LT->setLTToken(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("losttracks")));
 
   addModule(LT, "LT");
+
+  ntuple_pairwise * pairwise = new ntuple_pairwise();
+  pairwise->setJetRadius(jetR);
+  pairwise->setTrackBuilderToken( esConsumes<TransientTrackBuilder, TransientTrackRecord>(edm::ESInputTag("", "TransientTrackBuilder")));
+
+  addModule(pairwise, "pairwise");
 
   addModule(new ntuple_bTagVars(), "bTagVars");
 

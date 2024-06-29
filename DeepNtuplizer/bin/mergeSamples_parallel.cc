@@ -40,8 +40,9 @@
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_JetInfo.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_pfCands.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_SV.h"
+#include "DeepNTuples/DeepNtuplizer/interface/ntuple_V0Ks.h"
+#include "DeepNTuples/DeepNtuplizer/interface/ntuple_pairwise.h"
 #include "DeepNTuples/DeepNtuplizer/interface/ntuple_LT.h"
-#include "DeepNTuples/DeepNtuplizer/interface/ntuple_FatJetInfo.h"
 
 #include <dirent.h>
 #include <stdlib.h>
@@ -122,10 +123,11 @@ std::vector<TChain* > createChains(const std::vector<std::vector<TString> >& inf
 
     branchinfos.push_back(new ntuple_JetInfo());
     branchinfos.push_back(new ntuple_SV());
+    branchinfos.push_back(new ntuple_V0Ks());
+    branchinfos.push_back(new ntuple_pairwise());
     branchinfos.push_back(new ntuple_LT());
     branchinfos.push_back(new ntuple_bTagVars());
     branchinfos.push_back(new ntuple_pfCands());
-    branchinfos.push_back(new ntuple_FatJetInfo());
 
     std::vector<TChain* > chains;
     for(size_t i=0;i<infiles.size();i++){
