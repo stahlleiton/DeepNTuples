@@ -155,6 +155,10 @@ private:
     float  Cpfcan_HadFrac_[max_pfcand_];
     float  Cpfcan_CaloFrac_[max_pfcand_];
 
+    float  Cpfcan_tau_signal_[max_pfcand_];
+    float  Npfcan_tau_signal_[max_pfcand_];
+
+
 
     float mindrsvpfcand(const pat::PackedCandidate* pfcand);
     float mindistsvpfcand(const reco::TransientTrack track);

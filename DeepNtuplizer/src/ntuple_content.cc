@@ -35,6 +35,12 @@ const std::vector<reco::VertexCompositePtrCandidate> * ntuple_content::V0ks()con
     throw std::runtime_error("ntuple_content: V0ks_ not assigned");
 }
 
+const std::vector<pat::Tau> * ntuple_content::Taus()const{
+    if(taus_)
+        return taus_;
+    throw std::runtime_error("ntuple_content: taus_ not assigned");
+}
+
 const std::vector<PileupSummaryInfo> * ntuple_content::pupInfo()const{
 	return pupInfo_;
 }

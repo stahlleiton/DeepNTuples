@@ -91,6 +91,7 @@ private:
   edm::EDGetTokenT<std::vector<PileupSummaryInfo> > puToken_;
   edm::EDGetTokenT<double> rhoToken_;
   edm::EDGetTokenT< edm::View<reco::BaseTagInfo> > pixHitsToken_;
+  edm::EDGetTokenT<pat::TauCollection> tau_token_;
   std::string t_qgtagger;
 
   edm::Service<TFileService> fs;
@@ -120,6 +121,7 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   puToken_(consumes<std::vector<PileupSummaryInfo >>(iConfig.getParameter<edm::InputTag>("pupInfo"))),
   rhoToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("rhoInfo"))),
   pixHitsToken_(consumes< edm::View<reco::BaseTagInfo> > (iConfig.getParameter<edm::InputTag>("pixelhit"))),
+  tau_token_(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("taus"))),
   t_qgtagger(iConfig.getParameter<std::string>("qgtagger"))
 {
 
@@ -246,10 +248,13 @@ DeepNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle< edm::View<reco::BaseTagInfo> > pixHits;
   iEvent.getByToken(pixHitsToken_, pixHits);
 
+  edm::Handle<std::vector<pat::Tau>> taus = iEvent.getHandle(tau_token_);
+  
   for(auto& m:modules_){
     m->setPrimaryVertices(vertices.product());
     m->setSecVertices(secvertices.product());
     m->setV0ks(v0_ks.product());
+    m->setTaus(taus.product());
     m->setPuInfo(pupInfo.product());
     m->setRhoInfo(rhoInfo.product());
     m->readSetup(iSetup);

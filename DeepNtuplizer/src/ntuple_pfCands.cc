@@ -271,6 +271,8 @@ void ntuple_pfCands::initBranches(TTree* tree){
     addBranch(tree,"Cpfcan_HadFrac",&Cpfcan_HadFrac_,"Cpfcan_HadFrac_[n_Cpfcand_]/F");
     addBranch(tree,"Cpfcan_CaloFrac",&Cpfcan_CaloFrac_,"Cpfcan_CaloFrac_[n_Cpfcand_]/F");
 
+    addBranch(tree,"Cpfcan_tau_signal",&Cpfcan_tau_signal_,"Cpfcan_tau_signal_[n_Cpfcand_]/F");
+    addBranch(tree,"Npfcan_tau_signal",&Npfcan_tau_signal_,"Npfcan_tau_signal_[n_Npfcand_]/F");
 }
 
 void ntuple_pfCands::readEvent(const edm::Event& iEvent){
@@ -295,6 +297,24 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 
     const float jet_uncorr_pt=jet.correctedJet("Uncorrected").pt();
     const float jet_uncorr_e=jet.correctedJet("Uncorrected").energy();
+
+    // tau signal candidates
+    float min_pt_for_taus_ = 5.0;
+    float max_eta_for_taus_ = 2.5;
+      
+    std::vector<math::XYZTLorentzVector> tau_pfcandidates;
+    const auto taus = Taus();
+    for (size_t itau = 0; itau < taus->size(); itau++) {
+      if (taus->at(itau).pt() < min_pt_for_taus_)
+	continue;
+      if (fabs(taus->at(itau).eta()) > max_eta_for_taus_)
+	continue;
+      for (unsigned ipart = 0; ipart < taus->at(itau).signalCands().size(); ipart++) {
+	const pat::PackedCandidate *pfcand =
+          dynamic_cast<const pat::PackedCandidate *>(taus->at(itau).signalCands()[ipart].get());
+	tau_pfcandidates.push_back(pfcand->p4());
+      }
+    }
 
     TrackInfoBuilder trackinfo(builder);
     //create collection first, to be able to do some sorting
@@ -445,8 +465,14 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
             Cpfcan_isEl_[fillntupleentry] = 0;
             if(abs(PackedCandidate_->pdgId())==11) {
                 Cpfcan_isEl_[fillntupleentry] = 1;
-
             }
+
+	    // tau specific prior to any puppi weight application
+	    if (std::find(tau_pfcandidates.begin(), tau_pfcandidates.end(), PackedCandidate_->p4()) != tau_pfcandidates.end())
+	      Cpfcan_tau_signal_[fillntupleentry] = 1.0;
+	    else
+	      Cpfcan_tau_signal_[fillntupleentry] = 0.0;
+	    
 	    float cand_charge_ = PackedCandidate_->charge();
             Cpfcan_charge_[fillntupleentry] = cand_charge_;
             Cpfcan_lostInnerHits_[fillntupleentry] = catchInfs(PackedCandidate_->lostInnerHits(),2);
