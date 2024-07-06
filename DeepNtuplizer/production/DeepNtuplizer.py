@@ -357,4 +357,3 @@ process.p = cms.Path(
     process.genJetMatchTask
 )
 
-
