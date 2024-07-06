@@ -6,8 +6,8 @@ Installation (CMSSW 13_0_13)
 ============
 
 ```
-cmsrel CMSSW_13_0_13
-cd CMSSW_13_0_13/src/
+cmsrel CMSSW_14_0_1
+cd CMSSW_14_0_1/src/
 cmsenv
 git cms-init
 git clone https://github.com/AlexDeMoor/DeepNTuples
