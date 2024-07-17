@@ -31,7 +31,7 @@ public:
 
     //use either of these functions
 
-    bool fillBranches(const pat::Jet &, const size_t& jetidx, const  edm::View<pat::Jet> * coll=0);
+    bool fillBranches(const pat::Jet &, const pat::Jet &, const size_t& jetidx, const  edm::View<pat::Jet> * coll=0);
 
     void setAxis2Token(edm::EDGetTokenT<edm::ValueMap<float> > axis2Token) {
         axis2Token_ = axis2Token;
@@ -182,6 +182,7 @@ public:
     std::vector<reco::GenParticle> gToBB;
     std::vector<reco::GenParticle> gToCC;
     std::vector<reco::GenParticle> alltaus_;
+    std::vector<reco::GenParticle> quarksFromW;
 
     std::vector<reco::GenParticle> Bhadron_;
     std::vector<reco::GenParticle> Bhadron_daughter_;
@@ -232,6 +233,11 @@ public:
     int isTaum1h2p_;
     int isTaum3h0p_;
     int isTaum3h1p_;
+    int isWB_;
+    int isWC_;
+    int isWS_;
+    int isWD_;
+    int isWU_;
 
     //truth labeling with fallback to physics definition for light/gluon/undefined of standard flavor definition
     int isPhysB_;

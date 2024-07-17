@@ -285,7 +285,7 @@ void ntuple_pfCands::readEvent(const edm::Event& iEvent){
 
 //use either of these functions
 
-bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  edm::View<pat::Jet> * coll){
+bool ntuple_pfCands::fillBranches(const pat::Jet & unsubjet, const pat::Jet & jet, const size_t& jetidx, const  edm::View<pat::Jet> * coll){
 
     float etasign = 1.;
     if (jet.eta()<0) etasign =-1.;
@@ -318,8 +318,8 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 
     TrackInfoBuilder trackinfo(builder);
     //create collection first, to be able to do some sorting
-    for (unsigned int i = 0; i <  jet.numberOfDaughters(); i++){
-        const pat::PackedCandidate* PackedCandidate = dynamic_cast<const pat::PackedCandidate*>(jet.daughter(i));
+    for (unsigned int i = 0; i <  unsubjet.numberOfDaughters(); i++){
+        const pat::PackedCandidate* PackedCandidate = dynamic_cast<const pat::PackedCandidate*>(unsubjet.daughter(i));
         if(PackedCandidate){
             if(PackedCandidate->pt() < min_candidate_pt_) continue; 
             if(PackedCandidate->charge()!=0){
@@ -343,8 +343,8 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 		sortedchargedindices=sorting::invertSortingVector(sortedcharged);
 		sortedneutralsindices=sorting::invertSortingVector(sortedneutrals);
 
-    for (unsigned int i = 0; i <  jet.numberOfDaughters(); i++){
-        const pat::PackedCandidate* PackedCandidate_ = dynamic_cast<const pat::PackedCandidate*>(jet.daughter(i));
+    for (unsigned int i = 0; i <  unsubjet.numberOfDaughters(); i++){
+        const pat::PackedCandidate* PackedCandidate_ = dynamic_cast<const pat::PackedCandidate*>(unsubjet.daughter(i));
         //const auto& PackedCandidate_=s.get();
         if(!PackedCandidate_) continue;
         if(PackedCandidate_->pt() < min_candidate_pt_) continue; 

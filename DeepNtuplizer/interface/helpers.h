@@ -10,13 +10,16 @@
 
 namespace deep_ntuples {
   enum JetFlavor {UNDEFINED, G, U, D, S, C, GCC, CC, B, GBB, BB, LeptonicB, LeptonicB_C, MU, ELE,TAU,
-    TAUP1H0P,TAUP1H1P,TAUP1H2P,TAUP3H0P,TAUP3H1P,TAUM1H0P,TAUM1H1P,TAUM1H2P,TAUM3H0P,TAUM3H1P, PU};
+    TAUP1H0P,TAUP1H1P,TAUP1H2P,TAUP3H0P,TAUP3H1P,TAUM1H0P,TAUM1H1P,TAUM1H2P,TAUM3H0P,TAUM3H1P, PU,
+    WU, WD, WS, WC, WB};
     JetFlavor jet_flavour(const pat::Jet& jet,
+              const pat::Jet& unsubjet,
 			  const std::vector<reco::GenParticle>& gToBB,
 			  const std::vector<reco::GenParticle>& gToCC,
 			  const std::vector<reco::GenParticle>& neutrinosLepB,
 			  const std::vector<reco::GenParticle>& neutrinosLepB_C,
 			  const std::vector<reco::GenParticle>& alltaus,
+              const std::vector<reco::GenParticle>& quarksFromW,
 			  int pos_matched_genmu,
 			  int pos_matched_genele,
 			  int pos_matched_tauh,
