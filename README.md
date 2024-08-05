@@ -4,6 +4,23 @@ NTuple framework for DeepFlavour
 
 Installation (CMSSW 13_2_11, Now I am lazy and just used 14_1_X to have access to UParT producer)
 ============
+``` 
+
+cmsrel CMSSW_13_2_11
+cd  CMSSW_13_2_11/src
+cmsenv
+git cms-rebase-topic stahlleiton:UParT_CMSSW_13_2_X
+
+git clone git@github.com:DickyChant/DeepNTuples.git -b onnx_14_1_X
+git submodule init
+git submodule update
+```
+
+In addition to this, two simple addition would be needed with this installation method:
+
+1. Removing the 4 lines as mentioned in https://github.com/cms-sw/cmssw/pull/45642/files#r1704724904
+2. Changing the model path in `desc.add<edm::FileInPath>("model_path", edm::FileInPath("RecoBTag/Combined/data/UParTAK4/PUPPI/V00/UParTAK4.onnx"));` to `desc.add<edm::FileInPath>("model_path", edm::FileInPath("DeepNTuples/DeepNtuplizer/data/UParTAK4HI.onnx"));` 
+============
 
 ```
 cmsrel CMSSW_13_2_11
