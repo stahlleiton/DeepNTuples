@@ -115,6 +115,14 @@ bTagDiscriminators = [
     'pfParticleTransformerAK4JetTags:probg',
     'pfParticleTransformerAK4JetTags:problepb',
     'pfParticleTransformerAK4JetTags:probuds',
+    'pfUnifiedParticleTransformerAK4JetTags:probb',
+    'pfUnifiedParticleTransformerAK4JetTags:probbb',
+    'pfUnifiedParticleTransformerAK4JetTags:probc',
+    'pfUnifiedParticleTransformerAK4JetTags:probg',
+    'pfUnifiedParticleTransformerAK4JetTags:problepb',
+    'pfUnifiedParticleTransformerAK4JetTags:probu',
+    'pfUnifiedParticleTransformerAK4JetTags:probd',
+    'pfUnifiedParticleTransformerAK4JetTags:probs',
 ]
 
 # Create gen-level information
@@ -248,11 +256,13 @@ else:
 process.patAlgosToolsTask.remove(process.packedpuppi)
 process.patAlgosToolsTask.remove(process.packedpuppiNoLep)
 process.pfInclusiveSecondaryVertexFinderTagInfosDeepFlavour.weights = ""
-for taginfo in ["pfDeepFlavourTagInfosDeepFlavour", "pfParticleTransformerAK4TagInfosDeepFlavour"]:
+for taginfo in ["pfDeepFlavourTagInfosDeepFlavour", "pfParticleTransformerAK4TagInfosDeepFlavour",'pfUnifiedParticleTransformerAK4TagInfosDeepFlavour']:
     getattr(process, taginfo).fallback_puppi_weight = True
     getattr(process, taginfo).fallback_vertex_association = True
     getattr(process, taginfo).unsubjet_map = "unsubUpdatedPatJetsDeepFlavour"
     getattr(process, taginfo).puppi_value_map = ""
+
+process.pfUnifiedParticleTransformerAK4JetTagsDeepFlavour.model_path = 'DeepNTuples/DeepNtuplizer/data/ParTHITest.onnx'
 
 # End of b-tagging sequence ----------------
 

@@ -2,7 +2,7 @@
 NTuple framework for DeepFlavour
 
 
-Installation (CMSSW 13_2_11)
+Installation (CMSSW 13_2_11, Now I am lazy and just used 14_1_X to have access to UParT producer)
 ============
 
 ```
