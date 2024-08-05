@@ -20,8 +20,10 @@ In addition to this, two simple addition would be needed with this installation 
 
 1. Removing the 4 lines as mentioned in https://github.com/cms-sw/cmssw/pull/45642/files#r1704724904
 2. Changing the model path in `desc.add<edm::FileInPath>("model_path", edm::FileInPath("RecoBTag/Combined/data/UParTAK4/PUPPI/V00/UParTAK4.onnx"));` to `desc.add<edm::FileInPath>("model_path", edm::FileInPath("DeepNTuples/DeepNtuplizer/data/UParTAK4HI.onnx"));` 
+    - Should be a consequence of not having things compiled yet...
 
 The ONNX model conversion example can be found at https://cernbox.cern.ch/s/hIcjYFowT1oC3OV`
+
 ============
 
 ```
