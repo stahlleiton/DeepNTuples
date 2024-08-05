@@ -174,6 +174,7 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   jetinfo->setMuonsToken(consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("muons")));
   jetinfo->setElectronsToken(consumes<pat::ElectronCollection>(iConfig.getParameter<edm::InputTag>("electrons")));
   jetinfo->setTausToken(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("taus")));
+  jetinfo->setCentToken(consumes<int>(iConfig.getParameter<edm::InputTag>("cent")));
 
   addModule(jetinfo, "jetinfo");
 

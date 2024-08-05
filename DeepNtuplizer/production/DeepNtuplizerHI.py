@@ -262,6 +262,7 @@ process.es_prefer_jec = cms.ESPrefer("PoolDBESSource", "QGPoolDBESSource")
 process.load('RecoJets.JetProducers.QGTagger_cfi')
 process.QGTagger.srcJets   = "selectedUpdatedPatJetsDeepFlavour"
 process.QGTagger.jetsLabel = 'QGL_AK4PFchs'
+process.QGPoolDBESSource.connect = 'sqlite_file:QGL_cmssw8020_v2.db'
 
 # Match with gen jets
 from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cff import patJetGenJetMatch
@@ -292,6 +293,12 @@ print ('Using output file ' + outFileName)
 
 process.TFileService = cms.Service("TFileService", 
                                    fileName = cms.string(outFileName))
+
+# Heavy-ion specific
+process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
+process.centralityBin.Centrality = cms.InputTag("hiCentrality")
+process.centralityBin.centralityVariable = cms.string("HFtowers")
+process.patAlgosToolsTask.add(process.centralityBin)
 
 # DeepNtuplizer
 process.load("DeepNTuples.DeepNtuplizer.DeepNtuplizer_cfi")

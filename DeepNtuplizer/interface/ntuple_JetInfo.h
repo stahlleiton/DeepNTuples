@@ -91,6 +91,10 @@ public:
         tausToken_ = tausToken;
     }
 
+    void setCentToken(const edm::EDGetTokenT<int>& centToken) {
+        centToken_ = centToken;
+    }
+
     void setUseHerwigCompatibleMatching(const bool use){
         useherwcompat_matching_=use;
     }
@@ -141,6 +145,8 @@ public:
     edm::Handle<pat::MuonCollection> muonsHandle;
     edm::Handle<pat::ElectronCollection> electronsHandle;
     edm::Handle<pat::TauCollection> tausH;
+
+    edm::EDGetTokenT<int> centToken_;
 
     TRandom3 TRandom_;
     float gluonReduction_;
@@ -233,11 +239,10 @@ public:
     int isTaum1h2p_;
     int isTaum3h0p_;
     int isTaum3h1p_;
-    int isWB_;
-    int isWC_;
-    int isWS_;
-    int isWD_;
-    int isWU_;
+
+    // Heavy ion specific
+    int idxW_;
+    float cent_;
 
     //truth labeling with fallback to physics definition for light/gluon/undefined of standard flavor definition
     int isPhysB_;

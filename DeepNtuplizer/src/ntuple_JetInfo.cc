@@ -86,14 +86,13 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"isTaum1h2p_",&isTaum1h2p_, "isTaum1h2p_/I");
     addBranch(tree,"isTaum3h0p_",&isTaum3h0p_, "isTaum3h0p_/I");
     addBranch(tree,"isTaum3h1p_",&isTaum3h1p_, "isTaum3h1p_/I");
-    addBranch(tree,"isWB",&isWB_, "isWB_/I");
-    addBranch(tree,"isWC",&isWC_, "isWC_/I");
-    addBranch(tree,"isWS",&isWS_, "isWS_/I");
-    addBranch(tree,"isWD",&isWD_, "isWD_/I");
-    addBranch(tree,"isWU",&isWU_, "isWU_/I");
     addBranch(tree,"isPU",&isPU_, "isPU_/I");
     addBranch(tree,"isUndefined",&isUndefined_, "isUndefined_/I");
     addBranch(tree,"genDecay",&genDecay_, "genDecay_/F"); //dxy corresponds to the distance the Bhadron traveled
+
+    // Heavy ion specific
+    addBranch(tree,"idxW",&idxW_, "idxW_/I");
+    addBranch(tree,"cent",&cent_, "cent_/F");
     
     addBranch(tree,"jet_hflav", &jet_hflav_);
     addBranch(tree,"jet_pflav", &jet_pflav_);
@@ -177,6 +176,8 @@ void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
     iEvent.getByToken(tausToken_,tausH);
 
     event_no_=iEvent.id().event();
+
+    cent_ = iEvent.get(centToken_) / 2.0;
 
     //presumably this whole part can be removed!
 
@@ -698,7 +699,6 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & unsubjet, const pat::Jet & je
     isS_=0; isG_=0, isPU_=0, isLeptonicB_=0, isLeptonicB_C_=0, isUndefined_=0;
     isTaup1h0p_=0, isTaup1h1p_=0, isTaup1h2p_=0, isTaup3h0p_=0, isTaup3h1p_=0; 
     isTaum1h0p_=0, isTaum1h1p_=0, isTaum1h2p_=0, isTaum3h0p_=0, isTaum3h1p_=0; 
-    isWU_=0; isWD_=0; isWS_=0; isWC_=0; isWB_=0;
     auto muIds = deep_ntuples::jet_muonsIds(jet,*muonsHandle);
     auto elecIds = deep_ntuples::jet_electronsIds(jet,*electronsHandle);
 
@@ -751,7 +751,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & unsubjet, const pat::Jet & je
 
     //// Note that jets with gluon->bb (cc) and x->bb (cc) are in the same categories
     if(true){
-      switch(deep_ntuples::jet_flavour(unsubjet, jet, gToBB, gToCC, neutrinosLepB, neutrinosLepB_C, alltaus_, quarksFromW, pos_matched_genmu, pos_matched_genele, pos_matched_tauh, gentau_decaymode, tau_gen_charge)) {
+      switch(deep_ntuples::jet_flavour(unsubjet, jet, gToBB, gToCC, neutrinosLepB, neutrinosLepB_C, alltaus_, pos_matched_genmu, pos_matched_genele, pos_matched_tauh, gentau_decaymode, tau_gen_charge)) {
         case deep_ntuples::JetFlavor::MU:  isMU_=1; break;
         case deep_ntuples::JetFlavor::ELE:  isELE_=1; break;
         case deep_ntuples::JetFlavor::TAUP1H0P:  isTaup1h0p_=1; break;
@@ -777,13 +777,16 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & unsubjet, const pat::Jet & je
         case deep_ntuples::JetFlavor::S:  isS_=1; break;
         case deep_ntuples::JetFlavor::U: isU_=1; break;
         case deep_ntuples::JetFlavor::D: isD_=1; break;
-        case deep_ntuples::JetFlavor::WB: isWB_=1; break;
-        case deep_ntuples::JetFlavor::WC: isWC_=1; break;
-        case deep_ntuples::JetFlavor::WS: isWS_=1; break;
-        case deep_ntuples::JetFlavor::WD: isWD_=1; break;
-        case deep_ntuples::JetFlavor::WU: isWU_=1; break;
         default : isUndefined_=1; break;
         }
+
+      idxW_ = -1;
+      for (const auto& gen : quarksFromW) {
+        if (reco::deltaR(gen, unsubjet) < 0.4) {
+          idxW_ = gen.motherRef().key();
+          break;
+        }
+      }
     }
 
     //truth labeling with fallback to physics definition for light/gluon/undefined of standard flavor definition
@@ -792,7 +795,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & unsubjet, const pat::Jet & je
     isPhysGCC_=0; isPhysD_=0; isPhysU_=0; isPhysS_=0; isPhysG_=0, isPhysLeptonicB_=0, isPhysLeptonicB_C_=0, isPhysUndefined_=0;
     isPhysTau_=0, isPhysPU_=0;
     if(true){
-      switch(deep_ntuples::jet_flavour(unsubjet, jet, gToBB, gToCC, neutrinosLepB, neutrinosLepB_C, alltaus_, quarksFromW, pos_matched_genmu, pos_matched_genele, pos_matched_tauh, gentau_decaymode, tau_gen_charge, true)) {
+      switch(deep_ntuples::jet_flavour(unsubjet, jet, gToBB, gToCC, neutrinosLepB, neutrinosLepB_C, alltaus_, pos_matched_genmu, pos_matched_genele, pos_matched_tauh, gentau_decaymode, tau_gen_charge, true)) {
         case deep_ntuples::JetFlavor::S:  isPhysS_=1; break;
         case deep_ntuples::JetFlavor::U: isPhysU_=1; break;
         case deep_ntuples::JetFlavor::D: isPhysD_=1; break;

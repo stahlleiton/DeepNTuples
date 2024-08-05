@@ -28,7 +28,6 @@ JetFlavor jet_flavour(const pat::Jet& jet,
 		      const std::vector<reco::GenParticle>& neutrinosLepB,
 		      const std::vector<reco::GenParticle>& neutrinosLepB_C,
 		      const std::vector<reco::GenParticle>& alltaus,
-              const std::vector<reco::GenParticle>& quarksFromW,
 		      int pos_matched_genmu,
 		      int pos_matched_genele,
 		      int pos_matched_tauh,
@@ -107,10 +106,6 @@ JetFlavor jet_flavour(const pat::Jet& jet,
             else return JetFlavor::BB;
         }
         else if(nbs == 1) {
-            for (const auto& gen : quarksFromW) {
-              if(std::abs(gen.pdgId()) == hflav && reco::deltaR(gen, jet) < 0.4)
-                return JetFlavor::WB;
-            }
             for (std::vector<reco::GenParticle>::const_iterator it = neutrinosLepB.begin(); it != neutrinosLepB.end(); ++it){
                 if(reco::deltaR(it->eta(),it->phi(),jet.eta(),jet.phi()) < 0.4) {
                     return JetFlavor::LeptonicB;
@@ -139,11 +134,6 @@ JetFlavor jet_flavour(const pat::Jet& jet,
             if (ncFromGSP > 0) return JetFlavor::GCC;
             else return JetFlavor::CC;
         }
-        else if (ncs == 1) {
-          for (const auto& gen : quarksFromW)
-            if(std::abs(gen.pdgId()) == hflav && reco::deltaR(gen, jet) < 0.4)
-              return JetFlavor::WC;
-        }
         return JetFlavor::C;
     }
     else { //not a heavy jet
@@ -167,12 +157,6 @@ JetFlavor jet_flavour(const pat::Jet& jet,
             }
             if(ishadrtaucontained) return JetFlavor::TAU;
         }
-        for (const auto& gen : quarksFromW)
-          if(reco::deltaR(gen, jet) < 0.4) {
-            const auto id = std::abs(gen.pdgId());
-            if (pflav==0 || std::abs(pflav)==id)
-              return id == 5 ? JetFlavor::WB : (id == 4 ? JetFlavor::WC : (id == 3 ? JetFlavor::WS : (pflav == 2 ? JetFlavor::WD : JetFlavor::WU)));
-          }
         if(std::abs(pflav) == 4 || std::abs(pflav) == 5 || nbs || ncs) {
             if(usePhysForLightAndUndefined){
                 if(physflav == 21) return JetFlavor::G;
