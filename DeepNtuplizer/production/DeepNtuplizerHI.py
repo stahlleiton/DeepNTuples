@@ -262,7 +262,7 @@ for taginfo in ["pfDeepFlavourTagInfosDeepFlavour", "pfParticleTransformerAK4Tag
     getattr(process, taginfo).unsubjet_map = "unsubUpdatedPatJetsDeepFlavour"
     getattr(process, taginfo).puppi_value_map = ""
 
-process.pfUnifiedParticleTransformerAK4JetTagsDeepFlavour.model_path = 'DeepNTuples/DeepNtuplizer/data/ParTHITest.onnx'
+process.pfUnifiedParticleTransformerAK4JetTagsDeepFlavour.model_path = 'DeepNTuples/DeepNtuplizer/data/UParTAK4Test3.onnx'
 
 # End of b-tagging sequence ----------------
 
