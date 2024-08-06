@@ -123,6 +123,8 @@ bTagDiscriminators = [
     'pfUnifiedParticleTransformerAK4JetTags:probu',
     'pfUnifiedParticleTransformerAK4JetTags:probd',
     'pfUnifiedParticleTransformerAK4JetTags:probs',
+    'pfUnifiedParticleTransformerAK4JetTags:ptcorr',
+    'pfUnifiedParticleTransformerAK4JetTags:ptnu',
 ]
 
 # Create gen-level information
@@ -256,7 +258,7 @@ else:
 process.patAlgosToolsTask.remove(process.packedpuppi)
 process.patAlgosToolsTask.remove(process.packedpuppiNoLep)
 process.pfInclusiveSecondaryVertexFinderTagInfosDeepFlavour.weights = ""
-for taginfo in ["pfDeepFlavourTagInfosDeepFlavour", "pfParticleTransformerAK4TagInfosDeepFlavour",'pfUnifiedParticleTransformerAK4TagInfosDeepFlavour']:
+for taginfo in ["pfDeepFlavourTagInfosDeepFlavour", 'pfParticleTransformerAK4TagInfosDeepFlavour','pfUnifiedParticleTransformerAK4TagInfosDeepFlavour']:
     getattr(process, taginfo).fallback_puppi_weight = True
     getattr(process, taginfo).fallback_vertex_association = True
     getattr(process, taginfo).unsubjet_map = "unsubUpdatedPatJetsDeepFlavour"
