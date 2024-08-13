@@ -224,7 +224,6 @@ bool ntuple_LT::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  
     std::vector<sorting::sortingClass<size_t> > sortedcharged;
 
     const float jet_uncorr_pt=jet.correctedJet("Uncorrected").pt();
-    const float jet_uncorr_e=jet.correctedJet("Uncorrected").energy();
 
     TrackInfoBuilder trackinfo(builder);
     int n_lts = 0;
@@ -294,8 +293,7 @@ bool ntuple_LT::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  
       /// Split to charged and neutral candidates
       if(PackedCandidate_->charge()!=0 ){
 
-	int fillntupleentry= (int)i;
-	//	size_t fillntupleentry= sortedchargedindices.at(i);
+    size_t fillntupleentry= sortedchargedindices.at(sortedcharged[i].get());
 	if(fillntupleentry>=(int)max_ltcand_) continue;
 
 	LT_pt_[fillntupleentry] = PackedCandidate_->pt();
@@ -342,6 +340,8 @@ bool ntuple_LT::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  
 
 	float cand_charge_ = PackedCandidate_->charge();
 	LT_charge_[fillntupleentry] = cand_charge_;
+    LT_chi2_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? catchInfsAndBound(PackedCandidate_->pseudoTrack().normalizedChi2(),300,-1,300) : -1;
+    LT_quality_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? PackedCandidate_->pseudoTrack().qualityMask() : (1 << reco::TrackBase::loose);
 
 	LT_drminsv_[fillntupleentry] = catchInfsAndBound(drminltcandsv_,0,-0.4,0,-0.4);
 
@@ -450,8 +450,6 @@ GlobalPoint ntuple_LT::mingpsvltcand(const reco::TransientTrack track) {
 
 GlobalPoint ntuple_LT::gppvltcand(const reco::TransientTrack track, const GlobalVector direction, const reco::Vertex vertex) {
 
-  float mindist_ = 999.999;
-  float dist = 0.;
   GlobalPoint out_dist(0.0,0.0,0.0);
   GlobalPoint pca;
   if ((track.isValid()) && (vertex.isValid())){
