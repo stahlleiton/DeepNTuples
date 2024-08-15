@@ -2,17 +2,15 @@
 NTuple framework for DeepFlavour
 
 
-Installation (CMSSW 13_0_13)
+Installation (CMSSW 13_2_12)
 ============
 
 ```
-cmsrel CMSSW_14_0_11
-cd CMSSW_14_0_11/src/
+cmsrel CMSSW_13_2_12
+cd CMSSW_13_2_12/src/
 cmsenv
-git cms-init
-git clone https://github.com/AlexDeMoor/DeepNTuples
+git clone https://github.com/stahlleiton/DeepNTuples -b ParT_HIN_2024
 cd DeepNTuples
-git checkout ParT_2024
 # Add JetToolBox
 git submodule init
 git submodule update
@@ -34,7 +32,7 @@ Production
 
 Before doing a batch submission you can test the ntuplizer locally in the production directory with:
 ```
-cmsRun DeepNtuplizer.py inputFiles=/path/to/file.root
+cmsRun DeepNtuplizerHI.py inputFiles=/path/to/file.root
 ```
 The jobs can be submitted using the following syntax
 ```

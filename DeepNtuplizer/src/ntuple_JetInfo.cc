@@ -93,6 +93,7 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     // Heavy ion variables
     if (not centToken_.isUninitialized())
       addBranch(tree,"cent",&cent_, "cent_/F");
+    addBranch(tree,"idxW",&idxW_, "idxW_/I");
     
     addBranch(tree,"jet_hflav", &jet_hflav_);
     addBranch(tree,"jet_pflav", &jet_pflav_);
@@ -187,6 +188,7 @@ void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
     gToBB.clear();
     gToCC.clear();
     alltaus_.clear();
+    quarksFromW_.clear();
     Bhadron_.clear();
     Bhadron_daughter_.clear();
 
@@ -303,6 +305,10 @@ void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
 
         if(id == 15 && false){
             alltaus_.push_back(gen);
+        }
+
+        if (id >= 1 && id <= 5 && gen.mother() && std::abs(gen.mother()->pdgId())==24) {
+          quarksFromW_.push_back(gen);
         }
  }
  // GEN particle information
@@ -775,6 +781,14 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & unsubjet, const pat::Jet & je
         case deep_ntuples::JetFlavor::D: isD_=1; break;
         default : isUndefined_=1; break;
         }
+
+      idxW_ = -1;
+      for (const auto& gen : quarksFromW_) {
+        if (reco::deltaR(gen, jet) < 0.4) {
+          idxW_ = gen.motherRef().key();
+          break;
+        }
+      }
     }
 
     //truth labeling with fallback to physics definition for light/gluon/undefined of standard flavor definition

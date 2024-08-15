@@ -187,6 +187,7 @@ public:
     std::vector<reco::GenParticle> gToBB;
     std::vector<reco::GenParticle> gToCC;
     std::vector<reco::GenParticle> alltaus_;
+    std::vector<reco::GenParticle> quarksFromW_;
 
     std::vector<reco::GenParticle> Bhadron_;
     std::vector<reco::GenParticle> Bhadron_daughter_;
@@ -240,6 +241,7 @@ public:
 
     // Heavy ion variables
     float cent_;
+    int idxW_;
 
     //truth labeling with fallback to physics definition for light/gluon/undefined of standard flavor definition
     int isPhysB_;
