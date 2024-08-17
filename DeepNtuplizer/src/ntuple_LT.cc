@@ -342,6 +342,8 @@ bool ntuple_LT::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  
 
 	float cand_charge_ = PackedCandidate_->charge();
 	LT_charge_[fillntupleentry] = cand_charge_;
+    LT_chi2_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? catchInfsAndBound(PackedCandidate_->pseudoTrack().normalizedChi2(),300,-1,300) : -1;
+    LT_quality_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? PackedCandidate_->pseudoTrack().qualityMask() : (1 << reco::TrackBase::loose);
 
 	LT_drminsv_[fillntupleentry] = catchInfsAndBound(drminltcandsv_,0,-0.4,0,-0.4);
 
