@@ -924,7 +924,7 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & unsubjet, const pat::Jet & je
     jet_hflav_=abs(unsubjet.hadronFlavour());
     jet_pflav_=abs(unsubjet.partonFlavour());
     jet_phflav_=0;
-    if(unsubjet.genParton()) jet_phflav_=abs(unsubjet.genParton()->pdgId());
+    if(jet.genParton()) jet_phflav_=abs(jet.genParton()->pdgId());
 
     gen_pt_ =  0;
     Delta_gen_pt_ =  0;

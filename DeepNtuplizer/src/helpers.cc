@@ -46,7 +46,7 @@ JetFlavor jet_flavour(const pat::Jet& jet,
 	return JetFlavor::UNDEFINED;
       }
     }
-    if(unsubjet.genParton()) physflav=abs(unsubjet.genParton()->pdgId());
+    if(jet.genParton()) physflav=abs(jet.genParton()->pdgId());
     std::size_t nbs = unsubjet.jetFlavourInfo().getbHadrons().size();
     std::size_t ncs = unsubjet.jetFlavourInfo().getcHadrons().size();
 
