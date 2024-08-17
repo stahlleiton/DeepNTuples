@@ -428,7 +428,7 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & unsubjet, const pat::Jet & je
             Cpfcan_vertexRef_mass_[fillntupleentry]=PackedCandidate_->vertexRef()->p4().M();
 
 
-            Cpfcan_puppiw_[fillntupleentry] = PackedCandidate_->puppiWeight();
+            Cpfcan_puppiw_[fillntupleentry] = 1.0;//PackedCandidate_->puppiWeight();
 
             trackinfo.buildTrackInfo(PackedCandidate_,jetDir,jetRefTrackDir,pv);
 
@@ -500,7 +500,7 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & unsubjet, const pat::Jet & je
             Npfcan_ptrel_[fillntupleentry] = catchInfsAndBound(PackedCandidate_->pt()/jet_uncorr_pt,0,-1,0,-1);
             Npfcan_erel_[fillntupleentry] = catchInfsAndBound(PackedCandidate_->energy()/jet_uncorr_e,0,-1,0,-1);
             Npfcan_e_[fillntupleentry] = PackedCandidate_->energy();
-            Npfcan_puppiw_[fillntupleentry] = PackedCandidate_->puppiWeight();
+            Npfcan_puppiw_[fillntupleentry] = 1.0;//PackedCandidate_->puppiWeight();
             Npfcan_phirel_[fillntupleentry] = catchInfsAndBound(fabs(reco::deltaPhi(PackedCandidate_->phi(),jet.phi())),0,-2,0,-0.5);
             Npfcan_etarel_[fillntupleentry] = catchInfsAndBound(fabs(PackedCandidate_->eta()-jet.eta()),0,-2,0,-0.5);
             Npfcan_deltaR_[fillntupleentry] = catchInfsAndBound(reco::deltaR(*PackedCandidate_,jet),0,-0.6,0,-0.6);
