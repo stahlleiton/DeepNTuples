@@ -15,7 +15,7 @@ options.register('job', 0, VarParsing.VarParsing.multiplicity.singleton, VarPars
 options.register('nJobs', 1, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "total jobs")
 options.register('reportEvery', 1000, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "report every")
 options.register('gluonReduction', 0.0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.float, "gluon reduction")
-options.register('selectJets', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "select jets with good gen match")
+options.register('selectJets', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "select jets with good gen match")
 options.register('phase2', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "apply jet selection for phase 2. Currently sets JetEtaMax to 3.0 and picks slimmedJetsPuppi as jet collection.")
 options.register('puppi', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use puppi jets")
 options.register('eta', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use eta up to 5.0")
@@ -100,7 +100,8 @@ jetCorrectionsAK4 = ('AK4PFchs', ['L2Relative', 'L3Absolute'], 'None')
 bTagInfos = ['pfDeepFlavourTagInfos',
              'pfImpactParameterTagInfos',
              'pfInclusiveSecondaryVertexFinderTagInfos',
-             'pfParticleTransformerAK4TagInfos',] #'pfParticleNetAK4TagInfos',]
+             'pfParticleTransformerAK4TagInfos',
+             'pfUnifiedParticleTransformerAK4TagInfos',] #'pfParticleNetAK4TagInfos',]
 
 bTagDiscriminators = [
     'pfDeepFlavourJetTags:probb',
@@ -115,6 +116,16 @@ bTagDiscriminators = [
     'pfParticleTransformerAK4JetTags:probg',
     'pfParticleTransformerAK4JetTags:problepb',
     'pfParticleTransformerAK4JetTags:probuds',
+    'pfUnifiedParticleTransformerAK4JetTags:probb',
+    'pfUnifiedParticleTransformerAK4JetTags:probbb',
+    'pfUnifiedParticleTransformerAK4JetTags:probc',
+    'pfUnifiedParticleTransformerAK4JetTags:probg',
+    'pfUnifiedParticleTransformerAK4JetTags:problepb',
+    'pfUnifiedParticleTransformerAK4JetTags:probu',
+    'pfUnifiedParticleTransformerAK4JetTags:probd',
+    'pfUnifiedParticleTransformerAK4JetTags:probs',
+    'pfUnifiedParticleTransformerAK4JetTags:ptcorr',
+    'pfUnifiedParticleTransformerAK4JetTags:ptnu'
 ]
 
 # Create gen-level information
@@ -238,6 +249,8 @@ process.unsubUpdatedPatJetsDeepFlavour = cms.EDProducer("JetMatcherDR",
 )
 process.patAlgosToolsTask.add(process.unsubUpdatedPatJetsDeepFlavour)
 
+process.pfUnifiedParticleTransformerAK4JetTagsDeepFlavour.model_path = 'DeepNTuples/DeepNtuplizer/data/UParTAK4.onnx'
+
 if hasattr(process,'updatedPatJetsTransientCorrectedDeepFlavour'):
     process.updatedPatJetsTransientCorrectedDeepFlavour.addTagInfos = True
     process.updatedPatJetsTransientCorrectedDeepFlavour.addBTagInfo = True
@@ -248,7 +261,7 @@ else:
 process.patAlgosToolsTask.remove(process.packedpuppi)
 process.patAlgosToolsTask.remove(process.packedpuppiNoLep)
 process.pfInclusiveSecondaryVertexFinderTagInfosDeepFlavour.weights = ""
-for taginfo in ["pfDeepFlavourTagInfosDeepFlavour", "pfParticleTransformerAK4TagInfosDeepFlavour"]:
+for taginfo in ["pfDeepFlavourTagInfosDeepFlavour", "pfParticleTransformerAK4TagInfosDeepFlavour", "pfUnifiedParticleTransformerAK4TagInfosDeepFlavour"]:
     getattr(process, taginfo).fallback_puppi_weight = True
     getattr(process, taginfo).fallback_vertex_association = True
     getattr(process, taginfo).unsubjet_map = "unsubUpdatedPatJetsDeepFlavour"
@@ -308,6 +321,7 @@ process.deepntuplizer.puppi = False
 process.deepntuplizer.unsubjet_map = cms.InputTag("unsubJetMap")
 process.deepntuplizer.SVs = svSource
 process.deepntuplizer.secVertices = svSource
+process.deepntuplizer.cent = cms.InputTag("centralityBin","HFtowers")
 
 process.deepntuplizer.applySelection = options.selectJets
 process.deepntuplizer.tagInfoName = "pfDeepCSV"
