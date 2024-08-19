@@ -249,7 +249,7 @@ process.unsubUpdatedPatJetsDeepFlavour = cms.EDProducer("JetMatcherDR",
 )
 process.patAlgosToolsTask.add(process.unsubUpdatedPatJetsDeepFlavour)
 
-process.pfUnifiedParticleTransformerAK4JetTagsDeepFlavour.model_path = 'DeepNTuples/DeepNtuplizer/data/UParTAK4.onnx'
+process.pfUnifiedParticleTransformerAK4JetTagsDeepFlavour.model_path = 'DeepNTuples/DeepNtuplizer/data/UParTAK4_HIMG5132XADV.onnx'
 
 if hasattr(process,'updatedPatJetsTransientCorrectedDeepFlavour'):
     process.updatedPatJetsTransientCorrectedDeepFlavour.addTagInfos = True
