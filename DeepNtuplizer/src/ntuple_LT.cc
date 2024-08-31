@@ -161,6 +161,7 @@ void ntuple_LT::readSetup(const edm::EventSetup& iSetup){
 
 void ntuple_LT::getInput(const edm::ParameterSet& iConfig){
   min_candidate_pt_ = (iConfig.getParameter<double>("minCandidatePt"));
+  sort_cand_by_pt_ = iConfig.getParameter<bool>("sort_cand_by_pt");
 }
 
 void ntuple_LT::initBranches(TTree* tree){
@@ -237,9 +238,14 @@ bool ntuple_LT::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  
 	if(PackedCandidate){
 	  if(PackedCandidate->pt() < 1.0) continue; 
 	  trackinfo.buildTrackInfo(PackedCandidate,jetDir,jetRefTrackDir,pv);
-	  sortedcharged.push_back(sorting::sortingClass<size_t>
-				  (i, trackinfo.getTrackSip2dSig(),
-				   -mindrsvltcand(PackedCandidate), PackedCandidate->pt()/jet_uncorr_pt));
+      if (sort_cand_by_pt_)
+        sortedcharged.push_back(sorting::sortingClass<size_t>
+                    (i, PackedCandidate->pt()/jet_uncorr_pt,
+                     trackinfo.getTrackSip2dSig(), -mindrsvltcand(PackedCandidate)));
+      else
+	    sortedcharged.push_back(sorting::sortingClass<size_t>
+				    (i, trackinfo.getTrackSip2dSig(),
+				     -mindrsvltcand(PackedCandidate), PackedCandidate->pt()/jet_uncorr_pt));
 	  cpfPtrs.push_back(cand);
 	  n_lts++;
 	}

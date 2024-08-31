@@ -169,6 +169,7 @@ void ntuple_pfCands::readSetup(const edm::EventSetup& iSetup){
 
 void ntuple_pfCands::getInput(const edm::ParameterSet& iConfig){
 	min_candidate_pt_ = (iConfig.getParameter<double>("minCandidatePt"));
+    sort_cand_by_pt_ = iConfig.getParameter<bool>("sort_cand_by_pt");
     usePuppi_ = iConfig.getParameter<bool>("puppi");
 }
 
@@ -324,13 +325,22 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & unsubjet, const pat::Jet & je
             if(PackedCandidate->pt() < min_candidate_pt_) continue; 
             if(PackedCandidate->charge()!=0){
                 trackinfo.buildTrackInfo(PackedCandidate,jetDir,jetRefTrackDir,pv);
-                sortedcharged.push_back(sorting::sortingClass<size_t>
-                (i, trackinfo.getTrackSip2dSig(),
-                        -mindrsvpfcand(PackedCandidate), PackedCandidate->pt()/jet_uncorr_pt));
+                if (sort_cand_by_pt_)
+                  sortedcharged.push_back(sorting::sortingClass<size_t>
+                  (i, PackedCandidate->pt()/jet_uncorr_pt,
+                          trackinfo.getTrackSip2dSig(), -mindrsvpfcand(PackedCandidate)));
+                else
+                  sortedcharged.push_back(sorting::sortingClass<size_t>
+                  (i, trackinfo.getTrackSip2dSig(),
+                          -mindrsvpfcand(PackedCandidate), PackedCandidate->pt()/jet_uncorr_pt));
             }
             else{
-                sortedneutrals.push_back(sorting::sortingClass<size_t>
-                (i, -1, -mindrsvpfcand(PackedCandidate), PackedCandidate->pt()/jet_uncorr_pt));
+                if (sort_cand_by_pt_)
+                  sortedneutrals.push_back(sorting::sortingClass<size_t>
+                  (i, PackedCandidate->pt()/jet_uncorr_pt, -mindrsvpfcand(PackedCandidate), -1));
+                else
+                  sortedneutrals.push_back(sorting::sortingClass<size_t>
+                  (i, -1, -mindrsvpfcand(PackedCandidate), PackedCandidate->pt()/jet_uncorr_pt));
             }
         }
     }

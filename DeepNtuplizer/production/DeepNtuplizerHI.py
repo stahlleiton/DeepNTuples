@@ -124,16 +124,31 @@ bTagDiscriminators = [
     'pfUnifiedParticleTransformerAK4JetTags:probu',
     'pfUnifiedParticleTransformerAK4JetTags:probd',
     'pfUnifiedParticleTransformerAK4JetTags:probs',
+    'pfUnifiedParticleTransformerAK4JetTags:probtaup1h0p',
+    'pfUnifiedParticleTransformerAK4JetTags:probtaup1h1p',
+    'pfUnifiedParticleTransformerAK4JetTags:probtaup1h2p',
+    'pfUnifiedParticleTransformerAK4JetTags:probtaup3h0p',
+    'pfUnifiedParticleTransformerAK4JetTags:probtaup3h1p',
+    'pfUnifiedParticleTransformerAK4JetTags:probtaum1h0p',
+    'pfUnifiedParticleTransformerAK4JetTags:probtaum1h1p',
+    'pfUnifiedParticleTransformerAK4JetTags:probtaum1h2p',
+    'pfUnifiedParticleTransformerAK4JetTags:probtaum3h0p',
+    'pfUnifiedParticleTransformerAK4JetTags:probtaum3h1p',
+    'pfUnifiedParticleTransformerAK4JetTags:probele',
+    'pfUnifiedParticleTransformerAK4JetTags:probmu',
     'pfUnifiedParticleTransformerAK4JetTags:ptcorr',
     'pfUnifiedParticleTransformerAK4JetTags:ptnu'
 ]
 
 # Create gen-level information
-from PhysicsTools.PatAlgos.producersHeavyIons.heavyIonJets_cff import allPartons, cleanedPartons
-process.allPartons = allPartons.clone(
-    src = 'prunedGenParticles'
+from RecoHI.HiJetAlgos.hiSignalParticleProducer_cfi import hiSignalParticleProducer as hiSignalGenParticles
+process.hiSignalGenParticles = hiSignalGenParticles.clone(
+    src = "prunedGenParticles"
 )
-process.cleanedPartons = cleanedPartons.clone()
+from PhysicsTools.PatAlgos.producersHeavyIons.heavyIonJets_cff import allPartons
+process.allPartons = allPartons.clone(
+    src = 'hiSignalGenParticles'
+)
 from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
 process.ak4GenJetsWithNu = ak4GenJets.clone(
     src = 'packedGenParticlesSignal'
@@ -145,7 +160,7 @@ process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector",
 process.ak4GenJetsRecluster = ak4GenJets.clone(
     src = 'packedGenParticlesForJetsNoNu'
 )
-process.genTask = cms.Task(process.allPartons, process.cleanedPartons, process.ak4GenJetsWithNu, process.packedGenParticlesForJetsNoNu, process.ak4GenJetsRecluster)
+process.genTask = cms.Task(process.hiSignalGenParticles, process.allPartons, process.ak4GenJetsWithNu, process.packedGenParticlesForJetsNoNu, process.ak4GenJetsRecluster)
 
 # Remake secondary vertices
 from RecoVertex.AdaptiveVertexFinder.inclusiveVertexing_cff import inclusiveCandidateVertexFinder, candidateVertexMerger, candidateVertexArbitrator, inclusiveCandidateSecondaryVertices
@@ -178,12 +193,11 @@ addJetCollection(
   svSource           = svSource,
   muSource           = cms.InputTag("slimmedMuons"),
   elSource           = cms.InputTag("slimmedElectrons"),
-  genJetCollection   = cms.InputTag("slimmedGenJets"),
-  genParticles       = cms.InputTag("prunedGenParticles"),
+  genJetCollection   = cms.InputTag("ak4GenJetsWithNu"),
+  genParticles       = cms.InputTag("hiSignalGenParticles"),
   jetCorrections     = ('AK4PF',) + jetCorrectionsAK4[1:],
 )
 process.patJetsAK4PFUnsubJets.useLegacyJetMCFlavour = False
-process.patJetPartonMatchAK4PFUnsubJets = process.patJetPartonMatchAK4PFUnsubJets.clone(matched = "cleanedPartons")
 
 from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cff import ak4PFJets
 process.ak4PFUnsubJets = ak4PFJets.clone(
@@ -206,12 +220,11 @@ addJetCollection(
   svSource           = svSource,
   muSource           = cms.InputTag("slimmedMuons"),
   elSource           = cms.InputTag("slimmedElectrons"),
-  genJetCollection   = cms.InputTag("slimmedGenJets"),
-  genParticles       = cms.InputTag("prunedGenParticles"),
+  genJetCollection   = cms.InputTag("ak4GenJetsWithNu"),
+  genParticles       = cms.InputTag("hiSignalGenParticles"),
   jetCorrections     = jetCorrectionsAK4,
 )
 process.patJetsAKCs4PF.embedPFCandidates = True
-process.patJetPartonMatchAKCs4PF = process.patJetPartonMatchAKCs4PF.clone(matched = "cleanedPartons")
 
 from PhysicsTools.PatAlgos.producersHeavyIons.heavyIonJets_cff import PackedPFTowers, hiPuRho
 process.PackedPFTowers = PackedPFTowers.clone()
@@ -318,6 +331,7 @@ process.load("DeepNTuples.DeepNtuplizer.DeepNtuplizer_cfi")
 process.deepntuplizer.jets = "selectedUpdatedPatJetsDeepFlavour"
 process.deepntuplizer.bDiscriminators = bTagDiscriminators 
 process.deepntuplizer.puppi = False
+process.deepntuplizer.sort_cand_by_pt = True
 process.deepntuplizer.unsubjet_map = cms.InputTag("unsubJetMap")
 process.deepntuplizer.SVs = svSource
 process.deepntuplizer.secVertices = svSource
@@ -328,6 +342,10 @@ process.deepntuplizer.tagInfoName = "pfDeepCSV"
 process.deepntuplizer.jetPtMin = jetPtMin
 process.deepntuplizer.jetAbsEtaMax = jetAbsEtaMax
 process.deepntuplizer.gluonReduction  = options.gluonReduction
+
+process.deepntuplizer.packed = "packedGenParticlesSignal"
+process.deepntuplizer.genJets = "ak4GenJetsWithNu"
+process.deepntuplizer.pruned = "hiSignalGenParticles"
 
 #1631
 process.ProfilerService = cms.Service (

@@ -41,6 +41,7 @@ private:
 
     float jetradius_;
     float min_candidate_pt_ = -1;
+    bool sort_cand_by_pt_ = false;
     bool usePuppi_;
 
     edm::ESHandle<TransientTrackBuilder> builder;
