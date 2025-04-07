@@ -260,6 +260,10 @@ public:
     // jet regression targets
     float jet_genmatch_pt_;
     float jet_genmatch_wnu_pt_;
+    float jet_genmatch_eta_;
+    float jet_genmatch_wnu_eta_;
+    float jet_genmatch_phi_;
+    float jet_genmatch_wnu_phi_;
     float jet_genmatch_lep_vis_pt_;
     float jet_mumatch_pt_;
     float jet_elematch_pt_;

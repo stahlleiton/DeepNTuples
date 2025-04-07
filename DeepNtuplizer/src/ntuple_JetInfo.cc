@@ -96,7 +96,11 @@ void ntuple_JetInfo::initBranches(TTree* tree){
 
     // jet regression
     addBranch(tree,"jet_genmatch_pt", &jet_genmatch_pt_);
+    addBranch(tree,"jet_genmatch_eta", &jet_genmatch_eta_);
+    addBranch(tree,"jet_genmatch_phi", &jet_genmatch_phi_);
     addBranch(tree,"jet_genmatch_wnu_pt", &jet_genmatch_wnu_pt_);
+    addBranch(tree,"jet_genmatch_wnu_eta", &jet_genmatch_wnu_eta_);
+    addBranch(tree,"jet_genmatch_wnu_phi", &jet_genmatch_wnu_phi_);
     addBranch(tree,"&jet_genmatch_lep_vis_pt", &jet_genmatch_lep_vis_pt_);
     addBranch(tree,"jet_mumatch_pt", &jet_mumatch_pt_);
     addBranch(tree,"jet_elematch_pt", &jet_elematch_pt_);
@@ -826,14 +830,22 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     }
 
     jet_genmatch_pt_ = -1.0;
+    jet_genmatch_eta_ = -1.0;
+    jet_genmatch_phi_ = -1.0;
     jet_genmatch_wnu_pt_ = -1.0;
+    jet_genmatch_wnu_eta_ = -1.0;
+    jet_genmatch_wnu_phi_ = -1.0;
     
     if(genjet_pos_matched >= 0){
       jet_genmatch_pt_ = jetv_gen[genjet_pos_matched]->pt();
+      jet_genmatch_eta_ = jetv_gen[genjet_pos_matched]->eta();
+      jet_genmatch_phi_ = jetv_gen[genjet_pos_matched]->phi();
     }
 
     if(genjet_wnu_pos_matched >= 0){
       jet_genmatch_wnu_pt_ = jetv_gen_wnu[genjet_wnu_pos_matched]->pt();
+      jet_genmatch_wnu_eta_ = jetv_gen_wnu[genjet_wnu_pos_matched]->eta();
+      jet_genmatch_wnu_phi_ = jetv_gen_wnu[genjet_wnu_pos_matched]->phi();
     }
 
     genDecay_ = -1.;
