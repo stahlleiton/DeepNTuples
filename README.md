@@ -2,12 +2,12 @@
 NTuple framework for DeepFlavour
 
 
-Installation (CMSSW 13_0_13)
+Installation (CMSSW 15_0_2)
 ============
 
 ```
-cmsrel CMSSW_14_0_11
-cd CMSSW_14_0_11/src/
+cmsrel CMSSW_15_0_2
+cd CMSSW_15_0_2/src/
 cmsenv
 git cms-init
 git clone https://github.com/AlexDeMoor/DeepNTuples
