@@ -19,7 +19,11 @@ options.register('selectJets', True, VarParsing.VarParsing.multiplicity.singleto
 options.register('phase2', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "apply jet selection for phase 2. Currently sets JetEtaMax to 3.0 and picks slimmedJetsPuppi as jet collection.")
 options.register('puppi', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use puppi jets")
 options.register('eta', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use eta up to 5.0")
-
+options.register('isMC', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use MC info (gen) or not")
+options.register('isDomain', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "Flag as domain event jets or not")
+options.register('isemu', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use emu info (gen) or not")
+options.register('ismutau', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use mutau info (gen) or not")
+options.register('isdimu', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use dimu info (gen) or not")
 
 import os
 release=os.environ['CMSSW_VERSION'][6:]
@@ -202,7 +206,9 @@ addJetCollection(
   jetCorrections     = jetCorrectionsAK4,
 )
 
-process.patJetsAK4PuppiRecluster.getJetMCFlavour = True
+process.patJetsAK4PuppiRecluster.addGenPartonMatch = cms.bool(options.isMC)
+process.patJetsAK4PuppiRecluster.addGenJetMatch = cms.bool(options.isMC)
+process.patJetsAK4PuppiRecluster.getJetMCFlavour = cms.bool(options.isMC)
 getattr(process, "patJetFlavourAssociationAK4PuppiRecluster").weights = cms.InputTag("puppi")
 
 if usePuppi:
@@ -320,6 +326,17 @@ process.deepntuplizer.applySelection = cms.bool(options.selectJets)
 if ( int(releases[0]) > 8 ) or ( (int(releases[0])==8) and (int(releases[1]) >= 4) ):
    process.deepntuplizer.tagInfoName = cms.string('pfDeepCSV')
 
+if options.isMC:
+    process.deepntuplizer.MC = cms.bool(True)
+if options.isDomain:
+    process.deepntuplizer.Domain = cms.bool(True)
+if options.isemu:
+    process.deepntuplizer.emu = cms.bool(True)
+if options.isdimu:
+    process.deepntuplizer.dimu = cms.bool(True)
+if options.ismutau:
+    process.deepntuplizer.mutau = cms.bool(True)
+    
 if options.eta :
     process.deepntuplizer.jetAbsEtaMax = cms.double(5.0)
     process.deepntuplizer.jetPtMin = cms.double(10.0)
@@ -331,6 +348,10 @@ if options.phase2 :
     process.deepntuplizer.jetAbsEtaMax = cms.double(3.0)
 
 process.deepntuplizer.gluonReduction  = cms.double(options.gluonReduction)
+
+from PhysicsTools.PatAlgos.tools.coreTools import runOnData
+if not(options.isMC):
+    runOnData(process, names=["Jets","METs"], outputModules = [])
 
 #1631
 process.ProfilerService = cms.Service (

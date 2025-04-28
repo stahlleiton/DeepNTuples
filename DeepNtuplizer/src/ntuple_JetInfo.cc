@@ -38,6 +38,12 @@ void ntuple_JetInfo::getInput(const edm::ParameterSet& iConfig){
     jetAbsEtaMin_=(iConfig.getParameter<double>("jetAbsEtaMin"));
     jetAbsEtaMax_=(iConfig.getParameter<double>("jetAbsEtaMax"));
     min_candidate_pt_ = (iConfig.getParameter<double>("minCandidatePt"));
+
+    MC_=(iConfig.getParameter<bool>("MC"));
+    Domain_=(iConfig.getParameter<bool>("Domain"));
+    emu_=(iConfig.getParameter<bool>("emu"));
+    dimu_=(iConfig.getParameter<bool>("dimu"));
+    mutau_=(iConfig.getParameter<bool>("mutau"));
     
     vector<string> disc_names = iConfig.getParameter<vector<string> >("bDiscriminators");
     for(auto& name : disc_names) {
@@ -58,6 +64,7 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"Delta_gen_pt"    ,&Delta_gen_pt_,"Delta_gen_pt_/F"    );
 
     addBranch(tree,"isMC",&isMC_, "isMC_/I");
+    addBranch(tree,"isDomain",&isDomain_, "isDomain_/I");
     addBranch(tree,"isemu",&isemu_, "isemu_/I");
     addBranch(tree,"isdimu",&isdimu_, "isdimu_/I");
     addBranch(tree,"ismutau",&ismutau_, "ismutau_/I");
@@ -396,10 +403,12 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     if(!coll)
         throw std::runtime_error("ntuple_JetInfo::fillBranches: no jet collection");
 
-    isMC_    = -1;
-    isemu_   =  0;
-    isdimu_  =  0;
-    ismutau_ =  0;
+    isMC_ = MC_ ? 1 : 0;
+    isDomain_ = Domain_ ? 1 : 0;
+    isemu_   =  emu_ ? 1 : 0;
+    isdimu_  =  dimu_ ? 1 : 0;
+    ismutau_ =  mutau_ ? 1 : 0;
+    
     /// thresholds for matching
     static float dRCone        = 0.2;
     static float dRMatchingPF  = 0.1;

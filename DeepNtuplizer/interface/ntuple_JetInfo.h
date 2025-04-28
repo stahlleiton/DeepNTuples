@@ -201,6 +201,7 @@ public:
     float Delta_gen_pt_;
     //classification
     int isMC_;
+    int isDomain_;
     int isemu_;
     int ismutau_;
     int isdimu_;
@@ -328,6 +329,12 @@ public:
     int muons_number_ = 0;
     int electrons_number_ = 0;
 
+    bool MC_;
+    bool Domain_;
+    bool emu_;
+    bool dimu_;
+    bool mutau_;
+  
     float gen_pt_Recluster_;
     float gen_pt_WithNu_;
     float Delta_gen_pt_Recluster_;
