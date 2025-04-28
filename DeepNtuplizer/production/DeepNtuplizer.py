@@ -316,7 +316,28 @@ process.TFileService = cms.Service("TFileService",
 
 # DeepNtuplizer
 process.load("DeepNTuples.DeepNtuplizer.DeepNtuplizer_cfi")
-process.deepntuplizer.jets = cms.InputTag('selectedUpdatedPatJetsDeepFlavour')
+
+#Domain region
+if options.isdimu:
+    print ("add dimuon process selection")
+    process.load('DeepNTuples.DeepNtuplizer.dimu_skim_cff');
+    process.deepntuplizer.leptonPairs = cms.InputTag("dimuonPairs")
+    process.deepntuplizer.jets = cms.InputTag('selectedCleanJets')
+elif options.isemu:
+    from DeepNTuples.DeepNtuplizer.emu_skim_cff import emuSelection
+    print ("add emu process selection")
+    process = emuSelection(process,"pfParticleNetFromMiniAODAK4PuppiCentral");
+    process.deepntuplizer.leptonPairs = cms.InputTag("emuPairs")
+    process.deepntuplizer.jets = cms.InputTag('selectedCleanJets')
+elif options.ismutau:
+    from DeepNTuples.DeepNtuplizer.mutau_skim_cff import mutauSelection
+    print ("add mutau process selection")
+    process = mutauSelection(process,"pfParticleNetFromMiniAODAK4PuppiCentral");
+    process.deepntuplizer.leptonPairs = cms.InputTag("mutauPairs")
+    process.deepntuplizer.jets = cms.InputTag('selectedCleanJets')
+else:
+    process.deepntuplizer.jets = cms.InputTag('selectedUpdatedPatJetsDeepFlavour')
+
 process.deepntuplizer.bDiscriminators = bTagDiscriminators 
 process.deepntuplizer.bDiscriminators.append('pfCombinedMVAV2BJetTags')
 process.deepntuplizer.LooseSVs = cms.InputTag("looseIVFinclusiveCandidateSecondaryVertices")
@@ -339,10 +360,8 @@ if options.ismutau:
     
 if options.eta :
     process.deepntuplizer.jetAbsEtaMax = cms.double(5.0)
-    process.deepntuplizer.jetPtMin = cms.double(10.0)
 else:
     process.deepntuplizer.jetAbsEtaMax = cms.double(2.5)
-    process.deepntuplizer.jetPtMin = cms.double(15.0)
 
 if options.phase2 :
     process.deepntuplizer.jetAbsEtaMax = cms.double(3.0)
@@ -370,11 +389,62 @@ for mod in process.filters_().values(): #.itervalues():
 
 process.patAlgosToolsTask = getPatAlgosToolsTask(process)
 
-process.p = cms.Path(
-    process.QGTagger + process.deepntuplizer,
-    process.tsk, 
-    process.patAlgosToolsTask, 
-    process.genJetReclusterTask, 
-    process.genJetMatchTask
-)
-
+if (options.isMC and options.isemu): #All the MC+Skimming
+    process.p = cms.Path(
+        process.leptonSelection *
+        process.jetSelection *
+        process.QGTagger + process.deepntuplizer,
+        process.tsk, 
+        process.patAlgosToolsTask, 
+        process.genJetReclusterTask, 
+        process.genJetMatchTask
+    )
+elif (options.isMC and options.isdimu):
+    process.p = cms.Path(
+        process.leptonSelection *
+        process.jetSelection *
+        process.QGTagger + process.deepntuplizer,
+        process.tsk, 
+        process.patAlgosToolsTask, 
+        process.genJetReclusterTask, 
+        process.genJetMatchTask
+    )
+elif (options.isMC and options.ismutau):
+    process.p = cms.Path(
+        process.leptonSelection *
+        process.jetSelection *
+        process.QGTagger + process.deepntuplizer,
+        process.tsk, 
+        process.patAlgosToolsTask, 
+        process.genJetReclusterTask, 
+        process.genJetMatchTask
+    )
+elif (options.isMC): #OG Ntupler
+    process.p = cms.Path(
+        process.QGTagger + process.deepntuplizer,
+        process.tsk, 
+        process.patAlgosToolsTask, 
+        process.genJetReclusterTask, 
+        process.genJetMatchTask
+    )
+elif (options.isemu): #Data+Skimming
+    process.p = cms.Path(
+        process.leptonSelection *
+        process.jetSelection *
+        process.QGTagger + process.deepntuplizer,
+        process.tsk, 
+    )
+elif (options.isdimu): #Data+Skimming
+    process.p = cms.Path(
+        process.leptonSelection *
+        process.jetSelection *
+        process.QGTagger + process.deepntuplizer,
+        process.tsk, 
+    )
+elif (options.ismutau): #Data+Skimming
+    process.p = cms.Path(
+        process.leptonSelection *
+        process.jetSelection *
+        process.QGTagger + process.deepntuplizer,
+        process.tsk, 
+    )
