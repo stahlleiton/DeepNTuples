@@ -265,17 +265,28 @@ public:
     float jet_genmatch_phi_;
     float jet_genmatch_wnu_phi_;
     float jet_genmatch_lep_vis_pt_;
+    float jet_genmatch_lep_vis_eta_;
+    float jet_genmatch_lep_vis_phi_;
+    float jet_genmatch_lep_pt_;
+    float jet_genmatch_lep_eta_;
+    float jet_genmatch_lep_phi_;
     float jet_mumatch_pt_;
+    float jet_mumatch_eta_;
+    float jet_mumatch_phi_;
     float jet_elematch_pt_;
+    float jet_elematch_eta_;
+    float jet_elematch_phi_;
     float jet_taumatch_pt_;
+    float jet_taumatch_eta_;
+    float jet_taumatch_phi_;
   
     // jet variables
     float jet_pt_;
     float jet_corr_pt_;
-    float  jet_eta_;
-    float  jet_phi_;
-    float  jet_mass_;
-    float  jet_energy_;
+    float jet_eta_;
+    float jet_phi_;
+    float jet_mass_;
+    float jet_energy_;
 
     float jet_looseId_;
     int jet_jetId_;
@@ -328,7 +339,7 @@ public:
     int gen_number_;
     int gend_number_;
 
-    float gen_particle_pt_[max_num_gen_];
+  float gen_particle_pt_[max_num_gen_];
   float gen_particle_eta_[max_num_gen_];
   float gen_particle_phi_[max_num_gen_];
   float gen_particle_mass_[max_num_gen_];

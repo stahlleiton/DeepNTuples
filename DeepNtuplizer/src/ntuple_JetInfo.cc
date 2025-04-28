@@ -102,6 +102,7 @@ void ntuple_JetInfo::initBranches(TTree* tree){
     addBranch(tree,"jet_genmatch_wnu_eta", &jet_genmatch_wnu_eta_);
     addBranch(tree,"jet_genmatch_wnu_phi", &jet_genmatch_wnu_phi_);
     addBranch(tree,"jet_genmatch_lep_vis_pt", &jet_genmatch_lep_vis_pt_);
+    addBranch(tree,"jet_genmatch_lep_pt", &jet_genmatch_lep_pt_);
     addBranch(tree,"jet_mumatch_pt", &jet_mumatch_pt_);
     addBranch(tree,"jet_elematch_pt", &jet_elematch_pt_);
     addBranch(tree,"jet_taumatch_pt", &jet_taumatch_pt_);
@@ -533,6 +534,11 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     }
     
     jet_genmatch_lep_vis_pt_ = genLeptonVis4V.Pt();
+    jet_genmatch_lep_pt_ = genLepton4V.Pt();
+    jet_genmatch_lep_vis_eta_ = genLeptonVis4V.Eta();
+    jet_genmatch_lep_eta_ = genLepton4V.Eta();
+    jet_genmatch_lep_vis_phi_ = genLeptonVis4V.Phi();
+    jet_genmatch_lep_phi_ = genLepton4V.Phi();
 
     PatPtSorter<pat::Tau>      tauSorter;  
     pat::TauCollection tausColl = *tausH;
@@ -596,12 +602,18 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     }
     if(pos_matched_reco_mu >= 0){
       jet_mumatch_pt_ = muon4V_fromPF.at(pos_matched_reco_mu).Pt();
+      jet_mumatch_eta_ = muon4V_fromPF.at(pos_matched_reco_mu).Eta();
+      jet_mumatch_phi_ = muon4V_fromPF.at(pos_matched_reco_mu).Phi();
     }
     else if(not muon4V_fromPF.empty()){
       jet_mumatch_pt_ = muon4V_fromPF.front().Pt();
+      jet_mumatch_eta_ = muon4V_fromPF.front().Eta();
+      jet_mumatch_phi_ = muon4V_fromPF.front().Phi();
     }
     else{
       jet_mumatch_pt_ = -1;
+      jet_mumatch_eta_ = -9;
+      jet_mumatch_phi_ = -9;
     }
 
     std::sort(electron4V_fromPF.begin(),electron4V_fromPF.end(),
@@ -625,12 +637,18 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     }
     if(pos_matched_reco_ele >= 0){
       jet_elematch_pt_ = electron4V_fromPF.at(pos_matched_reco_ele).Pt();
+      jet_elematch_eta_ = electron4V_fromPF.at(pos_matched_reco_ele).Eta();
+      jet_elematch_phi_ = electron4V_fromPF.at(pos_matched_reco_ele).Phi();
     }
     else if(not electron4V_fromPF.empty()){
       jet_elematch_pt_ = electron4V_fromPF.front().Pt();
+      jet_elematch_eta_ = electron4V_fromPF.front().Eta();
+      jet_elematch_phi_ = electron4V_fromPF.front().Phi();
     }
     else{
       jet_elematch_pt_ = -1;
+      jet_elematch_eta_ = -9;
+      jet_elematch_phi_ = -9;
     }
 
     // Matching with reco tau
@@ -648,9 +666,13 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     }
     if(pos_matched_reco_tauh >= 0){
       jet_taumatch_pt_ = tausColl[pos_matched_reco_tauh].pt();
+      jet_taumatch_eta_ = tausColl[pos_matched_reco_tauh].eta();
+      jet_taumatch_phi_ = tausColl[pos_matched_reco_tauh].phi();
     }
     else{
       jet_taumatch_pt_ = -1;
+      jet_taumatch_eta_ = -9;
+      jet_taumatch_phi_ = -9;
     }
 
     /// cuts ///
