@@ -1,8 +1,5 @@
-
 import FWCore.ParameterSet.Config as cms
-
 import FWCore.ParameterSet.VarParsing as VarParsing
-### parsing job options 
 import sys
 
 options = VarParsing.VarParsing()
@@ -29,7 +26,6 @@ import os
 release=os.environ['CMSSW_VERSION'][6:]
 print("Using release "+release)
 
-
 options.register(
 	'inputFiles','',
 	VarParsing.VarParsing.multiplicity.list,
@@ -53,9 +49,7 @@ process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
-#'auto:run2_mc'
 process.GlobalTag = GlobalTag(process.GlobalTag, '130X_mcRun3_2023_realistic_postBPix_v2', '')
-#process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
@@ -71,14 +65,12 @@ process.load('DeepNTuples.DeepNtuplizer.samples.TTJetsPhase1_cfg') #default inpu
 
 if options.inputFiles:
 	process.source.fileNames = options.inputFiles
-
 if options.inputScript != '' and options.inputScript != 'DeepNTuples.DeepNtuplizer.samples.TTJetsPhase1_cfg':
     process.load(options.inputScript)
 
 numberOfFiles = len(process.source.fileNames)
 numberOfJobs = options.nJobs
 jobNumber = options.job
-
 
 process.source.fileNames = process.source.fileNames[jobNumber:numberOfFiles:numberOfJobs]
 if options.nJobs > 1:
@@ -94,7 +86,7 @@ releases = release.split("_")
 bTagInfos = ['pfDeepFlavourTagInfos',
              'pfImpactParameterTagInfos',
              'pfInclusiveSecondaryVertexFinderTagInfos',
-             'pfParticleNetAK4TagInfos',] #['pfParticleTransformerAK4TagInfos',]
+             'pfParticleNetAK4TagInfos',]
 
 from RecoBTag.ONNXRuntime.pfParticleNetAK4_cff import _pfParticleNetAK4JetTagsAll as pfParticleNetAK4JetTagsAll
 from RecoBTag.ONNXRuntime.pfParticleNetFromMiniAODAK4_cff import _pfParticleNetFromMiniAODAK4PuppiCentralJetTagsProbs
@@ -232,63 +224,62 @@ else:
 process.load("DeepNTuples.DeepNtuplizer.QGLikelihood_cfi")
 process.es_prefer_jec = cms.ESPrefer("PoolDBESSource", "QGPoolDBESSource")
 process.load('RecoJets.JetProducers.QGTagger_cfi')
-#process.QGTagger.srcJets   = cms.InputTag("selectedUpdatedPatJetsDeepFlavour")
 process.QGTagger.jetsLabel = cms.string('QGL_AK4PFchs')
 
-
-from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
-process.ak4GenJetsWithNu = ak4GenJets.clone(src ='packedGenParticles')
+if options.isMC:
+    from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
+    process.ak4GenJetsWithNu = ak4GenJets.clone(src ='packedGenParticles')
  
- ## Filter out neutrinos from packed GenParticles
-process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedGenParticles"), cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16"))
- ## Define GenJets
-process.ak4GenJetsRecluster = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
+    ## Filter out neutrinos from packed GenParticles
+    process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedGenParticles"), cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16"))
+    ## Define GenJets
+    process.ak4GenJetsRecluster = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
 
-if options.isemu or options.isdimu or options.ismutau:
-    jet_coll_gen = 'selectedCleanJets'
-else:
-    jet_coll_gen = 'selectedUpdatedPatJetsDeepFlavour'
+    if options.isemu or options.isdimu or options.ismutau:
+        jet_coll_gen = 'selectedCleanJets'
+    else:
+        jet_coll_gen = 'selectedUpdatedPatJetsDeepFlavour'
 
 
-process.patGenJetMatchAllowDuplicates = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
-    src         = cms.InputTag(jet_coll_gen),      # RECO jets (any View<Jet> is ok) 
-    matched     = cms.InputTag("ak4GenJetsWithNu"),        # GEN jets  (must be GenJetCollection)              
-    mcPdgId     = cms.vint32(),                      # n/a   
-    mcStatus    = cms.vint32(),                      # n/a   
-    checkCharge = cms.bool(False),                   # n/a   
-    maxDeltaR   = cms.double(0.4),                   # Minimum deltaR for the match   
-    #maxDPtRel   = cms.double(3.0),                  # Minimum deltaPt/Pt for the match (not used in GenJetMatcher)                     
-    resolveAmbiguities    = cms.bool(False),          # Forbid two RECO objects to match to the same GEN object 
-    resolveByMatchQuality = cms.bool(False),         # False = just match input in order; True = pick lowest deltaR pair first          
-)
+    process.patGenJetMatchAllowDuplicates = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
+                                                           src         = cms.InputTag(jet_coll_gen),      # RECO jets (any View<Jet> is ok) 
+                                                           matched     = cms.InputTag("ak4GenJetsWithNu"),        # GEN jets  (must be GenJetCollection)              
+                                                           mcPdgId     = cms.vint32(),                      # n/a   
+                                                           mcStatus    = cms.vint32(),                      # n/a   
+                                                           checkCharge = cms.bool(False),                   # n/a   
+                                                           maxDeltaR   = cms.double(0.4),                   # Minimum deltaR for the match   
+                                                           #maxDPtRel   = cms.double(3.0),                  # Minimum deltaPt/Pt for the match (not used in GenJetMatcher)
+                                                           resolveAmbiguities    = cms.bool(False),          # Forbid two RECO objects to match to the same GEN object 
+                                                           resolveByMatchQuality = cms.bool(False),         # False = just match input in order; True = pick lowest deltaR pair first
+                                                           )
  
  
-process.patGenJetMatchWithNu = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
-    src         = cms.InputTag(jet_coll_gen),      # RECO jets (any View<Jet> is ok) 
-    matched     = cms.InputTag("ak4GenJetsWithNu"),        # GEN jets  (must be GenJetCollection)              
-    mcPdgId     = cms.vint32(),                      # n/a   
-    mcStatus    = cms.vint32(),                      # n/a   
-    checkCharge = cms.bool(False),                   # n/a   
-    maxDeltaR   = cms.double(0.4),                   # Minimum deltaR for the match   
-    #maxDPtRel   = cms.double(3.0),                  # Minimum deltaPt/Pt for the match (not used in GenJetMatcher)                     
-    resolveAmbiguities    = cms.bool(True),          # Forbid two RECO objects to match to the same GEN object 
-    resolveByMatchQuality = cms.bool(False),         # False = just match input in order; True = pick lowest deltaR pair first          
-)
+    process.patGenJetMatchWithNu = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
+                                                  src         = cms.InputTag(jet_coll_gen),      # RECO jets (any View<Jet> is ok) 
+                                                  matched     = cms.InputTag("ak4GenJetsWithNu"),        # GEN jets  (must be GenJetCollection)              
+                                                  mcPdgId     = cms.vint32(),                      # n/a   
+                                                  mcStatus    = cms.vint32(),                      # n/a   
+                                                  checkCharge = cms.bool(False),                   # n/a   
+                                                  maxDeltaR   = cms.double(0.4),                   # Minimum deltaR for the match   
+                                                  #maxDPtRel   = cms.double(3.0),                  # Minimum deltaPt/Pt for the match (not used in GenJetMatcher)                     
+                                                  resolveAmbiguities    = cms.bool(True),          # Forbid two RECO objects to match to the same GEN object 
+                                                  resolveByMatchQuality = cms.bool(False),         # False = just match input in order; True = pick lowest deltaR pair first          
+                                                  )
+    
+    process.patGenJetMatchRecluster = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
+                                                     src         = cms.InputTag(jet_coll_gen),      # RECO jets (any View<Jet> is ok) 
+                                                     matched     = cms.InputTag("ak4GenJetsRecluster"),        # GEN jets  (must be GenJetCollection)              
+                                                     mcPdgId     = cms.vint32(),                      # n/a   
+                                                     mcStatus    = cms.vint32(),                      # n/a   
+                                                     checkCharge = cms.bool(False),                   # n/a   
+                                                     maxDeltaR   = cms.double(0.4),                   # Minimum deltaR for the match   
+                                                     #maxDPtRel   = cms.double(3.0),                  # Minimum deltaPt/Pt for the match (not used in GenJetMatcher)                     
+                                                     resolveAmbiguities    = cms.bool(True),          # Forbid two RECO objects to match to the same GEN object 
+                                                     resolveByMatchQuality = cms.bool(False),         # False = just match input in order; True = pick lowest deltaR pair first          
+                                                     )
 
-process.patGenJetMatchRecluster = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
-    src         = cms.InputTag(jet_coll_gen),      # RECO jets (any View<Jet> is ok) 
-    matched     = cms.InputTag("ak4GenJetsRecluster"),        # GEN jets  (must be GenJetCollection)              
-    mcPdgId     = cms.vint32(),                      # n/a   
-    mcStatus    = cms.vint32(),                      # n/a   
-    checkCharge = cms.bool(False),                   # n/a   
-    maxDeltaR   = cms.double(0.4),                   # Minimum deltaR for the match   
-    #maxDPtRel   = cms.double(3.0),                  # Minimum deltaPt/Pt for the match (not used in GenJetMatcher)                     
-    resolveAmbiguities    = cms.bool(True),          # Forbid two RECO objects to match to the same GEN object 
-    resolveByMatchQuality = cms.bool(False),         # False = just match input in order; True = pick lowest deltaR pair first          
-)
-
-process.genJetReclusterTask = cms.Task(process.packedGenParticlesForJetsNoNu,process.ak4GenJetsWithNu,process.ak4GenJetsRecluster) 
-process.genJetMatchTask = cms.Task(process.patGenJetMatchAllowDuplicates,process.patGenJetMatchWithNu,process.patGenJetMatchRecluster)
+    process.genJetReclusterTask = cms.Task(process.packedGenParticlesForJetsNoNu,process.ak4GenJetsWithNu,process.ak4GenJetsRecluster) 
+    process.genJetMatchTask = cms.Task(process.patGenJetMatchAllowDuplicates,process.patGenJetMatchWithNu,process.patGenJetMatchRecluster)
 
 # Very Loose IVF SV collection
 from PhysicsTools.PatAlgos.tools.helpers import loadWithPrefix
@@ -357,12 +348,10 @@ if options.isdimu:
     process.deepntuplizer.dimu = cms.bool(True)
 if options.ismutau:
     process.deepntuplizer.mutau = cms.bool(True)
-    
 if options.eta :
     process.deepntuplizer.jetAbsEtaMax = cms.double(5.0)
 else:
     process.deepntuplizer.jetAbsEtaMax = cms.double(2.5)
-
 if options.phase2 :
     process.deepntuplizer.jetAbsEtaMax = cms.double(3.0)
 
@@ -372,7 +361,6 @@ from PhysicsTools.PatAlgos.tools.coreTools import runOnData
 if not(options.isMC):
     runOnData(process, names=["Jets","METs"], outputModules = [])
 
-#1631
 process.ProfilerService = cms.Service (
       "ProfilerService",
        firstEvent = cms.untracked.int32(1631),
@@ -380,7 +368,6 @@ process.ProfilerService = cms.Service (
        paths = cms.untracked.vstring('p') 
 )
 
-#Trick to make it work in 9_1_X
 process.tsk = cms.Task()
 for mod in process.producers_().values(): #.itervalues():
     process.tsk.add(mod)
