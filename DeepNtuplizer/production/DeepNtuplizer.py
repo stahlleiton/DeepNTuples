@@ -244,8 +244,14 @@ process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", src = cm
  ## Define GenJets
 process.ak4GenJetsRecluster = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
 
+if options.isemu or options.isdimu or options.ismutau:
+    jet_coll_gen = 'selectedCleanJets'
+else:
+    jet_coll_gen = 'selectedUpdatedPatJetsDeepFlavour'
+
+
 process.patGenJetMatchAllowDuplicates = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
-    src         = cms.InputTag("selectedUpdatedPatJetsDeepFlavour"),      # RECO jets (any View<Jet> is ok) 
+    src         = cms.InputTag(jet_coll_gen),      # RECO jets (any View<Jet> is ok) 
     matched     = cms.InputTag("ak4GenJetsWithNu"),        # GEN jets  (must be GenJetCollection)              
     mcPdgId     = cms.vint32(),                      # n/a   
     mcStatus    = cms.vint32(),                      # n/a   
@@ -258,7 +264,7 @@ process.patGenJetMatchAllowDuplicates = cms.EDProducer("GenJetMatcher",  # cut o
  
  
 process.patGenJetMatchWithNu = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
-    src         = cms.InputTag("selectedUpdatedPatJetsDeepFlavour"),      # RECO jets (any View<Jet> is ok) 
+    src         = cms.InputTag(jet_coll_gen),      # RECO jets (any View<Jet> is ok) 
     matched     = cms.InputTag("ak4GenJetsWithNu"),        # GEN jets  (must be GenJetCollection)              
     mcPdgId     = cms.vint32(),                      # n/a   
     mcStatus    = cms.vint32(),                      # n/a   
@@ -270,7 +276,7 @@ process.patGenJetMatchWithNu = cms.EDProducer("GenJetMatcher",  # cut on deltaR;
 )
 
 process.patGenJetMatchRecluster = cms.EDProducer("GenJetMatcher",  # cut on deltaR; pick best by deltaR           
-    src         = cms.InputTag("selectedUpdatedPatJetsDeepFlavour"),      # RECO jets (any View<Jet> is ok) 
+    src         = cms.InputTag(jet_coll_gen),      # RECO jets (any View<Jet> is ok) 
     matched     = cms.InputTag("ak4GenJetsRecluster"),        # GEN jets  (must be GenJetCollection)              
     mcPdgId     = cms.vint32(),                      # n/a   
     mcStatus    = cms.vint32(),                      # n/a   
@@ -338,8 +344,8 @@ process.deepntuplizer.LooseSVs = cms.InputTag("looseIVFinclusiveCandidateSeconda
 
 process.deepntuplizer.applySelection = cms.bool(options.selectJets)
 
-#if ( int(releases[0]) > 8 ) or ( (int(releases[0])==8) and (int(releases[1]) >= 4) ):
- #  process.deepntuplizer.tagInfoName = cms.string('pfDeepCSV')
+if ( int(releases[0]) > 8 ) or ( (int(releases[0])==8) and (int(releases[1]) >= 4) ):
+   process.deepntuplizer.tagInfoName = cms.string('pfDeepCSV')
 
 if options.isMC:
     process.deepntuplizer.MC = cms.bool(True)
@@ -382,8 +388,6 @@ for mod in process.filters_().values(): #.itervalues():
     process.tsk.add(mod)
 
 process.patAlgosToolsTask = getPatAlgosToolsTask(process)
-
-print("AAAAAAAAAA")
 
 if (options.isMC and options.isemu): #All the MC+Skimming
     process.p = cms.Path(
