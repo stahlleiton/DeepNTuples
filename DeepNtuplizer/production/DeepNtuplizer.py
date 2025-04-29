@@ -102,10 +102,6 @@ from RecoBTag.ONNXRuntime.pfUnifiedParticleTransformerAK4_cff import _pfUnifiedP
 
 if (int(releases[0])>8) or ( (int(releases[0])==8) and (int(releases[1]) >= 4) ) :
  bTagDiscriminators = [
-     'pfDeepCSVJetTags:probudsg', #to be fixed with new names
-     'pfDeepCSVJetTags:probb',
-     'pfDeepCSVJetTags:probc',
-     'pfDeepCSVJetTags:probbb',
      'pfDeepFlavourJetTags:probb',
      'pfDeepFlavourJetTags:probbb',
      'pfDeepFlavourJetTags:problepb',
@@ -121,11 +117,6 @@ if (int(releases[0])>8) or ( (int(releases[0])==8) and (int(releases[1]) >= 4) )
  ] + _pfParticleNetFromMiniAODAK4PuppiCentralJetTagsProbs + pfParticleNetAK4JetTagsAll + _pfUnifiedParticleTransformerAK4JetTagsAll
 else :
   bTagDiscriminators = [
-      'pfDeepCSVJetTags:probudsg', #to be fixed with new names
-      'pfDeepCSVJetTags:probb',
-      'pfDeepCSVJetTags:probc',
-      'pfDeepCSVJetTags:probbb',
-      'pfDeepCSVJetTags:probcc',
       'pfDeepFlavourJetTags:probb',
       'pfDeepFlavourJetTags:probbb',
       'pfDeepFlavourJetTags:problepb',
@@ -241,7 +232,7 @@ else:
 process.load("DeepNTuples.DeepNtuplizer.QGLikelihood_cfi")
 process.es_prefer_jec = cms.ESPrefer("PoolDBESSource", "QGPoolDBESSource")
 process.load('RecoJets.JetProducers.QGTagger_cfi')
-process.QGTagger.srcJets   = cms.InputTag("selectedUpdatedPatJetsDeepFlavour")
+#process.QGTagger.srcJets   = cms.InputTag("selectedUpdatedPatJetsDeepFlavour")
 process.QGTagger.jetsLabel = cms.string('QGL_AK4PFchs')
 
 
@@ -323,29 +314,32 @@ if options.isdimu:
     process.load('DeepNTuples.DeepNtuplizer.dimu_skim_cff');
     process.deepntuplizer.leptonPairs = cms.InputTag("dimuonPairs")
     process.deepntuplizer.jets = cms.InputTag('selectedCleanJets')
+    process.QGTagger.srcJets   = cms.InputTag("selectedCleanJets")
 elif options.isemu:
     from DeepNTuples.DeepNtuplizer.emu_skim_cff import emuSelection
     print ("add emu process selection")
     process = emuSelection(process,"pfParticleNetFromMiniAODAK4PuppiCentral");
     process.deepntuplizer.leptonPairs = cms.InputTag("emuPairs")
     process.deepntuplizer.jets = cms.InputTag('selectedCleanJets')
+    process.QGTagger.srcJets   = cms.InputTag("selectedCleanJets")
 elif options.ismutau:
     from DeepNTuples.DeepNtuplizer.mutau_skim_cff import mutauSelection
     print ("add mutau process selection")
     process = mutauSelection(process,"pfParticleNetFromMiniAODAK4PuppiCentral");
     process.deepntuplizer.leptonPairs = cms.InputTag("mutauPairs")
     process.deepntuplizer.jets = cms.InputTag('selectedCleanJets')
+    process.QGTagger.srcJets   = cms.InputTag("selectedCleanJets")
 else:
     process.deepntuplizer.jets = cms.InputTag('selectedUpdatedPatJetsDeepFlavour')
+    process.QGTagger.srcJets   = cms.InputTag("selectedUpdatedPatJetsDeepFlavour")
 
 process.deepntuplizer.bDiscriminators = bTagDiscriminators 
-process.deepntuplizer.bDiscriminators.append('pfCombinedMVAV2BJetTags')
 process.deepntuplizer.LooseSVs = cms.InputTag("looseIVFinclusiveCandidateSecondaryVertices")
 
 process.deepntuplizer.applySelection = cms.bool(options.selectJets)
 
-if ( int(releases[0]) > 8 ) or ( (int(releases[0])==8) and (int(releases[1]) >= 4) ):
-   process.deepntuplizer.tagInfoName = cms.string('pfDeepCSV')
+#if ( int(releases[0]) > 8 ) or ( (int(releases[0])==8) and (int(releases[1]) >= 4) ):
+ #  process.deepntuplizer.tagInfoName = cms.string('pfDeepCSV')
 
 if options.isMC:
     process.deepntuplizer.MC = cms.bool(True)
@@ -389,11 +383,14 @@ for mod in process.filters_().values(): #.itervalues():
 
 process.patAlgosToolsTask = getPatAlgosToolsTask(process)
 
+print("AAAAAAAAAA")
+
 if (options.isMC and options.isemu): #All the MC+Skimming
     process.p = cms.Path(
         process.leptonSelection *
         process.jetSelection *
-        process.QGTagger + process.deepntuplizer,
+        process.QGTagger+
+        process.deepntuplizer,
         process.tsk, 
         process.patAlgosToolsTask, 
         process.genJetReclusterTask, 
@@ -403,7 +400,8 @@ elif (options.isMC and options.isdimu):
     process.p = cms.Path(
         process.leptonSelection *
         process.jetSelection *
-        process.QGTagger + process.deepntuplizer,
+        process.QGTagger+
+        process.deepntuplizer,
         process.tsk, 
         process.patAlgosToolsTask, 
         process.genJetReclusterTask, 
@@ -413,7 +411,8 @@ elif (options.isMC and options.ismutau):
     process.p = cms.Path(
         process.leptonSelection *
         process.jetSelection *
-        process.QGTagger + process.deepntuplizer,
+        process.QGTagger+
+        process.deepntuplizer,
         process.tsk, 
         process.patAlgosToolsTask, 
         process.genJetReclusterTask, 

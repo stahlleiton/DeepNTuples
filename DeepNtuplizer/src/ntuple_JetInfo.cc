@@ -166,10 +166,10 @@ void ntuple_JetInfo::initBranches(TTree* tree){
 
 void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
 
-    iEvent.getByToken(qglToken_, qglHandle);
+  /*iEvent.getByToken(qglToken_, qglHandle);
     iEvent.getByToken(ptDToken_, ptDHandle);
     iEvent.getByToken(axis2Token_, axis2Handle);
-    iEvent.getByToken(multToken_, multHandle);
+    iEvent.getByToken(multToken_, multHandle);*/
 
     iEvent.getByToken(genJetMatchReclusterToken_, genJetMatchRecluster);
     iEvent.getByToken(genJetMatchWithNuToken_, genJetMatchWithNu);
@@ -715,10 +715,10 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
 
     const auto jetRef = reco::CandidatePtr(coll->ptrs().at( jetidx));
 
-    jet_qgl_ = (*qglHandle)[jetRef];
-    QG_ptD_ = (*ptDHandle)[jetRef];
-    QG_axis2_ = (*axis2Handle)[jetRef];
-    QG_mult_ = (*multHandle)[jetRef];
+    jet_qgl_ = -1.0; //(*qglHandle)[jetRef];
+    QG_ptD_ = -1.0; //(*ptDHandle)[jetRef];
+    QG_axis2_ = -1.0; //(*axis2Handle)[jetRef];
+    QG_mult_ = -1.0; //(*multHandle)[jetRef];
 
     isB_=0; isGBB_=0; isBB_=0; isC_=0; isGCC_=0; isCC_=0; isU_=0; isD_=0; isMU_=0; isELE_=0;
     isS_=0; isG_=0, isPU_=0, isLeptonicB_=0, isLeptonicB_C_=0, isUndefined_=0;
