@@ -171,7 +171,6 @@ void ntuple_JetInfo::readEvent(const edm::Event& iEvent){
     iEvent.getByToken(axis2Token_, axis2Handle);
     iEvent.getByToken(multToken_, multHandle);
 
-    std::cout << MC_ << std::endl;
     if(MC_){
       iEvent.getByToken(genJetMatchReclusterToken_, genJetMatchRecluster);
       iEvent.getByToken(genJetMatchWithNuToken_, genJetMatchWithNu);
@@ -407,8 +406,6 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     if(!coll)
         throw std::runtime_error("ntuple_JetInfo::fillBranches: no jet collection");
 
-    std::cout << jet.pt() << std::endl;
-    
     isMC_ = MC_ ? 1 : 0;
     isDomain_ = Domain_ ? 1 : 0;
     isemu_   =  emu_ ? 1 : 0;
