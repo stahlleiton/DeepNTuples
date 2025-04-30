@@ -134,7 +134,6 @@ public:
 private:
 
     edm::ESHandle<TransientTrackBuilder>& builder;
-    // AS edm::ESHandle<TransientTrackBuilder> track_builder_;
     edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord> track_builder_token_;
     
     float trackMomentum_;
@@ -160,11 +159,8 @@ private:
 
 void ntuple_pfCands::readSetup(const edm::EventSetup& iSetup){
 
-    // AS iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", builder);
-    
     builder = iSetup.getHandle(track_builder_token_);
     
-
 }
 
 void ntuple_pfCands::getInput(const edm::ParameterSet& iConfig){

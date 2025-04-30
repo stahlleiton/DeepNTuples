@@ -110,8 +110,8 @@ private:
   std::vector<ntuple_content* > modules_;
   std::vector<std::string> module_names_;
 
-  bool applySelection_;
-};
+  bool applySelection_;}
+  ;
 
 DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   vtxToken_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
