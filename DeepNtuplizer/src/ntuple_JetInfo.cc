@@ -1000,7 +1000,5 @@ bool ntuple_JetInfo::fillBranches(const pat::Jet & jet, const size_t& jetidx, co
     y_axis2_  =  std::get<5>(qgtuple);
     y_pt_dr_log_=std::get<6>(qgtuple);
 
-    std::cout << returnval << std::endl;
-
     return returnval;
 }
