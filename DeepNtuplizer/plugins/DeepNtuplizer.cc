@@ -167,14 +167,12 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   jetinfo->setUseHerwigCompatibleMatching(useHerwigCompatibleMatching);
   jetinfo->setIsHerwig(isHerwig);
 
-  if(isMC_){
-    jetinfo->setGenJetMatchReclusterToken(consumes<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchRecluster" )));
-    jetinfo->setGenJetsToken(consumes<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("genJets")));
-    jetinfo->setGenJetsWnuToken(mayConsume<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("genJetsWnu")));
-    jetinfo->setGenJetMatchWithNuToken(consumes<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchWithNu" )));
-    jetinfo->setGenJetMatchAllowDuplicatesToken(consumes<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchAllowDuplicates" ))); 
-    jetinfo->setGenParticlesToken(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("pruned")));
-  }
+  jetinfo->setGenJetMatchReclusterToken(mayConsume<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchRecluster" )));
+  jetinfo->setGenJetsToken(mayConsume<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("genJets")));
+  jetinfo->setGenJetsWnuToken(mayConsume<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("genJetsWnu")));
+  jetinfo->setGenJetMatchWithNuToken(mayConsume<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchWithNu" )));
+  jetinfo->setGenJetMatchAllowDuplicatesToken(mayConsume<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchAllowDuplicates" ))); 
+  jetinfo->setGenParticlesToken(mayConsume<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("pruned")));
   jetinfo->setMuonsToken(consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("muons")));
   jetinfo->setElectronsToken(consumes<pat::ElectronCollection>(iConfig.getParameter<edm::InputTag>("electrons")));
   jetinfo->setTausToken(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("taus")));
