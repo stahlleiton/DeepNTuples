@@ -9,7 +9,7 @@ Installation (CMSSW 14_1_9)
 cmsrel CMSSW_14_1_9
 cd CMSSW_14_1_9/src/
 cmsenv
-git clone https://github.com/stahlleiton/DeepNTuples -b ParT_HIN_2024
+git clone https://github.com/stahlleiton/DeepNTuples -b ParT_HIN_2025
 cd DeepNTuples
 # Add JetToolBox
 git submodule init
