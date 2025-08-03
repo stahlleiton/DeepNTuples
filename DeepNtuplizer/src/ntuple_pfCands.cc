@@ -134,7 +134,6 @@ public:
 private:
 
     edm::ESHandle<TransientTrackBuilder>& builder;
-    // AS edm::ESHandle<TransientTrackBuilder> track_builder_;
     edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord> track_builder_token_;
     
     float trackMomentum_;
@@ -160,11 +159,8 @@ private:
 
 void ntuple_pfCands::readSetup(const edm::EventSetup& iSetup){
 
-    // AS iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", builder);
-    
     builder = iSetup.getHandle(track_builder_token_);
     
-
 }
 
 void ntuple_pfCands::getInput(const edm::ParameterSet& iConfig){
@@ -202,6 +198,8 @@ void ntuple_pfCands::initBranches(TTree* tree){
     addBranch(tree,"Cpfcan_firsthit",&Cpfcan_firsthit_,"Cpfcan_firsthit_[n_Cpfcand_]/F");
 
     addBranch(tree,"Cpfcan_fromPV",&Cpfcan_fromPV_,"Cpfcan_fromPV_[n_Cpfcand_]/F");
+    addBranch(tree,"Cpfcan_qdotp", &Cpfcan_qdotp_,"Cpfcan_qdotp_[n_Cpfcand_]/F");
+    addBranch(tree,"Cpfcan_qoverp", &Cpfcan_qoverp_,"Cpfcan_qoverp_[n_Cpfcand_]/F");
 
     addBranch(tree,"Cpfcan_drminsv",&Cpfcan_drminsv_,"Cpfcan_drminsv_[n_Cpfcand_]/F");
     addBranch(tree,"Cpfcan_distminsv",&Cpfcan_distminsv_,"Cpfcan_distminsv_[n_Cpfcand_]/F");
@@ -412,14 +410,14 @@ bool ntuple_pfCands::fillBranches(const pat::Jet & unsubjet, const pat::Jet & je
 	    Cpfcan_firsthit_[fillntupleentry] = PackedCandidate_->firstHit();
 
             Cpfcan_dxyerrinv_[fillntupleentry]= PackedCandidate_->hasTrackDetails() ? catchInfsAndBound(1/PackedCandidate_->dxyError(),0,-1, 10000.) : -1;
-
             Cpfcan_dxysig_[fillntupleentry]= PackedCandidate_->hasTrackDetails() ? catchInfsAndBound(fabs(PackedCandidate_->dxy()/PackedCandidate_->dxyError()),0.,-2000,2000) : 0.;
-
 
             Cpfcan_dz_[fillntupleentry] = PackedCandidate_->dz();
             Cpfcan_VTX_ass_[fillntupleentry] = PackedCandidate_->pvAssociationQuality();
 
             Cpfcan_fromPV_[fillntupleentry] = PackedCandidate_->fromPV();
+            Cpfcan_qdotp_[fillntupleentry] = PackedCandidate_->charge()*PackedCandidate_->pt();
+            Cpfcan_qoverp_[fillntupleentry] = PackedCandidate_->charge()/PackedCandidate_->pt();
 
             float tempdontopt=PackedCandidate_->vx();
             tempdontopt++;

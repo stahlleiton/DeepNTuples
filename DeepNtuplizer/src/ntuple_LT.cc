@@ -174,6 +174,10 @@ void ntuple_LT::initBranches(TTree* tree){
   addBranch(tree,"LT_phi", &LT_phi_,"LT_phi_[n_LTcand_]/F");
   addBranch(tree,"LT_e", &LT_e_,"LT_e_[n_LTcand_]/F");
 
+  addBranch(tree,"LT_px", &LT_px_,"LT_px_[n_LTcand_]/F");
+  addBranch(tree,"LT_py", &LT_py_,"LT_py_[n_LTcand_]/F");
+  addBranch(tree,"LT_pz", &LT_pz_,"LT_pz_[n_LTcand_]/F");
+
   addBranch(tree,"LT_puppiw",&LT_puppiw_,"LT_puppiw_[n_LTcand_]/F");
   addBranch(tree,"LT_dz",&LT_dz_,"LT_dz_[n_LTcand_]/F");
 
@@ -299,13 +303,17 @@ bool ntuple_LT::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  
       /// Split to charged and neutral candidates
       if(PackedCandidate_->charge()!=0 ){
 
-    size_t fillntupleentry= sortedchargedindices.at(sortedcharged[i].get());
+	size_t fillntupleentry= sortedchargedindices.at(sortedcharged[i].get());
 	if(fillntupleentry>=(int)max_ltcand_) continue;
 
 	LT_pt_[fillntupleentry] = PackedCandidate_->pt();
 	LT_eta_[fillntupleentry] = PackedCandidate_->eta();
 	LT_phi_[fillntupleentry] = PackedCandidate_->phi();
 	LT_e_[fillntupleentry] = PackedCandidate_->energy();
+
+	LT_px_[fillntupleentry] = PackedCandidate_->px();
+	LT_py_[fillntupleentry] = PackedCandidate_->py();
+	LT_pz_[fillntupleentry] = PackedCandidate_->pz();
 
 	LT_puppiw_[fillntupleentry] = PackedCandidate_->puppiWeight();
 	LT_dz_[fillntupleentry] = PackedCandidate_->dz();
@@ -346,8 +354,8 @@ bool ntuple_LT::fillBranches(const pat::Jet & jet, const size_t& jetidx, const  
 
 	float cand_charge_ = PackedCandidate_->charge();
 	LT_charge_[fillntupleentry] = cand_charge_;
-    LT_chi2_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? catchInfsAndBound(PackedCandidate_->pseudoTrack().normalizedChi2(),300,-1,300) : -1;
-    LT_quality_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? PackedCandidate_->pseudoTrack().qualityMask() : (1 << reco::TrackBase::loose);
+	LT_chi2_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? catchInfsAndBound(PackedCandidate_->pseudoTrack().normalizedChi2(),300,-1,300) : -1;
+	LT_quality_[fillntupleentry] = PackedCandidate_->hasTrackDetails() ? PackedCandidate_->pseudoTrack().qualityMask() : (1 << reco::TrackBase::loose);
 
 	LT_drminsv_[fillntupleentry] = catchInfsAndBound(drminltcandsv_,0,-0.4,0,-0.4);
 

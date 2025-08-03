@@ -2,12 +2,12 @@
 NTuple framework for DeepFlavour
 
 
-Installation (CMSSW 13_2_12)
+Installation (CMSSW 14_1_9)
 ============
 
 ```
-cmsrel CMSSW_13_2_12
-cd CMSSW_13_2_12/src/
+cmsrel CMSSW_14_1_9
+cd CMSSW_14_1_9/src/
 cmsenv
 git clone https://github.com/stahlleiton/DeepNTuples -b ParT_HIN_2024
 cd DeepNTuples

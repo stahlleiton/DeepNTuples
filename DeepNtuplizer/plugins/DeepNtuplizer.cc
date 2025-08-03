@@ -135,9 +135,10 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
    *  modules don't interact.
    */
   // read configuration parameters
+  const bool isMC_ = iConfig.getParameter<bool>("MC");
+  const bool isDomain_ = iConfig.getParameter<bool>("Domain");
   const double jetR = iConfig.getParameter<double>("jetR");
   const bool  runFatJets_ = iConfig.getParameter<bool>("runFatJet");
-  // AS const bool  runDeepVertex_ = iConfig.getParameter<bool>("runDeepVertex");
 
   //not implemented yet
   const bool useHerwigCompatibleMatching=iConfig.getParameter<bool>("useHerwigCompatible");
@@ -145,7 +146,12 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
 
   ntuple_content::useoffsets = iConfig.getParameter<bool>("useOffsets");
 
-  applySelection_=iConfig.getParameter<bool>("applySelection");
+  if(isDomain_){
+    applySelection_=false;
+    }
+  else{
+    applySelection_=iConfig.getParameter<bool>("applySelection");
+  }
 
   ntuple_SV* svmodule=new ntuple_SV("", jetR);
   svmodule->setTrackBuilderToken(
@@ -165,12 +171,12 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
   jetinfo->setUseHerwigCompatibleMatching(useHerwigCompatibleMatching);
   jetinfo->setIsHerwig(isHerwig);
 
-  jetinfo->setGenJetMatchReclusterToken(consumes<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchRecluster" )));
-  jetinfo->setGenJetsToken(consumes<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("genJets")));
+  jetinfo->setGenJetMatchReclusterToken(mayConsume<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchRecluster" )));
+  jetinfo->setGenJetsToken(mayConsume<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("genJets")));
   jetinfo->setGenJetsWnuToken(mayConsume<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("genJetsWnu")));
-  jetinfo->setGenJetMatchWithNuToken(consumes<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchWithNu" )));
-  jetinfo->setGenJetMatchAllowDuplicatesToken(consumes<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchAllowDuplicates" ))); 
-  jetinfo->setGenParticlesToken(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("pruned")));
+  jetinfo->setGenJetMatchWithNuToken(mayConsume<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchWithNu" )));
+  jetinfo->setGenJetMatchAllowDuplicatesToken(mayConsume<edm::Association<reco::GenJetCollection>>(iConfig.getParameter<edm::InputTag>( "genJetMatchAllowDuplicates" ))); 
+  jetinfo->setGenParticlesToken(mayConsume<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("pruned")));
   jetinfo->setMuonsToken(consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("muons")));
   jetinfo->setElectronsToken(consumes<pat::ElectronCollection>(iConfig.getParameter<edm::InputTag>("electrons")));
   jetinfo->setTausToken(consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("taus")));
@@ -206,7 +212,9 @@ DeepNtuplizer::DeepNtuplizer(const edm::ParameterSet& iConfig):
 
   if(runFatJets_){
     auto *fatjetinfo = new ntuple_FatJetInfo(jetR);
-    fatjetinfo->setGenParticleToken(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("pruned")));
+    if(isMC_){
+      fatjetinfo->setGenParticleToken(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("pruned")));
+    }
     fatjetinfo->setFatJetToken(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjets")));
     addModule(fatjetinfo, "fatJets");
   }
