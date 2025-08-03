@@ -19,6 +19,7 @@ options.register('selectJets', True, VarParsing.VarParsing.multiplicity.singleto
 options.register('phase2', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "apply jet selection for phase 2. Currently sets JetEtaMax to 3.0 and picks slimmedJetsPuppi as jet collection.")
 options.register('puppi', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use puppi jets")
 options.register('eta', False, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "use eta up to 5.0")
+options.register('jetR', 0.2, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.float, "jet radius")
 
 
 import os
@@ -95,6 +96,7 @@ else:
 if options.phase2 :
     jetAbsEtaMax = 3.0
 
+jetR = options.jetR
 jetCorrectionsAK4 = ('AK4PF', ['L2Relative', 'L3Absolute'], 'None')
 
 bTagInfos = ['pfDeepFlavourTagInfos',
@@ -151,14 +153,16 @@ process.allPartons = allPartons.clone(
 )
 from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
 process.ak4GenJetsWithNu = ak4GenJets.clone(
-    src = 'packedGenParticlesSignal'
+    src = 'packedGenParticlesSignal',
+    rParam = jetR
 )
 process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector",
     src = cms.InputTag("packedGenParticlesSignal"),
     cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16")
 )
 process.ak4GenJetsRecluster = ak4GenJets.clone(
-    src = 'packedGenParticlesForJetsNoNu'
+    src = 'packedGenParticlesForJetsNoNu',
+    rParam = jetR
 )
 process.genTask = cms.Task(process.hiSignalGenParticles, process.allPartons, process.ak4GenJetsWithNu, process.packedGenParticlesForJetsNoNu, process.ak4GenJetsRecluster)
 
@@ -187,7 +191,7 @@ addJetCollection(
   labelName          = "AK4PF",
   jetSource          = cms.InputTag("ak4PFUnsubJets"),
   algo               = "ak", #name of algo must be in this format
-  rParam             = 0.4,
+  rParam             = jetR,
   pvSource           = cms.InputTag("offlineSlimmedPrimaryVertices"),
   pfCandidates       = cms.InputTag("packedPFCandidates"),
   svSource           = svSource,
@@ -198,10 +202,13 @@ addJetCollection(
   jetCorrections     = jetCorrectionsAK4,
 )
 process.patJetsAK4PFUnsubJets.useLegacyJetMCFlavour = False
+process.patJetPartonMatchAK4PFUnsubJets.maxDeltaR = jetR
+process.patJetPartonAssociationLegacyAK4PFUnsubJets.coneSizeToAssociate = min(jetR, 0.3)
 
 from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cff import ak4PFJets
 process.ak4PFUnsubJets = ak4PFJets.clone(
     src = 'packedPFCandidates',
+    rParam = jetR,
     jetPtMin = jetPtMin
 )
 process.patAlgosToolsTask.add(process.ak4PFUnsubJets)
@@ -214,7 +221,7 @@ addJetCollection(
   labelName          = "AKCs4PF",
   jetSource          = cms.InputTag("akCs4PFJets"),
   algo               = "ak", #name of algo must be in this format
-  rParam             = 0.4,
+  rParam             = jetR,
   pvSource           = cms.InputTag("offlineSlimmedPrimaryVertices"),
   pfCandidates       = cms.InputTag("packedPFCandidates"),
   svSource           = svSource,
@@ -225,6 +232,8 @@ addJetCollection(
   jetCorrections     = jetCorrectionsAK4,
 )
 process.patJetsAKCs4PF.embedPFCandidates = True
+process.patJetPartonMatchAKCs4PF.maxDeltaR = jetR
+process.patJetPartonAssociationLegacyAKCs4PF.coneSizeToAssociate = min(jetR, 0.3)
 
 from PhysicsTools.PatAlgos.producersHeavyIons.heavyIonJets_cff import PackedPFTowers, hiPuRho
 process.PackedPFTowers = PackedPFTowers.clone()
@@ -234,6 +243,7 @@ process.hiPuRho = hiPuRho.clone(
 from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cff import akCs4PFJets
 process.akCs4PFJets = akCs4PFJets.clone(
     src = 'packedPFCandidates',
+    rParam = jetR,
     jetPtMin = jetPtMin
 )
 for mod in ["PackedPFTowers", "hiPuRho", "akCs4PFJets"]:
@@ -264,6 +274,10 @@ process.patAlgosToolsTask.add(process.unsubUpdatedPatJetsDeepFlavour)
 
 process.pfUnifiedParticleTransformerAK4JetTagsDeepFlavour.model_path = 'DeepNTuples/DeepNtuplizer/data/UParTAK4_HIMG5132XADV.onnx'
 process.pfUnifiedParticleTransformerAK4TagInfosDeepFlavour.sort_cand_by_pt = True
+
+process.pfImpactParameterTagInfosDeepFlavour.maxDeltaR = jetR
+for taginfo in ["pfDeepFlavourTagInfosDeepFlavour", "pfParticleTransformerAK4TagInfosDeepFlavour", "pfUnifiedParticleTransformerAK4TagInfosDeepFlavour"]:
+    getattr(process, taginfo).jet_radius = jetR
 
 if hasattr(process,'updatedPatJetsTransientCorrectedDeepFlavour'):
     process.updatedPatJetsTransientCorrectedDeepFlavour.addTagInfos = True
@@ -297,6 +311,7 @@ process.patGenJetMatchWithNu = patJetGenJetMatch.clone(
     src         = "selectedUpdatedPatJetsDeepFlavour", # RECO jets (any View<Jet> is ok)
     matched     = "ak4GenJetsWithNu",  # GEN jets  (must be GenJetCollection)
     resolveAmbiguities = True,         # Forbid two RECO objects to match to the same GEN object
+    maxDeltaR = jetR,
 )
 process.patGenJetMatchAllowDuplicates = process.patGenJetMatchWithNu.clone(
     resolveAmbiguities = False,        # Forbid two RECO objects to match to the same GEN object
@@ -342,6 +357,7 @@ process.deepntuplizer.applySelection = options.selectJets
 process.deepntuplizer.tagInfoName = "pfDeepCSV"
 process.deepntuplizer.jetPtMin = jetPtMin
 process.deepntuplizer.jetAbsEtaMax = jetAbsEtaMax
+process.deepntuplizer.jetR = jetR
 process.deepntuplizer.gluonReduction  = options.gluonReduction
 
 process.deepntuplizer.packed = "packedGenParticlesSignal"
